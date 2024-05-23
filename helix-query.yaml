@@ -1,44 +1,39 @@
 version: 1
-# See https://www.hlx.live/docs/setup-indexing.
-
 indices:
-  site:
+  en:
     include:
-      - '/mysite/**'
+      - /
     exclude:
-      - '**/Document.*'
-    # target: SharePoint URL of your query index, e.g. <shared-folder-url>/query-index.xlsx
-    target: /mysite/query-index.json
+      - '/_sandbox/**'
+    target: /en-index.json
     properties:
-      author:
-        select: head > meta[name="author"]
-        value: |
-          attribute(el, 'content')
       title:
         select: head > meta[property="og:title"]
-        value: |
-          attribute(el, 'content')
-      date:
-        select: head > meta[name="publication-date"]
-        value: |
-          dateValue(attribute(el, 'content'), 'MM-DD-YYYY')
+        value: attribute(el, "content")
       image:
         select: head > meta[property="og:image"]
-        value: |
-          match(attribute(el, 'content'), 'https:\/\/[^/]+(\/.*)')
+        value: match(attribute(el, "content"), "https:\/\/[^/]+(/.*)")
+      thumbnail:
+        select: head > meta[name="thumbnail"]
+        value: attribute(el, "content")
       description:
         select: head > meta[name="description"]
-        value: |
-          attribute(el, 'content')
+        value: attribute(el, "content")
+      type:
+        select: head > meta[name="template"]
+        value: attribute(el, "content")
+      publicationType:
+        select: head > meta[name="publication-type"]
+        value: attribute(el, "content")  
+      identifier:
+        select: head > meta[name="identifier"]
+        value: attribute(el, "content")
       category:
         select: head > meta[name="category"]
-        value: |
-          attribute(el, 'content')
-      topics:
-        select: head > meta[name="topics"]
-        value: |
-          attribute(el, 'content')
-      lastModified:
-        select: none
-        value: |
-          parseTimestamp(headers['last-modified'], 'ddd, DD MMM YYYY hh:mm:ss GMT')
+        value: attribute(el, "content")
+      subCategory:
+        select: head > meta[name="sub-category"]
+        value: attribute(el, "content")
+      technologyType:
+        select: head > meta[name="technology-type"]
+        value: attribute(el, "content")
