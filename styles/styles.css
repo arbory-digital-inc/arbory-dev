@@ -10,19 +10,20 @@
  * governing permissions and limitations under the License.
  */
 
-:root {
+ :root {
   /* colors */
-  --link-color: #035fe6;
-  --link-hover-color: #136ff6;
-  --background-color: white;
-  --light-color: #eee;
-  --dark-color: #ccc;
-  --text-color: black;
+  --link-color: #62a814;
+  --link-hover-color: #406e0c;
+  --background-color: #272B36;
+  --overlay-background-color: #272B36;
+  --highlight-background-color: #232323;
+  --text-color: #FFFFFF;
+  
 
   /* fonts */
   --body-font-family: roboto, roboto-fallback;
   --heading-font-family: var(--body-font-family);
-  --fixed-font-family: "Roboto Mono", menlo, consolas, "Liberation Mono", monospace;
+  --fixed-font-family: 'Roboto Mono', menlo, consolas, 'Liberation Mono', monospace;
 
   /* body sizes */
   --body-font-size-m: 22px;
@@ -37,21 +38,20 @@
   --heading-font-size-s: 20px;
   --heading-font-size-xs: 18px;
 
-  /* header */
+  /* nav height */
   --nav-height: 64px;
-  --breadcrumbs-height: 35px;
-  --header-height: var(--nav-height);
-  --breadcrumbs-font-size: 14px;
+
 }
 
 @font-face {
   font-family: roboto-fallback;
   size-adjust: 100.06%;
   ascent-override: 95%;
-  src: local("Arial");
+  src: local('Arial');
 }
 
-@media (width >= 900px) {
+
+@media (min-width: 900px) {
   :root {
     --heading-font-size-xxl: 60px;
     --heading-font-size-xl: 48px;
@@ -60,6 +60,13 @@
     --heading-font-size-s: 24px;
     --heading-font-size-xs: 22px;
   }
+}
+h1 {
+  text-shadow: 1px 0 0 #000, 0 -1px 0 #000, 0 1px 0 #000, -1px 0 0 #000;
+}
+
+h2 {
+  color: #62a814;
 }
 
 body {
@@ -72,59 +79,50 @@ body {
   display: none;
 }
 
-@media screen and (min-width: 900px) {
-  body.breadcrumbs-enabled {
-    --header-height: calc(var(--nav-height) + var(--breadcrumbs-height));
-  }
-}
-
 body.appear {
-  display: block;
+  display: unset;
 }
 
 header {
-  height: var(--header-height);
+  height: var(--nav-height);
 }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
+h1, h2, h3,
+h4, h5, h6 {
   font-family: var(--heading-font-family);
   font-weight: 600;
   line-height: 1.25;
   margin-top: 1em;
-  margin-bottom: 0.5em;
-  scroll-margin: calc(var(--header-height) + 1em);
+  margin-bottom: .5em;
+  scroll-margin: calc(var(--nav-height) + 1em);
 }
 
-h1 { font-size: var(--heading-font-size-xxl); }
-h2 { font-size: var(--heading-font-size-xl); }
-h3 { font-size: var(--heading-font-size-l); }
-h4 { font-size: var(--heading-font-size-m); }
-h5 { font-size: var(--heading-font-size-s); }
-h6 { font-size: var(--heading-font-size-xs); }
+h1 { font-size: var(--heading-font-size-xxl) }
+h2 { font-size: var(--heading-font-size-xl) }
+h3 { font-size: var(--heading-font-size-l) }
+h4 { font-size: var(--heading-font-size-m) }
+h5 { font-size: var(--heading-font-size-s) }
+h6 { font-size: var(--heading-font-size-xs) }
 
-p,
-dl,
-ol,
-ul,
-pre,
-blockquote {
+p, dl, ol, ul, pre, blockquote {
   margin-top: 1em;
   margin-bottom: 1em;
 }
 
-code,
-pre {
+hr {
+  margin-top: 1.5em;
+  margin-bottom: 1.5em;
+  border: 0;
+  border-bottom: 1px solid var(--overlay-background-color);
+}
+
+code, pre, samp {
   font-family: var(--fixed-font-family);
   font-size: var(--body-font-size-s);
 }
 
-code {
-  padding: 0.125em;
+code, samp {
+  padding: .125em;
 }
 
 pre {
@@ -132,14 +130,13 @@ pre {
 }
 
 main pre {
-  background-color: var(--light-color);
+  background-color: var(--overlay-background-color);
   padding: 1em;
-  border-radius: 0.25em;
+  border-radius: .25em;
   overflow-x: auto;
   white-space: pre;
 }
 
-/* links */
 a:any-link {
   color: var(--link-color);
   text-decoration: none;
@@ -151,8 +148,7 @@ a:hover {
 }
 
 /* buttons */
-a.button:any-link,
-button {
+a.button:any-link, button {
   font-family: var(--body-font-family);
   display: inline-block;
   box-sizing: border-box;
@@ -172,25 +168,55 @@ button {
   border-radius: 30px;
 }
 
-a.button:hover,
-a.button:focus,
-button:hover,
-button:focus {
+a.button:hover, a.button:focus, button:hover, button:focus  {
   background-color: var(--link-hover-color);
   cursor: pointer;
 }
 
-button:disabled,
-button:disabled:hover {
-  background-color: var(--light-color);
+button:disabled, button:disabled:hover {
+  background-color: var(--overlay-background-color);
   cursor: unset;
 }
 
-a.button.secondary,
-button.secondary {
+a.button.secondary, button.secondary {
   background-color: unset;
   border: 2px solid currentcolor;
+  color: var(--text-color)
+}
+
+main input {
+  font-size: 1.25rem;
+  width: 100%;
+  max-width: 50rem;
+  display: block;
+  margin-bottom: 1rem;
+  padding: 0.75rem 0.6rem;
+  border-radius: 0.25rem;
+  box-sizing: border-box;
+  border: 1px solid var(--text-color);
   color: var(--text-color);
+  background-color: var(--background-color);
+}
+
+main input:hover {
+  border: 1px solid var(--text-color);
+}
+
+main blockquote {
+  font-style: italic;
+  margin: 3rem;
+  text-indent: -1rem;
+  hanging-punctuation: first;
+}
+
+main blockquote p::before {
+  content: "“";
+  line-height: 0;
+}
+
+main blockquote p::after {
+  content: "”";
+  line-height: 0;
 }
 
 main img {
@@ -205,23 +231,22 @@ main img {
   width: 24px;
 }
 
-.icon img {
+.icon svg {
   height: 100%;
   width: 100%;
 }
 
-/* sections */
 main .section {
   padding: 64px 16px;
 }
 
-@media (width >= 600px) {
+@media (min-width: 600px) {
   main .section {
     padding: 64px 32px;
   }
 }
 
-@media (width >= 900px) {
+@media (min-width: 900px) {
   .section > div {
     max-width: 1200px;
     margin: auto;
@@ -229,7 +254,11 @@ main .section {
 }
 
 /* section metadata */
-main .section.light,
 main .section.highlight {
-  background-color: var(--light-color);
+  background-color: var(--highlight-background-color);
+}
+
+::selection {
+  color: white;
+  background-color: #62a814;
 }
