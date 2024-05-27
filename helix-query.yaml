@@ -29,7 +29,7 @@ indices:
       
   sitemap:
     include:
-      - /**
+      - /
     target: /sitemap.json
     properties:
       author:
