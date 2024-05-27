@@ -27,7 +27,7 @@ indices:
         value: |
           attribute(el, "content")
       
-  en:
+  sitemap:
     include:
       - /**
     target: /sitemap.json
