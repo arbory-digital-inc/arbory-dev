@@ -4,12 +4,29 @@ indices:
       - /**
     exclude:
       - /_sandbox/**
-    target: /test.json
+    target: /blog.json
     properties:
       author:
         select: main > div:nth-of-type(3) > p:nth-of-type(1)
         value: |
           match(el, 'by (.*)')
+      title:
+        select: head > meta[property="og:title"]
+        value: |
+          attribute(el, "content")
+      image:
+        select: head > meta[property="og:image"]
+        value: |
+          match(attribute(el, "content"), "https:\/\/[^/]+(/.*)")
+      thumb:
+        select: head > meta[name="thumbnail"]
+        value: |
+          attribute(el, "content")
+      mydescription:
+        select: head > meta[name="description"]
+        value: |
+          attribute(el, "content")
+      
   en:
     include:
       - /**
@@ -31,7 +48,7 @@ indices:
         select: head > meta[name="thumbnail"]
         value: |
           attribute(el, "content")
-      description:
+      mydescription:
         select: head > meta[name="description"]
         value: |
           attribute(el, "content")
