@@ -11,6 +11,13 @@ window.dispatchEvent(new Event('gtaginit'));
 gtag('js', new Date());
 gtag('config', 'G-9RTBV1LRPP');`;
 
+
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-9RTBV1LRPP');
+
+
 function createInlineScript(innerHTML, parent) {
 const script = document.createElement('script');
 script.type = 'text/partytown';
