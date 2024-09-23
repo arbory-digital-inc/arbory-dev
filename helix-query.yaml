@@ -3,7 +3,7 @@ indices:
     include:
       - /**
     exclude:
-      - /_sandbox/**
+      - /0-sandbox/**
     target: /blog.json
     properties:
       author:

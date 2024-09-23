@@ -1,0 +1,4 @@
+sitemaps:
+   example:
+     source: /blog.json
+     destination: /sitemap.xml
