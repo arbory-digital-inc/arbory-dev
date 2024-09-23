@@ -3,3 +3,4 @@ sitemaps:
      source: /blog.json
      destination: /sitemap.xml
      lastmod: YYYY-MM-DD
+     hreflang: en
