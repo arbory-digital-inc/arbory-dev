@@ -9,6 +9,8 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
+/* Cloned from Adobe aem-boilerplate 25 Sept 2024 */
+
 
 /* eslint-env browser */
 function sampleRUM(checkpoint, data) {
