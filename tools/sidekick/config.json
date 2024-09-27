@@ -1,0 +1,5 @@
+{
+    "project": "Arbory Blog",
+    "editUrlLabel": "Document Authoring",
+    "editUrlPattern": "https://da.live/edit#/{{org}}/{{site}}{{pathname}}"
+}
