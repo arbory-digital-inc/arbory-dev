@@ -113,3 +113,6 @@ body > main > div:nth-child(6) > div:nth-child(3) > p{
   text-align: center;
   font-style: italic;
 }
+#adobe-experience-manager-news {
+  border-bottom: solid 6px #272B36 !important;
+}
