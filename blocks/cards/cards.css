@@ -1,31 +1,115 @@
+.cards-container h2{
+  font-size: 2.1em;
+  padding-bottom: 20px;
+  text-align: center;
+  border-bottom: solid 6px #191B22;
+}
+
+.cards-container{
+  background-color: var(--background-color) !important;
+}
+
+.cards-wrapper{
+  padding: 20px 0;
+}
+
 .cards > ul {
   list-style: none;
   margin: 0;
   padding: 0;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  grid-gap: 16px;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-gap: 20px;
+  place-content: center;
+  justify-content: center;
+  align-content: center;
+}
+
+@media (max-width: 900px) {
+  .cards > ul {
+    display: grid;
+    column-gap: 20px;
+    row-gap: 20px;
+    grid-template-columns: 1fr;
+    justify-content: center;
+  }
+}
+
+.cards > ul > li {
+  place-content: center;
 }
 
 .cards > ul > li {
   border: 1px solid var(--highlight-background-color);
-  background-color: var(--background-color)
+  background-color: var(--cards-bg-color);
+  border-radius: 8px;
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
 }
 
 .cards .cards-card-body {
   margin: 16px;
+  padding:12px 6px;
 }
 
 .cards .cards-card-image {
   line-height: 0;
+  background-color: var(--cards-bg-color);
+  border-radius: 6px;
+  padding: 40px 20px 0 20px;
+}
+
+.cards .cards-card-image h1{
+  margin: 0;
 }
 
 .cards .cards-card-body > *:first-child {
   margin-top: 0;
 }
 
-.cards > ul > li img {
+
+.cards-card-image > picture > img {
+  max-height: 200px;
   width: 100%;
-  aspect-ratio: 4 / 3;
   object-fit: cover;
+  border-radius: 6px;
+}
+
+.cards-card-image > picture > source{
+  border-radius: 6px;
+}
+
+.cards a{
+  transition: all 200ms ease-in-out;
+  font-size: 1.2em;
+  font-family: 'Poppins';
+}
+
+.cards strong{
+  font-size:1.1em;
+}
+
+.cards p{
+  text-align:center;
+  font-size: 0.8em;
+}
+
+.cards a:hover{
+  transition: all 200ms ease-in-out;
+  text-decoration: none;
+}
+
+body > main > div.section.highlight.cards-container {
+  background-color: #191B22 !important;
+}
+body > main > div.section.highlight.cards-container > div.cards-wrapper > div > ul > li{
+  background-color: #272B36;
+}
+body > main > div.section.highlight.cards-container > div.cards-wrapper > div > ul > li > div.cards-card-image{
+  background-color: #272B36;
+}
+
+body > main > div:nth-child(6) > div:nth-child(3) > p{
+  padding: 20px;
+  text-align: center;
+  font-style: italic;
 }

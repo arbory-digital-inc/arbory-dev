@@ -1,10 +1,77 @@
 .columns > div {
-  display: flex;
-  flex-direction: column;
+  display: inline-grid;
+  column-gap: 20px;
+  row-gap: 20px;
+  grid-template-columns: 1fr 1fr;
+  justify-content: space-between;
+  line-height: 1.5;
+}
+@media (max-width: 900px) {
+  .columns > div {
+    display: inline-grid;
+    column-gap: 10px;
+    row-gap: 10px;
+    grid-template-columns: 1fr;
+    justify-content: center;
+  }
+
+  .columns > div > div {
+    flex: 1;
+    order: unset;
+  }
 }
 
 .columns img {
   width: 100%;
+  border-radius: 6px;
+  -webkit-transition: all 200ms ease-in;
+  -webkit-transform: scale(1); 
+  -ms-transition: all 200ms ease-in;
+  -ms-transform: scale(1); 
+  -moz-transition: all 200ms ease-in;
+  -moz-transform: scale(1);
+  transition: all 200ms ease-in;
+  transform: scale(1);   
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
+}
+.columns img:hover{
+  box-shadow: rgba(0, 0, 0, 0.19) 0px 10px 20px, rgba(0, 0, 0, 0.23) 0px 6px 6px;
+  z-index: 2;
+  -webkit-transition: all 200ms ease-in;
+  -webkit-transform: scale(1.01);
+  -ms-transition: all 200ms ease-in;
+  -ms-transform: scale(1.01);   
+  -moz-transition: all 200ms ease-in;
+  -moz-transform: scale(1.01);
+  transition: all 200ms ease-in;
+  transform: scale(1.01);
+}
+@media (max-width: 900px) {
+  .columns picture{
+    display: grid;
+    place-content: center;
+  }
+}
+
+.columns a{
+  transition: all 200ms ease-in-out;
+  font-size: 1.2em;
+  font-family: 'Poppins';
+}
+
+.columns p{
+  padding: 10px 6px;
+  text-align:center;
+}
+@media (max-width: 900px) {
+  .columns p{
+    padding: 0px 10px 40px 10px;
+  }
+}
+
+.columns a:hover{
+  transition: all 200ms ease-in-out;
+  text-decoration: none;
 }
 
 .columns > div > div {
@@ -13,6 +80,7 @@
 
 .columns > div > .columns-img-col {
   order: 0;
+  align-items: center;
 }
 
 .columns > div > .columns-img-col img {
@@ -23,7 +91,8 @@
   .columns > div {
     align-items: center;
     flex-direction: unset;
-    gap: 32px;
+    gap: 30px;
+    padding-bottom:60px;
   }
 
   .columns > div > div {

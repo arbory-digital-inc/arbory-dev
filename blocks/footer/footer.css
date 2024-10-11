@@ -1,6 +1,6 @@
 footer {
   padding: 2rem;
-  background-color: var(--overlay-background-color);
+  background-color: var(--highlight-background-color);
   font-size: var(--body-font-size-s);
 }
 
@@ -11,4 +11,27 @@ footer .footer {
 
 footer .footer p {
   margin: 0;
+  width: 100%;
+  font-family: 'Poppins';
+  font-size: 0.9em;
+}
+
+footer .section div {
+  display: inline-grid;
+  column-gap: 20px;
+  row-gap: 20px;
+  grid-template-columns: 1fr 1fr;
+  justify-content: space-between;
+}
+
+footer > div > div > div > div > p.button-container {
+  display: grid;
+}
+
+footer > div > div > div > div > p.button-container > a {
+  justify-self: end;
+}
+
+footer > div > div > div > div > p:nth-child(1) {
+  place-content: center;
 }
