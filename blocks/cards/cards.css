@@ -1,5 +1,5 @@
 .cards-container h2{
-  font-size: 2.1em;
+  font-size: 2em;
   padding-bottom: 20px;
   text-align: center;
   border-bottom: solid 6px #191B22;
@@ -32,6 +32,8 @@
     row-gap: 20px;
     grid-template-columns: 1fr;
     justify-content: center;
+    align-items: center;
+    grid-template-rows: auto auto auto;
   }
 }
 
@@ -68,10 +70,19 @@
 
 
 .cards-card-image > picture > img {
-  max-height: 200px;
-  width: 100%;
-  object-fit: cover;
+  
+  width: 300px;
+  max-width: 100%;
+  object-fit: contain;
+  text-align: center;
   border-radius: 6px;
+  max-height: 250px;
+  align-self: center; 
+}
+
+.cards-card-image > picture{
+  display: grid;
+  justify-items: center;
 }
 
 .cards-card-image > picture > source{
@@ -90,7 +101,7 @@
 
 .cards p{
   text-align:center;
-  font-size: 0.8em;
+  font-size: 0.75em;
 }
 
 .cards a:hover{
