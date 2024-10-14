@@ -16,6 +16,10 @@ footer .footer p {
   font-size: 0.9em;
 }
 
+footer .footer p a {
+  margin:auto !important;
+}
+
 footer .section div {
   display: inline-grid;
   column-gap: 20px;
