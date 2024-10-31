@@ -27,7 +27,7 @@ indices:
       - /en/**
     exclude:
       - /en/drafts/**
-    target: /en/index.json
+    target: /en-index.json
     properties:
       author:
         select: head > meta[name="author"]
@@ -50,7 +50,7 @@ indices:
       - /fr/**
     exclude:
       - /fr/drafts/**
-    target: /fr/index.json
+    target: /fr-index.json
     properties:
       author:
         select: head > meta[name="author"]
