@@ -22,4 +22,49 @@ indices:
         select: head > meta[name="description"]
         value: |
           attribute(el, "content")
-      
+  arbory-en:
+    include:
+      - /en/**
+    exclude:
+      - /en/drafts/**
+    target: /en/index.json
+    properties:
+      author:
+        select: head > meta[name="author"]
+        value: |
+          attribute(el, "content")
+      title:
+        select: head > meta[property="og:title"]
+        value: |
+          attribute(el, "content")
+      image:
+        select: head > meta[property="og:image"]
+        value: |
+          match(attribute(el, "content"), "https:\/\/[^/]+(/.*)")
+      description:
+        select: head > meta[name="description"]
+        value: |
+          attribute(el, "content")
+  arbory-fr:
+    include:
+      - /fr/**
+    exclude:
+      - /fr/drafts/**
+    target: /fr/index.json
+    properties:
+      author:
+        select: head > meta[name="author"]
+        value: |
+          attribute(el, "content")
+      title:
+        select: head > meta[property="og:title"]
+        value: |
+          attribute(el, "content")
+      image:
+        select: head > meta[property="og:image"]
+        value: |
+          match(attribute(el, "content"), "https:\/\/[^/]+(/.*)")
+      description:
+        select: head > meta[name="description"]
+        value: |
+          attribute(el, "content")
