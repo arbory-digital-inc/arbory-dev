@@ -8,7 +8,7 @@
       "title": "Tag Browser",
       "environments": ["edit"],
       "daLibrary": true,
-      "url": "https://aem-tags--jmp-da--jmphlx.hlx.live/tools/tags.html"
+      "url": "/tools/tags.html"
     }
   ]
 }
