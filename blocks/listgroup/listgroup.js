@@ -14,6 +14,7 @@ import {
 export default async function decorate(block) {
   // Get language index.
   const languageIndexUrl = getLanguageIndex();
+  console.log(languageIndexUrl);
 
   const { data: allPages, columns: propertyNames } = await getJsonFromUrl(languageIndexUrl);
   let pageSelection = allPages;
