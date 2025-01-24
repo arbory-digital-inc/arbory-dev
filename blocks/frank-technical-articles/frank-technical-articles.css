@@ -1,5 +1,12 @@
 /* Made with love and chaos by your boy Frank */
 
+.frank-technical-articles-container h1{
+  font-size: 2em;
+  text-align: center;
+  font-weight: 400;
+  font-family: 'Poppins';
+}
+
 .frank-technical-articles-container{
   background-color: #191B22;
 }

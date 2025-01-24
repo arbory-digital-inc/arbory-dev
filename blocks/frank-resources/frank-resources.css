@@ -1,5 +1,12 @@
 /* Made with love and chaos by your boy Frank */
 
+.frank-resources-container h1{
+  font-size: 2em;
+  text-align: center;
+  font-weight: 400;
+  font-family: 'Poppins';
+}
+
 .resources-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);

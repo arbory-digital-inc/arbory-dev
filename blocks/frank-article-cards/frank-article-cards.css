@@ -8,11 +8,14 @@
     padding:1rem 0;
 }
 
-h1{
+.frank-article-cards-container h1{
     font-size: 2em;
     text-align: center;
     font-weight: 400;
     font-family: 'Poppins';
+}
+.frank-article-cards-container p{
+  text-align: left;
 }
 
 .article-cards {
