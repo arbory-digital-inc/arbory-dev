@@ -1,6 +1,8 @@
 .columns > div {
   display: flex;
   flex-direction: column;
+  padding-top: 20px;
+  padding-bottom: 20px;
 }
 
 .columns img {
@@ -17,7 +19,29 @@
 
 .columns > div > .columns-img-col img {
   display: block;
+  border-radius: 1rem;
+  padding: 5px;
+  transition: .25s ease;
 }
+.columns > div > .columns-img-col img:hover{
+  -webkit-transform: scale(1.02);
+  -ms-transform: scale(1.02);
+  transform: scale(1.02);
+  transition: 1s ease;
+  }
+
+.columns a{
+  transition: 0.25s ease;
+  text-decoration: none;
+
+}
+.columns a:hover{
+  transform: color;
+  transition: 0.5s ease;
+  text-decoration: none;
+}
+
+
 
 @media (min-width: 900px) {
   .columns > div {

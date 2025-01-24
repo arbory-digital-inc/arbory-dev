@@ -1,0 +1,119 @@
+/* Made with love and chaos by your boy Frank */
+
+.frank-article-cards-wrapper{
+    padding: 0.5rem 0 20px 0;
+}
+
+.section .frank-article-cards-container{
+    padding:1rem 0;
+}
+
+h1{
+    font-size: 2em;
+    text-align: center;
+    font-weight: 400;
+    font-family: 'Poppins';
+}
+
+.article-cards {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1rem;
+  }
+  
+  @media (min-width: 768px) {
+    .article-cards {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  
+  .article-card {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    background: #191B22;
+    border: 1px solid #406e0c80;
+    overflow: hidden;
+    border-radius: 1rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  }
+  
+  .article-card:hover {
+    transform: translateY(-5px);
+    text-decoration: none;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2), 0 10px 10px rgba(0, 0, 0, 0.18);
+  }
+  
+  .article-card-image img {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16/9;
+    object-fit: cover;
+  }
+  
+  .article-card-content {
+    padding: 1.25rem;
+    padding-top: 0.75rem;
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+    padding-bottom: 1.25rem;
+  }
+  
+  .article-card-content h1,
+  .article-card-content h2,
+  .article-card-content h3,
+  .article-card-content h4,
+  .article-card-content h5,
+  .article-card-content h6 {
+    margin: 0 0 1rem;
+    font-size: 1.35rem;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-align: center;
+    font-family: 'Poppins';
+    font-weight: 500;
+  }
+  
+  .article-card-content p {
+    margin: 0;
+    color: #f7f7f7;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    font-size: 1.1rem;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-align: center;
+  }
+  
+  .load-more-wrapper {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: center;
+    margin-top: 0.5rem;
+  }
+  
+  .load-more-button {
+    background: #406E0C;
+    color: white;
+    border: none;
+    padding: 1rem 2rem;
+    cursor: pointer;
+    font-family: 'Poppins';
+    font-size: 1.25rem;
+    border-radius: 1rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  }
+  
+  .load-more-button:hover {
+    transform: translateY(-5px);
+    text-decoration: none;
+    box-shadow: 0 10px 22px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
+  }

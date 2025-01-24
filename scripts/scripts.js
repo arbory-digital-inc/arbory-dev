@@ -78,6 +78,54 @@ async function loadEager(doc) {
   const main = doc.querySelector('main');
   if (main) {
     decorateMain(main);
+
+    function smoothScroll() {
+      // For all scrollable elements
+      const scrollableElements = [
+        document.documentElement,
+        document.body,
+        ...Array.from(document.querySelectorAll('*')).filter(el => {
+          const style = window.getComputedStyle(el);
+          return ['auto', 'scroll'].includes(style.overflowY) || ['auto', 'scroll'].includes(style.overflow);
+        })
+      ];
+    
+      // Apply smooth scroll to all scrollable elements
+      scrollableElements.forEach(element => {
+        if (element) {
+          element.style.scrollBehavior = 'smooth';
+        }
+      });
+    
+      // Handle anchor links
+      document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+          e.preventDefault();
+          const targetId = this.getAttribute('href').slice(1);
+          const targetElement = document.getElementById(targetId);
+          
+          if (targetElement) {
+            targetElement.scrollIntoView({
+              behavior: 'smooth',
+              block: 'start'
+            });
+          }
+        });
+      });
+    
+      // Handle programmatic scrolling
+      window.smoothScrollTo = (x, y) => {
+        window.scrollTo({
+          left: x,
+          top: y,
+          behavior: 'smooth'
+        });
+      };
+    }
+    
+    // Add to loadEager function in scripts.js
+    smoothScroll();
+    
     document.body.classList.add('appear');
     await loadSection(main.querySelector('.section'), waitForFirstImage);
   }
