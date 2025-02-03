@@ -1,5 +1,5 @@
 export default function decorate(block) {
-  // Comrade, we must prepare glorious video display
+  // In glorious motherland, video container finds you
   const videoContainer = block.querySelector('p');
   if (videoContainer) {
     const url = videoContainer.textContent.trim();
@@ -19,74 +19,62 @@ export default function decorate(block) {
       videoContainer.appendChild(video);
     }
   }
-
-  // Now we make text dance like ballerina in Bolshoi Theatre
+ 
+  // We seize all subtitle elements for glory of animation
   const subtitles = [...block.querySelectorAll('h6')];
-  let currentIndex = 0;
-
-  // Like good Soviet archive, we store original texts and clear workspace
   const texts = subtitles.map(subtitle => subtitle.textContent);
+  let currentIndex = 0;
+  let charIndex = 0;
+  let isDeleting = false;
+  let animationFrame;
+ 
+  // Clear text like KGB clearing documents, very efficient
   subtitles.forEach(subtitle => {
     subtitle.textContent = '';
     subtitle.classList.add('animate-in');
   });
-
-  // This function types text like old KGB typewriter, very precise
-  function typeWriter(element, text, callback) {
-    let index = 0;
-    element.textContent = '';
-    element.classList.add('typing');
-
-    function type() {
-      if (index < text.length) {
-        element.textContent += text.charAt(index);
-        index++;
-        setTimeout(type, 50);
+ 
+  // Main animation loop works like Soviet factory - continuous production!
+  function animate() {
+    const currentSubtitle = subtitles[currentIndex];
+    const fullText = texts[currentIndex];
+    
+    if (!isDeleting) {
+      if (charIndex <= fullText.length) {
+        // Type text like reliable Kalashnikov - never fails!
+        currentSubtitle.textContent = fullText.substring(0, charIndex);
+        charIndex++;
+        animationFrame = requestAnimationFrame(animate);
       } else {
-        // Wait two seconds, like waiting for train in Moscow winter
-        setTimeout(() => {
-          deleteText(element, callback);
-        }, 2000);
+        // Brief pause, like waiting in bread line
+        animationFrame = requestAnimationFrame(() => {
+          isDeleting = true;
+          animate();
+        });
+      }
+    } else {
+      if (charIndex > 0) {
+        // Delete text like disappearing dissident
+        currentSubtitle.textContent = fullText.substring(0, charIndex - 1);
+        charIndex--;
+        animationFrame = requestAnimationFrame(animate);
+      } else {
+        // Reset for next cycle, like five-year plan
+        isDeleting = false;
+        currentIndex = (currentIndex + 1) % texts.length;
+        charIndex = 0;
+        animationFrame = requestAnimationFrame(animate);
       }
     }
-
-    type();
   }
-
-  // Is like erasing secrets from document, da?
-  function deleteText(element, callback) {
-    function erase() {
-      if (element.textContent.length > 0) {
-        element.textContent = element.textContent.slice(0, -1);
-        setTimeout(erase, 30);
-      } else {
-        element.classList.remove('typing');
-        if (callback) callback();
-      }
+ 
+  // Begin great animation program! For the people!
+  animate();
+ 
+  // Clean up like good party member
+  return () => {
+    if (animationFrame) {
+      cancelAnimationFrame(animationFrame);
     }
-
-    erase();
-  }
-
-  // Function makes text appear like magic of Siberian circus
-  function animateNext() {
-    const currentElement = subtitles[currentIndex];
-    const text = texts[currentIndex];
-
-    // Type text like efficient Soviet worker
-    typeWriter(currentElement, text, () => {
-      // Move to next index
-      currentIndex = (currentIndex + 1) % texts.length;
-      // Begin next animation cycle, is perpetual like Russian winter
-      setTimeout(animateNext, 500);
-    });
-  }
-
-  // Start grand performance, tovarisch!
-  animateNext();
-
-  // Remove capitalist animation classes that AEM tries to add
-  subtitles.forEach(subtitle => {
-    subtitle.classList.remove('animate-in', 'typing');
-  });
-}
+  };
+ }
