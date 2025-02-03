@@ -1,11 +1,11 @@
 export default function decorate(block) {
-    // Add any additional classes to the block
+    // Saddle up this block with some extra style, partner
     block.classList.add('small-navbar');
     
-    // Get all button containers
+    // Round up all them button corrals
     const buttonContainers = block.querySelectorAll('.button-container');
     
-    // Add click event listeners for smooth scrolling
+    // Wrangle them click events for that smooth-as-butter scrollin'
     buttonContainers.forEach(container => {
       const button = container.querySelector('a.button');
       if (button && button.getAttribute('href').startsWith('#')) {
@@ -20,14 +20,14 @@ export default function decorate(block) {
               block: 'start'
             });
             
-            // Update URL without scrolling
+            // Brand the URL without spookin' the page
             history.pushState(null, '', `#${targetId}`);
           }
         });
       }
     });
   
-    // Handle active states
+    // Keep them buttons in line, like cattle on the trail
     function updateActiveButton() {
       const hash = window.location.hash;
       buttonContainers.forEach(container => {
@@ -42,7 +42,7 @@ export default function decorate(block) {
       });
     }
   
-    // Update active state on page load and hash change
+    // Keep yer eyes peeled for page loads and hash changes, pardner
     window.addEventListener('load', updateActiveButton);
     window.addEventListener('hashchange', updateActiveButton);
   }
