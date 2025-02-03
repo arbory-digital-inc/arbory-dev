@@ -20,7 +20,7 @@ export default function decorate(block) {
           const cardLink = document.createElement('a');
           cardLink.href = href;
           cardLink.className = 'article-card';
-          
+
           const imgWrapper = document.createElement('div');
           imgWrapper.className = 'article-card-image';
           imgWrapper.append(...imageCol.children);

@@ -4,8 +4,8 @@
     padding: 0.5rem 0 20px 0;
 }
 
-.section .frank-article-cards-container{
-    padding:1rem 0;
+.frank-article-cards-container{
+    padding: 0rem 0.5rem 2rem 0.5rem !important;
 }
 
 .frank-article-cards-container h1{

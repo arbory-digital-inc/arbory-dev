@@ -7,6 +7,10 @@
   font-family: 'Poppins';
 }
 
+.frank-resources-container{
+  padding: 2rem 0.5rem 2rem 0.5rem !important;
+}
+
 .resources-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);

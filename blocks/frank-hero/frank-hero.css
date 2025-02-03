@@ -1,64 +1,141 @@
-/* Made with moon energy crystals by your boy Frank */
+.frank-hero-container .frank-hero-wrapper {
+  max-width: unset;
+  padding: 0;
+  max-height: 400px;
+}
 
-.frank-hero-container {
-  max-width: 100% !important;
+.frank-hero-container{
+
   padding: 0 !important;
 }
 
-.frank-hero-wrapper {
+.frank-hero {
   position: relative;
-  max-width: 100% !important;
-  height: 600px;
+  height: 400px;
+  width: 100%;
   overflow: hidden;
 }
 
-.frank-hero {
+/* Video Background */
+.frank-hero video {
   position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: left;
-}
-
-.frank-hero picture {
-  position: absolute;
-  inset: 0;
-}
-
-.frank-hero img {
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
+  z-index: 0;
 }
 
-.frank-hero h1 {
-  position: relative;
-  font-size: 2rem;
-  background: #191B22;
-  text-align: left;
-  border-radius: 0rem 1rem 0 0;
-  padding: 1.5rem 2rem 0rem 2rem;
-  font-family: 'Poppins';
-  line-height: 1.4;
-  margin-bottom: 0;
+/* Hide the video wrapper paragraph */
+.frank-hero > div > div > p:first-child {
+  margin: 0;
+  padding: 0;
+}
+
+/* Content Container */
+.frank-hero > div {
+  z-index: 1;
+  height: 300px;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: grid;
+  grid-template-columns: 1.4fr 0.6fr;
+  padding: 40px;
+}
+
+.frank-hero > div > div {
+  display: grid;
+  align-items: center;
+  align-content: center;
+}
+
+/* Left Column Content */
+.frank-hero > div > div > h1 {
+  grid-column: 1;
+  align-self: center;
+  color: white;
+  font-size: 3.5rem;
+  font-weight: 500;
   z-index: 1;
   margin: 0;
-  font-weight: 200;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+  padding-right: 40px;
+  font-family: 'Poppins';
 }
 
-.frank-hero h2 {
-  position: relative;
+/* H6 Container */
+.frank-hero > div > div > h6 {
+  grid-column: 1;
+  top: calc(50% + 80px); /* Position below h1 */
+  left: 40px;
+  font-family: 'Poppins';
+  color: #f7f7f7;
+  font-size: 1.125rem;
+  font-weight: 400;
+  line-height: 1.5;
+  margin: 0;
+  min-height: 1.5em;
+  z-index: 1;
+}
+
+/* Logo Column */
+.frank-hero > div > div > p:last-child {
+  grid-column: 2;
+  align-self: center;
+  justify-self: center;
+  margin: 0;
+  width: 100%;
+  z-index: 1;
+}
+
+.frank-hero picture {
+  display: block;
+  width: 100%;
   text-align: center;
-  margin-top: 0;
-  font-size: 6rem;
-  background: #191B22;
-  border-radius: 0 0 1rem 0rem;
-  padding: 0rem 2.5rem 2rem 2rem;
-  font-family: 'Poppins';
   z-index: 1;
-  line-height: 1;
-  margin: 0;
-  font-weight: 600;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+}
+
+.frank-hero picture img {
+  max-width: 250px;
+  z-index: 1;
+}
+
+/* Typing cursor */
+.frank-hero h6.typing::after {
+  content: "▊";
+  display: inline-block;
+  margin-left: 2px;
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* Mobile Adjustments */
+@media (max-width: 768px) {
+  .frank-hero > div > div {
+    grid-template-columns: 1fr;
+    text-align: center;
+    padding: 20px;
+  }
+
+  .frank-hero > div > div > h1 {
+    grid-column: 1;
+    padding-right: 0;
+    font-size: 2.5rem;
+  }
+
+  .frank-hero > div > div > h6 {
+    grid-column: 1;
+    top: calc(50% + 60px);
+    left: 20px;
+    right: 20px;
+    text-align: center;
+  }
+
+  .frank-hero > div > div > p:last-child {
+    grid-column: 1;
+    margin-top: 160px;
+  }
 }
