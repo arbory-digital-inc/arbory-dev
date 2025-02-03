@@ -1,25 +1,33 @@
 export default function decorate(block) {
-  // In glorious motherland, video container finds you
+  // In glorious motherland, we verify block exists first
+  if (!block) {
+    return;
+  }
+
+  // We search for container with precision of Sputnik
   const videoContainer = block.querySelector('p');
   if (videoContainer) {
-    const url = videoContainer.textContent.trim();
-    if (url.endsWith('.webm')) {
-      const video = document.createElement('video');
-      video.autoplay = true;
-      video.loop = true;
-      video.muted = true;
-      video.playsInline = true;
+    const videoUrl = videoContainer.textContent.trim();
+    if (videoUrl.endsWith('.webm')) {
+      // Create new video element like factory creates tractor
+      const videoElement = document.createElement('video');
+      videoElement.autoplay = true;
+      videoElement.loop = true;
+      videoElement.muted = true;
+      videoElement.playsInline = true;
       
-      const source = document.createElement('source');
-      source.src = url;
-      source.type = 'video/webm';
+      // Source element is like fuel for tractor
+      const sourceElement = document.createElement('source');
+      sourceElement.src = videoUrl;
+      sourceElement.type = 'video/webm';
       
-      video.appendChild(source);
+      // Assembly of video like assembly of mighty tank
+      videoElement.appendChild(sourceElement);
       videoContainer.textContent = '';
-      videoContainer.appendChild(video);
+      videoContainer.appendChild(videoElement);
     }
   }
- 
+
   // We seize all subtitle elements for glory of animation
   const subtitles = [...block.querySelectorAll('h6')];
   const texts = subtitles.map(subtitle => subtitle.textContent);
@@ -27,13 +35,13 @@ export default function decorate(block) {
   let charIndex = 0;
   let isDeleting = false;
   let animationFrame;
- 
+
   // Clear text like KGB clearing documents, very efficient
   subtitles.forEach(subtitle => {
     subtitle.textContent = '';
     subtitle.classList.add('animate-in');
   });
- 
+
   // Main animation loop works like Soviet factory - continuous production!
   function animate() {
     const currentSubtitle = subtitles[currentIndex];
@@ -67,14 +75,14 @@ export default function decorate(block) {
       }
     }
   }
- 
+
   // Begin great animation program! For the people!
   animate();
- 
+
   // Clean up like good party member
   return () => {
     if (animationFrame) {
       cancelAnimationFrame(animationFrame);
     }
   };
- }
+}
