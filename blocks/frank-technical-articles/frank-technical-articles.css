@@ -47,7 +47,7 @@
  
 .frank-technical-articles .article-content {
   display: flex;
-  gap: 0.5rem;
+  gap: 0.25rem;
   align-items: flex-start;
   position: relative;
   height: 100%;
@@ -72,7 +72,7 @@
 }
  
 .frank-technical-articles h3 {
-  font-size: 1.25rem;
+  font-size: 1.15rem;
   font-weight: 500;
   color: #406E0C;
   font-family: 'Poppins';
@@ -97,7 +97,6 @@
   padding-right: 0.5rem;
   line-height: 1.4;
   display: -webkit-box;
-  -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
 
   flex-grow: 1;
@@ -118,5 +117,11 @@
 @media (max-width: 768px) {
   .frank-technical-articles > ul {
     grid-template-columns: 1fr;
+  }
+}
+
+@media screen and (max-width: 730px) {
+  .article-content > .text-content > h3 > a {
+      font-size: 0.75em;
   }
 }
