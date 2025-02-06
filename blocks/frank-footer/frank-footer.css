@@ -77,15 +77,6 @@
     justify-self: center;
 }
 
-.footer-row-2 .button-container .button{
-    background-color: transparent;
-    color: #f7f7f7;
-    font-weight: 400;
-    font-family: 'Poppins';
-    font-size: 0.75em;
-
-}
-
 .footer-row-2 > div > p > a > picture {
     width: 20px;
     justify-self: end;
@@ -93,6 +84,12 @@
     display: inline-flex;
     padding: 1rem;
     align-self: center;
+    transition: all 500ms ease;
+}
+.footer-row-2 > div > p > a > picture:hover {
+    background-color: #191B22;
+    border-radius: 0.5rem;
+    width: 25px;
 }
 
 .footer-bottom div{
