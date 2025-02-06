@@ -1,0 +1,113 @@
+/* made with earth energy crystals by ur boy frank */
+
+.frank-footer-wrapper {
+    max-width: 100%;
+    
+}
+
+@media screen and (max-width: 730px) {
+    .footer-row-1 {
+        text-align: center;
+    }
+}
+
+.footer-row-1 {
+    padding-bottom: 3rem;
+    justify-content: center;
+    display: flex;
+}
+
+.footer-row-1 div {
+    display: inline-flex;
+    
+}
+
+.footer-row-1 p {
+    font-size: 0.75em;
+    display: inline-flex;
+    margin: auto;
+    padding: 0.5rem;
+    font-family: 'Poppins';
+}
+
+.footer-row-1 > div.button-container.footer-button > p > a{
+    border-radius: 0.5rem;
+    background-color: #406e0c;
+    color: #f7f7f7;
+    transition: background-color;
+    transition-timing-function: ease;
+    transition-duration: 0.3s;
+}
+.footer-row-1 > div.button-container.footer-button > p > a:hover{
+    background-color: #191B22;
+}
+
+.footer-row-1 .footer-button {
+    justify-self: end;
+    display: inline-flex;
+    font-family: 'Poppins';
+}
+
+.footer-row-1 .footer-button a {
+    display: inline-flex;
+    font-size: 0.9em;
+}
+
+.frank-footer {
+    width: 100%;
+}
+
+.footer-row-2 {
+    display: grid;
+    grid-template-columns: 1fr 3fr;
+    grid-template-rows: 1fr;
+    grid-column-gap: 0px;
+    grid-row-gap: 0px;
+    width: 100%;
+}
+.footer-row-2 div{
+    display: flex;
+    justify-self: end;
+    align-items: center;
+}
+
+.footer-row-2 > div > picture{
+    width: 250px;
+    align-self: center;
+    justify-self: center;
+}
+
+.footer-row-2 .button-container .button{
+    background-color: transparent;
+    color: #f7f7f7;
+    font-weight: 400;
+    font-family: 'Poppins';
+    font-size: 0.75em;
+
+}
+
+.footer-row-2 > div > p > a > picture {
+    width: 20px;
+    justify-self: end;
+    color: #f7f7f7;
+    display: inline-flex;
+    padding: 1rem;
+    align-self: center;
+}
+
+.footer-bottom div{
+    display: flex;
+    justify-content: center;
+}
+
+.footer-bottom div p{
+    justify-items: center;
+}
+
+.footer-bottom div p .button{
+    background-color: transparent;
+    color: #f7f7f7;
+    font-weight: 300;
+    font-family: 'Poppins';
+    font-size: 0.6em;
+}

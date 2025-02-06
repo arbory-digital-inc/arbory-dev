@@ -47,7 +47,6 @@ export default function decorate(block) {
     // PART 2: TEXT ANIMATION
     // Get all h6 elements that will be animated
     const subtitles = [...block.querySelectorAll('h6')];
-    console.log('Found subtitles:', subtitles.length);
     
     // Exit if no subtitles found
     if (subtitles.length === 0) {
