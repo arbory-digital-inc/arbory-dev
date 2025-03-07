@@ -1,26 +1,26 @@
 /* Made with love and chaos by your boy Frank */
 
-.frank-technical-articles-container h1{
+.technical-articles-container h1{
   font-size: 2em;
   text-align: center;
   font-weight: 400;
   font-family: 'Poppins';
 }
 
-.frank-technical-articles-container{
+.technical-articles-container{
   background-color: #191B22;
   padding: 2rem 0.5rem 2rem 0.5rem !important;
   box-shadow: 0px 2px 4px rgba(0,0,0,0.15);
 }
 
 
-.frank-technical-articles-container .frank-technical-articles {
+.technical-articles-container .technical-articles {
   margin: 0 auto;
   max-width: 1200px;
   padding: 10px 10px 80px 10px;
 }
  
-.frank-technical-articles-container .frank-technical-articles > ul {
+.technical-articles-container .technical-articles > ul {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 1rem;
@@ -30,7 +30,7 @@
 
 }
  
-.frank-technical-articles-container .frank-technical-articles > ul > li {
+.technical-articles-container .technical-articles > ul > li {
   padding: 0;
   border: 1px solid #406e0c80;
   border-radius: 0.5rem;
@@ -39,13 +39,13 @@
   background: #272B36;
 }
  
-.frank-technical-articles-container .frank-technical-articles > ul > li:hover {
+.technical-articles-container .technical-articles > ul > li:hover {
   transform: translateY(-5px);
   text-decoration: none;
   box-shadow: 0 8px 28px rgba(0, 0, 0, 0.25), 0 5px 10px rgba(0, 0, 0, 0.22);
 }
  
-.frank-technical-articles-container .frank-technical-articles .article-content {
+.technical-articles-container .technical-articles .article-content {
   display: flex;
   gap: 0.25rem;
   align-items: flex-start;
@@ -54,7 +54,7 @@
   padding-right: 12px;
 }
  
-.frank-technical-articles-container .frank-technical-articles .icon {
+.technical-articles-container .technical-articles .icon {
   display: flex;
   align-self: center;
   justify-content: center;
@@ -66,12 +66,12 @@
   border-radius: 0.5rem;
 }
 
-.frank-technical-articles-container .frank-technical-articles .article-content .icon{
+.technical-articles-container .technical-articles .article-content .icon{
   width: 25px;
   height: 25px;
 }
  
-.frank-technical-articles-container .frank-technical-articles h3 {
+.technical-articles-container .technical-articles h3 {
   font-size: 1.15rem;
   font-weight: 500;
   color: #406E0C;
@@ -81,7 +81,7 @@
   margin-bottom: 0.5rem;
 }
 
-.frank-technical-articles-container .frank-technical-articles h3 a {
+.technical-articles-container .technical-articles h3 a {
   color: #62a814;
   text-decoration: none;
   display: block;
@@ -89,7 +89,7 @@
   margin:0;
 }
  
-.frank-technical-articles-container .frank-technical-articles p {
+.technical-articles-container .technical-articles p {
   font-size: 0.875rem;
   color: #f7f7f7;
   margin-top: 0.5rem;
@@ -102,26 +102,26 @@
   flex-grow: 1;
 }
 
-.frank-technical-articles-container .text-content{
+.technical-articles-container .text-content{
   display: block;
   align-self: center;
   text-overflow: ellipsis;
 }
  
 @media (max-width: 1024px) {
-  .frank-technical-articles-container .frank-technical-articles > ul {
+  .technical-articles-container .technical-articles > ul {
     grid-template-columns: repeat(1, 1fr);
   }
 }
 
 @media (max-width: 768px) {
-  .frank-technical-articles-container .frank-technical-articles > ul {
+  .technical-articles-container .technical-articles > ul {
     grid-template-columns: 1fr;
   }
 }
 
 @media screen and (max-width: 730px) {
-  .frank-technical-articles-container .article-content > .text-content > h3 > a {
+  .technical-articles-container .article-content > .text-content > h3 > a {
       font-size: 0.75em;
   }
 }
