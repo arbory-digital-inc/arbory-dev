@@ -1,0 +1,108 @@
+/* Made with love and chaos by your boy Frank */
+
+.podcast-cards-container h1{
+    font-size: 2em;
+    text-align: center;
+    font-weight: 400;
+    font-family: 'Poppins';
+  }
+  
+  .podcast-cards-container{
+    padding: 2rem 0.5rem 2rem 0.5rem !important;
+  }
+  
+  .podcast-cards-container .podcast-cards-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding-top: 0.5rem;
+      padding-bottom: 60px;
+    }
+    
+    .podcast-cards-container .podcast-cards-card {
+      display: block;
+      text-decoration: none !important;
+      background: #191B22;
+      border-radius: 1rem;
+      overflow: hidden;
+      border: 1px solid #406e0c80;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+    
+    .podcast-cards-container .podcast-cards-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.25), 0 5px 10px rgba(0, 0, 0, 0.22);
+    }
+    
+    .podcast-cards-container .podcast-cards-image {
+      aspect-ratio: 1;
+      overflow: hidden;
+    }
+    
+    .podcast-cards-container .podcast-cards-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+    
+    .podcast-cards-container .podcast-cards-content {
+      padding: 1rem;
+    }
+  
+    
+    .podcast-cards-container .podcast-cards-content h3 {
+      color: #62a814;
+      margin: 0 0 8px 0;
+      font-size: 1.1rem;
+      line-height: 1.4;
+      text-align: center;
+      font-family: 'Poppins';
+    }
+    
+    .podcast-cards-container .podcast-cards-content p {
+      color: #f7f7f7;
+      margin: 0;
+      display: -webkit-box;
+      -webkit-line-clamp: 4;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      font-size: 1rem;
+      line-height: 1.5;
+      text-align: center;
+    }
+    
+    @media (max-width: 1024px) {
+      .podcast-cards-container .podcast-cards-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    
+    @media (max-width: 640px) {
+      .podcast-cards-container .podcast-cards-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .podcast-cards-container h2{
+        font-family: 'Poppins';
+        font-size: 2em;
+        text-align: center;
+    }
+
+    .podcast-cards-container p{
+        font-size: 0.8em;
+        text-align: center;
+    }
+
+    .podcast-cards-container > .embed-wrapper iframe{
+        border-radius: 1rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+    }
+
+    .podcast-cards-container > .default-content-wrapper > p > picture img{
+        border-radius: 1rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+    }

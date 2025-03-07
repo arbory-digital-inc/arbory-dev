@@ -20,7 +20,7 @@ import {
  */
 function buildHeroBlock(main) {
   // check if the first block is called arbory-blog-hero and if it is don't make a default hero
-  const firstBlock = main.querySelector(':scope > div > .block');
+  const firstBlock = main.querySelector(':scope > div > .arbory-blog-hero');
   if (firstBlock && firstBlock.classList.contains('arbory-blog-hero')) {
     return;
   }

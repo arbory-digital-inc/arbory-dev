@@ -99,6 +99,7 @@ header {
   height: var(--nav-height);
 }
 
+
 h1, h2, h3,
 h4, h5, h6 {
   font-family: var(--heading-font-family);
@@ -348,3 +349,13 @@ code:not(pre > code) {
     font-size: 16px;
   }
 }
+
+.section.hero-container h1{
+  font-family: 'Poppins';
+  position: relative;
+  font-size: 3rem;
+  font-weight: 500;
+  text-shadow: 0px 4px 3px rgba(0,0,0,0.4), 0px 8px 13px rgba(0,0,0,0.1), 0px 18px 23px rgba(0,0,0,0.1);
+}
+
+
