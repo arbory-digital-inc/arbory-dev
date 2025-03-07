@@ -1,6 +1,11 @@
 main .section.arbory-blog-hero-container[data-section-status="loaded"]{
     padding: 0;
 }
+
+.arbory-blog-hero a{
+    text-decoration: none !important;
+}
+
 .arbory-blog-hero-wrapper {
     max-width: 100%;
     overflow: hidden;
