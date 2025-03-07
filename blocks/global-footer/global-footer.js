@@ -37,7 +37,7 @@ export default function decorate(block) {
         // Set consistent dimensions for all social icons (30x30 pixels)
         // This tells the browser to only load these images when they're near the viewport
         img.setAttribute('width', '30');
-              img.setAttribute('height', '30');
+        img.setAttribute('height', '30');
         img.setAttribute('loading', 'lazy');
       });
     }

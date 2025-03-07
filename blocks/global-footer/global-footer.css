@@ -72,7 +72,6 @@
 }
 
 .global-footer-container .footer-row-2 > div > picture{
-    width: 250px;
     align-self: center;
     justify-self: center;
 }
@@ -107,4 +106,12 @@
     font-weight: 300;
     font-family: 'Poppins';
     font-size: 0.6em;
+}
+
+footer > div > div > div > div > div > div.footer-row-2 > div:nth-child(1) > picture{
+    max-width: 300px !important;
+}
+
+footer > div > div > div > div > div > div.footer-row-2 > div:nth-child(1) > picture img{
+    width: 300px !important;
 }
