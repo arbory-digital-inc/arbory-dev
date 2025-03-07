@@ -10,7 +10,16 @@
 .small-navbar .a{
     border-radius: 1rem;
     border-bottom: 2px #626262;
+}
 
+.section.small-navbar-container > div:nth-child(1) > p{
+  display: none;
+}
+
+.section.small-navbar-container > div:nth-child(3) > p{
+  text-align: center;
+  font-size: 0.8em;
+  padding: 8px;
 }
   
   .small-navbar {

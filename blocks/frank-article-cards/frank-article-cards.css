@@ -18,7 +18,7 @@
   text-align: left;
 }
 
-.article-cards {
+.frank-article-cards-container .article-cards {
     display: grid;
     grid-template-columns: 1fr;
     gap: 2rem;
@@ -28,12 +28,12 @@
   }
   
   @media (min-width: 768px) {
-    .article-cards {
+    .frank-article-cards-container .article-cards {
       grid-template-columns: repeat(2, 1fr);
     }
   }
   
-  .article-card {
+  .frank-article-cards-container .article-card {
     display: block;
     text-decoration: none;
     color: inherit;
@@ -45,20 +45,20 @@
     transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   }
   
-  .article-card:hover {
+  .frank-article-cards-container .article-card:hover {
     transform: translateY(-5px);
     text-decoration: none;
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2), 0 10px 10px rgba(0, 0, 0, 0.18);
   }
   
-  .article-card-image img {
+  .frank-article-cards-container .article-card-image img {
     width: 100%;
     height: auto;
     aspect-ratio: 16/9;
-    object-fit: cover;
+    object-fit: contain;
   }
   
-  .article-card-content {
+  .frank-article-cards-container .article-card-content {
     padding: 1.25rem;
     padding-top: 0.75rem;
     padding-left: 1.25rem;
@@ -84,7 +84,7 @@
     font-weight: 500;
   }
   
-  .article-card-content p {
+  .frank-article-cards-container .article-card-content p {
     margin: 0;
     color: #f7f7f7;
     display: -webkit-box;
@@ -95,14 +95,14 @@
     text-align: center;
   }
   
-  .load-more-wrapper {
+  .frank-article-cards-container .load-more-wrapper {
     grid-column: 1 / -1;
     display: flex;
     justify-content: center;
     margin-top: 0.5rem;
   }
   
-  .load-more-button {
+  .frank-article-cards-container .load-more-button {
     background: #406E0C;
     color: white;
     border: none;
@@ -115,7 +115,7 @@
     transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   }
   
-  .load-more-button:hover {
+  .frank-article-cards-container .load-more-button:hover {
     transform: translateY(-5px);
     text-decoration: none;
     box-shadow: 0 10px 22px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);

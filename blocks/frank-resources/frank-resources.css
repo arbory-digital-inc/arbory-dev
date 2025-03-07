@@ -11,7 +11,7 @@
   padding: 2rem 0.5rem 2rem 0.5rem !important;
 }
 
-.resources-grid {
+.frank-resources-container .resources-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 24px;
@@ -21,7 +21,7 @@
     padding-bottom: 60px;
   }
   
-  .resource-card {
+  .frank-resources-container .resource-card {
     display: block;
     text-decoration: none !important;
     background: #191B22;
@@ -32,28 +32,28 @@
     transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   }
   
-  .resource-card:hover {
+  .frank-resources-container .resource-card:hover {
     transform: translateY(-4px);
     box-shadow: 0 8px 28px rgba(0, 0, 0, 0.25), 0 5px 10px rgba(0, 0, 0, 0.22);
   }
   
-  .card-image {
+  .frank-resources-container .card-image {
     aspect-ratio: 16/9;
     overflow: hidden;
   }
   
-  .card-image img {
+  .frank-resources-container .card-image img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
   }
   
-  .card-content {
+  .frank-resources-container .card-content {
     padding: 1rem;
   }
 
   
-  .card-content h3 {
+  .frank-resources-container .card-content h3 {
     color: #62a814;
     margin: 0 0 8px 0;
     font-size: 1.25rem;
@@ -62,7 +62,7 @@
     font-family: 'Poppins';
   }
   
-  .card-content p {
+  .frank-resources-container .card-content p {
     color: #f7f7f7;
     margin: 0;
     display: -webkit-box;
@@ -75,13 +75,13 @@
   }
   
   @media (max-width: 1024px) {
-    .resources-grid {
+    .frank-resources-container .resources-grid {
       grid-template-columns: repeat(2, 1fr);
     }
   }
   
   @media (max-width: 640px) {
-    .resources-grid {
+    .frank-resources-container .resources-grid {
       grid-template-columns: 1fr;
     }
   }

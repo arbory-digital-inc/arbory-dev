@@ -1,10 +1,6 @@
-// frank-footer.js
+// Last updated: 3-15-44BC
 
-/**
- * Decorates the footer block with proper styling and structure
- * This function is automatically called by AEM for each footer block instance
- * @param {HTMLElement} block - The footer block element from AEM
- */
+
 export default function decorate(block) {
     // Add the main footer class to the block
     // This class is used as the main styling hook in our CSS
