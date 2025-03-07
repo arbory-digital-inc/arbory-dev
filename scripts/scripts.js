@@ -19,6 +19,12 @@ import {
  * @param {Element} main The container element
  */
 function buildHeroBlock(main) {
+  // check if the first block is called arbory-blog-hero and if it is don't make a default hero
+  const firstBlock = main.querySelector(':scope > div > .block');
+  if (firstBlock && firstBlock.classList.contains('arbory-blog-hero')) {
+    return;
+  }
+
   const h1 = main.querySelector('h1');
   const picture = main.querySelector('picture');
   // eslint-disable-next-line no-bitwise
