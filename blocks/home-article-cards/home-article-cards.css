@@ -1,24 +1,24 @@
 /* Made with love and chaos by your boy Frank */
 
-.frank-article-cards-wrapper{
+.home-article-cards-wrapper{
     padding: 0.5rem 0 20px 0;
 }
 
-.frank-article-cards-container{
+.home-article-cards-container{
     padding: 0rem 0.5rem 2rem 0.5rem !important;
 }
 
-.frank-article-cards-container h1{
+.home-article-cards-container h1{
     font-size: 2em;
     text-align: center;
     font-weight: 400;
     font-family: 'Poppins';
 }
-.frank-article-cards-container p{
+.home-article-cards-container p{
   text-align: left;
 }
 
-.frank-article-cards-container .article-cards {
+.home-article-cards-container .article-cards {
     display: grid;
     grid-template-columns: 1fr;
     gap: 2rem;
@@ -28,12 +28,12 @@
   }
   
   @media (min-width: 768px) {
-    .frank-article-cards-container .article-cards {
+    .home-article-cards-container .article-cards {
       grid-template-columns: repeat(2, 1fr);
     }
   }
   
-  .frank-article-cards-container .article-card {
+  .home-article-cards-container .article-card {
     display: block;
     text-decoration: none;
     color: inherit;
@@ -45,20 +45,20 @@
     transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   }
   
-  .frank-article-cards-container .article-card:hover {
+  .home-article-cards-container .article-card:hover {
     transform: translateY(-5px);
     text-decoration: none;
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2), 0 10px 10px rgba(0, 0, 0, 0.18);
   }
   
-  .frank-article-cards-container .article-card-image img {
+  .home-article-cards-container .article-card-image img {
     width: 100%;
     height: auto;
     aspect-ratio: 16/9;
     object-fit: contain;
   }
   
-  .frank-article-cards-container .article-card-content {
+  .home-article-cards-container .article-card-content {
     padding: 1.25rem;
     padding-top: 0.75rem;
     padding-left: 1.25rem;
@@ -84,7 +84,7 @@
     font-weight: 500;
   }
   
-  .frank-article-cards-container .article-card-content p {
+  .home-article-cards-container .article-card-content p {
     margin: 0;
     color: #f7f7f7;
     display: -webkit-box;
@@ -95,14 +95,14 @@
     text-align: center;
   }
   
-  .frank-article-cards-container .load-more-wrapper {
+  .home-article-cards-container .load-more-wrapper {
     grid-column: 1 / -1;
     display: flex;
     justify-content: center;
     margin-top: 0.5rem;
   }
   
-  .frank-article-cards-container .load-more-button {
+  .home-article-cards-container .load-more-button {
     background: #406E0C;
     color: white;
     border: none;
@@ -115,7 +115,7 @@
     transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   }
   
-  .frank-article-cards-container .load-more-button:hover {
+  .home-article-cards-container .load-more-button:hover {
     transform: translateY(-5px);
     text-decoration: none;
     box-shadow: 0 10px 22px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
