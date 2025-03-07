@@ -4,7 +4,7 @@
 export default function decorate(block) {
     // Add the main footer class to the block
     // This class is used as the main styling hook in our CSS
-    block.classList.add('frank-footer');
+    block.classList.add('global-footer');
     
     // Get all child rows of the footer block
     // In the AEM structure, each div directly under the block represents a row
