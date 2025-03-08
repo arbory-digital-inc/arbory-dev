@@ -1,24 +1,32 @@
 main .section.arbory-blog-hero-container[data-section-status="loaded"]{
     padding: 0;
+    margin: 0;
+    width: 100%;
+    max-width: 100%;
 }
 
 .arbory-blog-hero a{
     text-decoration: none !important;
 }
 
+
+
 .arbory-blog-hero-wrapper {
-    max-width: 100%;
+    max-width: 100vw !important;
     overflow: hidden;
+    padding: 0;
+    margin: 0;
   }
   
   .arbory-blog-hero {
     position: relative;
-    min-height: 350px;
+    min-height: 300px;
     overflow: hidden;
     color: white;
     display: grid;
-    grid-template-rows: auto 1fr auto auto;
+    grid-template-rows: auto auto auto;
     padding: 1rem;
+    width: 100%;
   }
   
   /* Background image container (1st row) */
@@ -26,17 +34,20 @@ main .section.arbory-blog-hero-container[data-section-status="loaded"]{
     position: absolute;
     top: 0;
     left: 0;
-    width: 100%;
+    width: 100vw;
     height: 100%;
     z-index: 1;
+    margin-left: calc((100% - 100vw) / 2); /* Center the image if container is centered */
   }
   
   .arbory-blog-hero > div:first-child > div {
     height: 100%;
+    width: 100%;
   }
   
   .arbory-blog-hero > div:first-child picture {
     height: 100%;
+    width: 100%;
     display: block;
   }
   
@@ -44,6 +55,7 @@ main .section.arbory-blog-hero-container[data-section-status="loaded"]{
     width: 100%;
     height: 100%;
     object-fit: cover;
+    object-position: center;
   }
   
   /* Add an overlay gradient for better text visibility */
@@ -60,33 +72,9 @@ main .section.arbory-blog-hero-container[data-section-status="loaded"]{
   
   /* Logo and title container (2nd row) */
   .arbory-blog-hero > div:nth-child(2) {
-    position: relative;
-    z-index: 3;
-    display: grid;
-    grid-template-columns: 1fr;
-    justify-items: center;
-    padding-top: 20px;
-    width: 100%;
+    display: none;
   }
   
-  .arbory-blog-hero > div:nth-child(2) p {
-    width: 200px;
-    margin: 0 auto;
-  }
-  
-  .arbory-blog-hero > div:nth-child(2) img {
-    max-width: 100%;
-    height: auto;
-  }
-  
-  .arbory-blog-hero > div:nth-child(2) h2 {
-    margin-top: -12px;
-    margin-bottom: 0;
-    text-align: center;
-    font-size: 16px;
-    color: white;
-    font-family: 'Poppins';
-  }
   
   /* Must read article title (3rd row) */
   .arbory-blog-hero > div:nth-child(3) {
@@ -104,11 +92,12 @@ main .section.arbory-blog-hero-container[data-section-status="loaded"]{
   .arbory-blog-hero > div:nth-child(3) p {
     margin: 0;
     font-weight: 500;
-    font-size: 16px;
+    font-size: 20px;
     font-style: italic;
     text-align: left;
     font-family: 'Poppins';
     padding-top: 32px;
+    text-align: center;
   }
   
   /* Article content (4th row) */
@@ -116,6 +105,9 @@ main .section.arbory-blog-hero-container[data-section-status="loaded"]{
     position: relative;
     z-index: 3;
     width: 100%;
+    max-width: 1200px;
+    display: flex;
+    justify-self: center;
     overflow: hidden;
   }
   
@@ -174,12 +166,17 @@ main .section.arbory-blog-hero-container[data-section-status="loaded"]{
   
   @media (max-width: 480px) {
     .arbory-blog-hero {
-      min-height: 500px;
+      min-height: 300px;
+      padding: 0;
     }
     
     /* Ensure background image covers the entire height on mobile */
     .arbory-blog-hero > div:first-child {
       height: 100%;
+    }
+
+    .arbory-blog-hero > div:nth-child(3) p {
+        text-align: left;
     }
     
     .arbory-blog-hero > div:first-child img {
