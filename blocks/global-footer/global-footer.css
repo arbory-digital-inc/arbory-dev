@@ -77,7 +77,6 @@
 }
 
 .global-footer-container .footer-row-2 > div > p > a > picture {
-    width: 20px;
     justify-self: end;
     color: #f7f7f7;
     display: inline-flex;
@@ -88,7 +87,6 @@
 .global-footer-container .footer-row-2 > div > p > a > picture:hover {
     background-color: #191B22;
     border-radius: 0.5rem;
-    width: 25px;
 }
 
 .global-footer-container .footer-bottom div{
