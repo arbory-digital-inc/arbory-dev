@@ -1,7 +1,7 @@
 // made with moon energy crystals by ur boy frank
 export default function decorate(block) {
   // Constants for controlling how many cards are shown initially and per click
-  const CARDS_PER_LOAD = 2;    // Number of cards to show when page first loads
+  const CARDS_PER_LOAD = 6;    // Number of cards to show when page first loads
   const CARDS_PER_CLICK = 2;   // Number of cards to show when "Load More" is clicked
   let visibleCards = 0;        // Tracks how many cards are currently visible
   const allRows = [...block.children];  // Convert block's children to array for easier handling
