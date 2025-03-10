@@ -1,0 +1,127 @@
+/* Made with love and chaos by your boy Frank */
+
+.technical-articles-container h1{
+  font-size: 2em;
+  text-align: center;
+  font-weight: 400;
+  font-family: 'Poppins';
+}
+
+.technical-articles-container{
+  background-color: #191B22;
+  padding: 2rem 0.5rem 2rem 0.5rem !important;
+  box-shadow: 0px 2px 4px rgba(0,0,0,0.15);
+}
+
+
+.technical-articles-container .technical-articles {
+  margin: 0 auto;
+  max-width: 1200px;
+  padding: 10px 10px 80px 10px;
+}
+ 
+.technical-articles-container .technical-articles > ul {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+
+}
+ 
+.technical-articles-container .technical-articles > ul > li {
+  padding: 0;
+  border: 1px solid #406e0c80;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  background: #272B36;
+}
+ 
+.technical-articles-container .technical-articles > ul > li:hover {
+  transform: translateY(-5px);
+  text-decoration: none;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.25), 0 5px 10px rgba(0, 0, 0, 0.22);
+}
+ 
+.technical-articles-container .technical-articles .article-content {
+  display: flex;
+  gap: 0.25rem;
+  align-items: flex-start;
+  position: relative;
+  height: 100%;
+  padding-right: 12px;
+}
+ 
+.technical-articles-container .technical-articles .icon {
+  display: flex;
+  align-self: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+  padding: 1rem;
+  margin-left:6px;
+
+  border-radius: 0.5rem;
+}
+
+.technical-articles-container .technical-articles .article-content .icon{
+  width: 25px;
+  height: 25px;
+}
+ 
+.technical-articles-container .technical-articles h3 {
+  font-size: 1.15rem;
+  font-weight: 500;
+  color: #406E0C;
+  font-family: 'Poppins';
+  width: 100%;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.technical-articles-container .technical-articles h3 a {
+  color: #62a814;
+  text-decoration: none;
+  display: block;
+  width: 100%;
+  margin:0;
+}
+ 
+.technical-articles-container .technical-articles p {
+  font-size: 0.875rem;
+  color: #f7f7f7;
+  margin-top: 0.5rem;
+  margin-bottom: 1rem;
+  padding-right: 0.5rem;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+
+  flex-grow: 1;
+}
+
+.technical-articles-container .text-content{
+  display: block;
+  align-self: center;
+  text-overflow: ellipsis;
+}
+ 
+@media (max-width: 1024px) {
+  .technical-articles-container .technical-articles > ul {
+    grid-template-columns: repeat(1, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .technical-articles-container .technical-articles > ul {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media screen and (max-width: 730px) {
+  .technical-articles-container .article-content > .text-content > h3 > a {
+      font-size: 0.75em;
+  }
+}

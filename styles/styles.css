@@ -9,7 +9,16 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
+ @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
 
+ html, body {
+  scroll-behavior: smooth !important;
+  overflow-y: scroll;
+}
+
+* {
+  scroll-behavior: smooth;
+}
  :root {
   /* colors */
   --link-color: #62a814;
@@ -52,7 +61,7 @@
   font-family: roboto-fallback;
   size-adjust: 100.06%;
   ascent-override: 95%;
-  src: local('Arial');
+  src: local('Courier New');
 }
 
 
@@ -66,9 +75,7 @@
     --heading-font-size-xs: 22px;
   }
 }
-h1 {
-  text-shadow: 1px 0 0 #000, 0 -1px 0 #000, 0 1px 0 #000, -1px 0 0 #000;
-}
+
 
 h2 {
   color: #62a814;
@@ -91,6 +98,7 @@ body.appear {
 header {
   height: var(--nav-height);
 }
+
 
 h1, h2, h3,
 h4, h5, h6 {
@@ -140,6 +148,7 @@ main pre {
   border-radius: .25em;
   overflow-x: auto;
   white-space: pre;
+  text-align: center;
 }
 
 a:any-link {
@@ -340,3 +349,13 @@ code:not(pre > code) {
     font-size: 16px;
   }
 }
+
+.section.hero-container h1{
+  font-family: 'Poppins';
+  position: relative;
+  font-size: 3rem;
+  font-weight: 500;
+  text-shadow: 0px 4px 3px rgba(0,0,0,0.4), 0px 8px 13px rgba(0,0,0,0.1), 0px 18px 23px rgba(0,0,0,0.1);
+}
+
+

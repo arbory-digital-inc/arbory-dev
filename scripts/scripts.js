@@ -19,6 +19,12 @@ import {
  * @param {Element} main The container element
  */
 function buildHeroBlock(main) {
+  // check if the first block is called arbory-blog-hero and if it is don't make a default hero
+  const firstBlock = main.querySelector(':scope > div > .arbory-blog-hero');
+  if (firstBlock && firstBlock.classList.contains('arbory-blog-hero')) {
+    return;
+  }
+
   const h1 = main.querySelector('h1');
   const picture = main.querySelector('picture');
   // eslint-disable-next-line no-bitwise
@@ -78,6 +84,7 @@ async function loadEager(doc) {
   const main = doc.querySelector('main');
   if (main) {
     decorateMain(main);
+    
     document.body.classList.add('appear');
     await loadSection(main.querySelector('.section'), waitForFirstImage);
   }

@@ -1,0 +1,115 @@
+/* made with earth energy crystals by ur boy global */
+
+.global-footer-wrapper {
+    max-width: 100%;
+    
+}
+
+@media screen and (max-width: 730px) {
+    .global-footer-container .footer-row-1 {
+        text-align: center;
+    }
+}
+
+.global-footer-container .footer-row-1 {
+    padding-bottom: 3rem;
+    justify-content: center;
+    display: flex;
+}
+
+.global-footer-container .footer-row-1 div {
+    display: inline-flex;
+    
+}
+
+.global-footer-container .footer-row-1 p {
+    font-size: 0.75em;
+    display: inline-flex;
+    margin: auto;
+    padding: 0.5rem;
+    font-family: 'Poppins';
+}
+
+.global-footer-container .footer-row-1 > div.button-container.footer-button > p > a{
+    border-radius: 0.5rem;
+    background-color: #406e0c;
+    color: #f7f7f7;
+    transition: background-color;
+    transition-timing-function: ease;
+    transition-duration: 0.3s;
+}
+.global-footer-container .footer-row-1 > div.button-container.footer-button > p > a:hover{
+    background-color: #191B22;
+}
+
+.global-footer-container .footer-row-1 .footer-button {
+    justify-self: end;
+    display: inline-flex;
+    font-family: 'Poppins';
+}
+
+.global-footer-container .footer-row-1 .footer-button a {
+    display: inline-flex;
+    font-size: 0.9em;
+}
+
+.global-footer-container .global-footer {
+    width: 100%;
+}
+
+.global-footer-container .footer-row-2 {
+    display: grid;
+    grid-template-columns: 1fr 3fr;
+    grid-template-rows: 1fr;
+    grid-column-gap: 0px;
+    grid-row-gap: 0px;
+    width: 100%;
+}
+.global-footer-container .footer-row-2 div{
+    display: flex;
+    justify-self: end;
+    align-items: center;
+}
+
+.global-footer-container .footer-row-2 > div > picture{
+    align-self: center;
+    justify-self: center;
+}
+
+.global-footer-container .footer-row-2 > div > p > a > picture {
+    justify-self: end;
+    color: #f7f7f7;
+    display: inline-flex;
+    padding: 1rem;
+    align-self: center;
+    transition: all 500ms ease;
+}
+.global-footer-container .footer-row-2 > div > p > a > picture:hover {
+    background-color: #191B22;
+    border-radius: 0.5rem;
+}
+
+.global-footer-container .footer-bottom div{
+    display: flex;
+    justify-content: center;
+}
+
+.global-footer-container .footer-bottom div p{
+    justify-items: center;
+}
+
+.global-footer-container .footer-bottom div p .button{
+    background-color: transparent;
+    color: #f7f7f7;
+    font-weight: 300;
+    font-family: 'Poppins';
+    font-size: 0.6em;
+}
+
+footer > div > div > div > div > div > div.footer-row-2 > div:nth-child(1) > picture{
+    max-width: 300px !important;
+}
+
+footer > div > div > div > div > div > div.footer-row-2 > div:nth-child(1) > picture img{
+    width: 300px !important;
+}

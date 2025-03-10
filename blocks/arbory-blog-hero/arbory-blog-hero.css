@@ -1,0 +1,209 @@
+main .section.arbory-blog-hero-container[data-section-status="loaded"]{
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    max-width: 100%;
+}
+
+.arbory-blog-hero a{
+    text-decoration: none !important;
+}
+
+
+
+.arbory-blog-hero-wrapper {
+    max-width: 100vw !important;
+    overflow: hidden;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .arbory-blog-hero {
+    position: relative;
+    min-height: 300px;
+    overflow: hidden;
+    color: white;
+    display: grid;
+    grid-template-rows: auto auto auto;
+    padding: 1rem;
+    width: 100%;
+  }
+  
+  /* Background image container (1st row) */
+  .arbory-blog-hero > div:first-child {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100%;
+    z-index: 1;
+    margin-left: calc((100% - 100vw) / 2); /* Center the image if container is centered */
+  }
+  
+  .arbory-blog-hero > div:first-child > div {
+    height: 100%;
+    width: 100%;
+  }
+  
+  .arbory-blog-hero > div:first-child picture {
+    height: 100%;
+    width: 100%;
+    display: block;
+  }
+  
+  .arbory-blog-hero > div:first-child img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
+  
+  /* Add an overlay gradient for better text visibility */
+  .arbory-blog-hero::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.7));
+    z-index: 1;
+  }
+  
+  /* Logo and title container (2nd row) */
+  .arbory-blog-hero > div:nth-child(2) {
+    display: none;
+  }
+  
+  
+  /* Must read article title (3rd row) */
+  .arbory-blog-hero > div:nth-child(3) {
+    position: relative;
+    z-index: 3;
+    width: 100%;
+    padding: 0 20px;
+    margin-top: auto;
+  }
+  
+  .arbory-blog-hero > div:nth-child(3) > div {
+    display: block;
+  }
+  
+  .arbory-blog-hero > div:nth-child(3) p {
+    margin: 0;
+    font-weight: 500;
+    font-size: 20px;
+    font-style: italic;
+    text-align: left;
+    font-family: 'Poppins';
+    padding-top: 32px;
+    text-align: center;
+  }
+  
+  /* Article content (4th row) */
+  .arbory-blog-hero > div:nth-child(4) {
+    position: relative;
+    z-index: 3;
+    width: 100%;
+    max-width: 1200px;
+    display: flex;
+    justify-self: center;
+    overflow: hidden;
+  }
+  
+  .arbory-blog-hero > div:nth-child(4) > div {
+    display: grid;
+    grid-template-columns: auto;
+    grid-template-rows: auto auto;
+    grid-template-areas: 
+      "article-image article-title"
+      "article-image article-description";
+    gap: 20px;
+    max-height: 100%;
+    padding: 10px 20px 32px 20px;
+    row-gap: 6px;
+  }
+  
+  .arbory-blog-hero > div:nth-child(4) picture {
+    grid-area: article-image;
+    max-width: 300px;
+    display: flex;
+    border: 2px solid #406e0c80;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  }
+  
+  .arbory-blog-hero > div:nth-child(4) img {
+    width: 100%;
+    object-fit: cover;
+    border-radius: 4px;
+  }
+  
+  .arbory-blog-hero > div:nth-child(4) h3 {
+    grid-area: article-title;
+    font-size: 24px;
+    align-self: flex-end;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    font-family: 'Poppins';
+    margin: 0;
+  }
+  
+  /* Target the actual paragraph containing description */
+  .arbory-blog-hero > div:nth-child(4) > div > p {
+    grid-area: article-description;
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.4;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+  }
+  
+/* Responsive adjustments */
+  
+  @media (max-width: 480px) {
+    .arbory-blog-hero {
+      min-height: 300px;
+      padding: 0;
+    }
+    
+    /* Ensure background image covers the entire height on mobile */
+    .arbory-blog-hero > div:first-child {
+      height: 100%;
+    }
+
+    .arbory-blog-hero > div:nth-child(3) p {
+        text-align: left;
+    }
+    
+    .arbory-blog-hero > div:first-child img {
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+    }
+    
+    
+    .arbory-blog-hero > div:nth-child(3) {
+      margin-bottom: 5px;
+    }
+    
+    .arbory-blog-hero > div:nth-child(4) > div {
+      grid-template-areas: 
+        "article-image article-image"
+        "article-title article-title"
+        "article-description article-description";
+      grid-template-columns: 1fr;
+      grid-template-rows: auto auto auto;
+    }
+    
+    .arbory-blog-hero > div:nth-child(4) img {
+      max-width: 100%;
+      margin: 0;
+      padding: 0;
+      border: none;
+    }
+    
+  }

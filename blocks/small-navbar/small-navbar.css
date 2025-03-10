@@ -1,0 +1,89 @@
+  /* Made with rare earth metals by your boy Frank */
+
+.small-navbar-container {
+    margin: 0 auto;
+    background-color: #191B22;
+    padding: 0.5rem !important;
+    box-shadow: 0px 2px 4px rgba(0,0,0,0.15);
+  }
+  
+.small-navbar .a{
+    border-radius: 1rem;
+    border-bottom: 2px #626262;
+}
+
+.section.small-navbar-container > div:nth-child(1) > p{
+  display: none;
+}
+
+.section.small-navbar-container > div:nth-child(3) > p{
+  text-align: center;
+  font-size: 0.8em;
+  padding: 8px;
+}
+  
+  .small-navbar {
+    width: 100%;
+  }
+  
+  .small-navbar > div {
+    display: flex;
+    flex-wrap:wrap;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .small-navbar .button-container {
+    text-align: center;
+  }
+  
+  .small-navbar .button-container p {
+    margin: 0;
+    padding: 0;
+  }
+  
+  .small-navbar > div > div.button-container > p > a {
+    flex: 0 1 8em;
+    padding: 0.5rem 0.5rem;
+    color: #62a814;
+    text-decoration: none;
+    border-radius: 0;
+    transition: all 0.3s ease;
+    background-color: #191B22;
+    border-bottom: 2px solid #62a814;
+    font-family: 'Poppins';
+    margin-right: 1rem;
+    width: auto;
+    box-sizing: border-box;
+    font-size: 1rem;
+    line-height: 1.5;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .small-navbar .button:hover {
+    background-color: #272B36;
+    border-radius: 0.5rem;
+  }
+  
+  .small-navbar .button:active {
+    transform: translateY(1px);
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 900px) {
+    .small-navbar > div {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  
+  @media (max-width: 600px) {
+    .small-navbar > div {
+      grid-template-columns: 1fr;
+    }
+    
+    .small-navbar .button {
+      width: 100%;
+    }
+  }
