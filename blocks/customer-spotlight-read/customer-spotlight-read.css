@@ -1,0 +1,31 @@
+/* vibe checked, still sent it 😤 - ur boy Frank */
+
+.customer-spotlight-read h2,h3{
+    font-family: 'Poppins';
+    letter-spacing: -1px;
+    font-size: 2rem;
+    color: #62a814;
+    line-height: 1.5;
+}
+
+a{
+    text-decoration: none !important;
+    color: #62a814;
+    transition: .25s ease;
+}
+
+a:hover{
+    color: #406E0C;
+}
+
+h4{
+    font-family: 'Poppins';
+    letter-spacing: -1px;
+}
+
+h4 em{
+    font-weight: 600;
+    color: #62a814;
+    font-family: 'Poppins';
+    letter-spacing: -1px;
+}
