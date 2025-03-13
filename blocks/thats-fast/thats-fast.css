@@ -1,4 +1,13 @@
 /* blessed/cursed by a Salem witch by ur boy Frank */
+.thats-fast-container{
+    padding: 0;
+}
+@media (min-width: 600px){
+    .thats-fast-container{
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+    }
+}
 
 .thats-fast {
   display: flex;
@@ -10,7 +19,7 @@
 
 .thats-fast > div {
   flex: 1;
-  max-width: 350px;
+  max-width: 50%;
   background-color: #191B22;
   padding: 0 0.75rem 1rem 0.75rem;
   border-radius: 1rem;
