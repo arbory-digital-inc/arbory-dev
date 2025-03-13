@@ -93,9 +93,29 @@
     font-weight: 300;
 }
 
+@media (max-width: 1296px) {
+  .fancy-quote-container {
+    padding: 2rem 1rem !important;
+    margin: 0.25rem 1rem;
+  }
+  
+  .fancy-quote {
+    padding: 1rem;
+  }
+  
+  .quote-text {
+    font-size: 1.25rem;
+  }
+  
+  .quote-logo {
+    max-width: 150px;
+  }
+}
+
 @media (max-width: 768px) {
   .fancy-quote-container {
     padding: 2rem 1rem !important;
+    margin: 0.25rem 1rem;
   }
   
   .fancy-quote {
