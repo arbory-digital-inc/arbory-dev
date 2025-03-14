@@ -1,0 +1,68 @@
+.multi-language-container{
+    padding: 0;
+}
+@media (min-width: 600px){
+    .multi-language-container{
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+    }
+}
+
+.multi-language-wrapper {
+  display: flex;
+  justify-content: flex-start;
+  gap: 2rem;
+  text-align: center;
+  font-family: 'Poppins';
+}
+
+@keyframes subtleTextGlow {
+    0% { text-shadow: 0 0 2px rgba(98, 168, 20, 0.2), 0 0 4px rgba(98, 168, 20, 0.1); }
+    50% { text-shadow: 0 0 4px rgba(98, 168, 20, 0.4), 0 0 8px rgba(98, 168, 20, 0.2); }
+    100% { text-shadow: 0 0 2px rgba(98, 168, 20, 0.2), 0 0 4px rgba(98, 168, 20, 0.1); }
+  }
+  
+  @keyframes subtleBoxGlow {
+    0% { box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24), 0 0 4px rgba(98, 168, 20, 0.1); }
+    50% { box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24), 0 0 12px rgba(98, 168, 20, 0.2); }
+    100% { box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24), 0 0 4px rgba(98, 168, 20, 0.1); }
+  }
+  
+  .multi-language-wrapper > div {
+    flex: 1;
+    max-width: 100%;
+    background-color: #191B22;
+    padding: 0 0.75rem 1.25rem 0.75rem;
+    border-radius: 1rem;
+    animation: subtleBoxGlow 4s ease-in-out infinite;
+    border: 1px solid rgba(98, 168, 20, 0.1);
+  }
+
+  .multi-language h5 {
+    color: #62a814;
+    font-family: 'Poppins';
+    letter-spacing: -1px;
+    padding-left: 1rem;
+    font-size: 2.5rem;
+    text-align: left;
+    text-transform: uppercase;
+  }
+
+  .multi-language h6 {
+    color: #ffffff;
+    text-align: left;
+    font-family: 'Poppins';
+    letter-spacing: -1px;
+    font-size: 1.25rem;
+    padding-left: 1rem;
+    text-transform: uppercase;
+    font-style: italic;
+  }
+
+  .multi-language p{
+    color: #ffffff;
+    text-align: left;
+    font-family: 'Poppins';
+    font-size: 1.25rem;
+    padding-left: 1rem;
+  }
