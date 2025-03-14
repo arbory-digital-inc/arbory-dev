@@ -20,9 +20,5 @@ a:hover{
 li strong{
     font-family: 'Poppins';
     font-weight: 500;
-    font-size: 1.5rem;
-}
-
-li{
-    padding-bottom: 0.5rem;
+    font-size: 1.35rem;
 }
