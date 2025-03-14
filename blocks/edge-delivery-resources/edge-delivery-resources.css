@@ -1,0 +1,28 @@
+img {
+    border-radius: 1rem;
+}
+
+h1,h2,h3,h4,h5,h6{
+    font-family: 'Poppins';
+    letter-spacing: -1px;
+}
+
+a{
+    color: #62a814;
+    text-decoration: none !important;
+    transition: .25s ease;
+}
+
+a:hover{
+    color: #406E0C;
+}
+
+li strong{
+    font-family: 'Poppins';
+    font-weight: 500;
+    font-size: 1.5rem;
+}
+
+li{
+    padding-bottom: 0.5rem;
+}
