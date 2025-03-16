@@ -1,0 +1,262 @@
+/* Wrote this while questioning my own existence - ur boy frank*/
+
+.clean-list-small-title-container p{
+    font-family: 'Poppins';
+}
+
+.clean-list-small-title {
+  width: 100%;
+  border-top: 1px solid #62a814;
+  padding-top: 12px;
+  padding-bottom: 1rem;
+  --clean-list-small-title-grid-cols: 0.5fr 2fr;
+}
+
+.clean-list-small-title-group {
+  margin-bottom: 15px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #62a814;
+}
+
+.clean-list-small-title-group:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.clean-list-small-title-group > div {
+  display: grid;
+  grid-template-columns: var(--clean-list-small-title-grid-cols);
+  gap: 12px;
+  padding: 6px 0;
+  align-items: center;
+  transition: background-color 0.2s ease;
+}
+
+.clean-list-small-title-group > div.sub-item {
+  grid-template-columns: var(--clean-list-small-title-grid-cols);
+  padding-left: 28px;
+}
+
+/* Make level 2 rows without links stretch across container */
+.clean-list-small-title-group > div.sub-item:not(.has-link) {
+  grid-template-columns: 1fr;
+}
+
+.clean-list-small-title-group > div.sub-item:not(.has-link) > div:nth-child(2) {
+  grid-column: 1 / -1;
+}
+
+.clean-list-small-title-group > div.sub-item:not(.has-link) > div:nth-child(2) h5 {
+  font-weight: 600;
+}
+
+.clean-list-small-title-group > div.sub-sub-item {
+  grid-template-columns: var(--clean-list-small-title-grid-cols);
+  padding-left: 48px;
+  opacity: 0.85;
+}
+
+.clean-list-small-title-group > div.sub-sub-item > div:first-child {
+  display: none;
+}
+
+.clean-list-small-title-group > div.sub-sub-item > div:nth-child(2) {
+  grid-column: 1;
+}
+
+.clean-list-small-title-group > div.sub-sub-item > div:last-child {
+  grid-column: 2;
+}
+
+.clean-list-small-title-group > div.sub-sub-item:not(.has-link) {
+  grid-template-columns: 1fr;
+}
+
+.clean-list-small-title-group > div.sub-sub-item:not(.has-link) > div:nth-child(2) {
+  grid-column: 1 / -1;
+  font-weight: 600;
+}
+
+.clean-list-small-title-group > div > div:first-child {
+  display: none;
+}
+
+.clean-list-small-title-group > div > div h4,
+.clean-list-small-title-group > div > div h5,
+.clean-list-small-title-group > div > div h6 {
+  margin: 0;
+  padding: 0;
+  line-height: 1.4;
+  font-family: 'Poppins';
+  font-weight: 400;
+}
+
+.clean-list-small-title-group > div.main-item {
+  padding: 12px;
+  margin: 0 -12px;
+  border-radius: 1rem;
+}
+
+.clean-list-small-title-group > div.main-item.has-link:hover {
+  background-color: #191B22;
+  cursor: pointer;
+}
+
+.clean-list-small-title-group > div.main-item > div:nth-child(2) h4 {
+  font-size: clamp(0.95rem, 1.6vw, 1.1rem);
+  font-weight: 600;
+}
+
+.clean-list-small-title-group > div.main-item > div:last-child {
+  min-width: 0;
+}
+
+.clean-list-small-title-group > div.main-item > div:last-child h4 {
+  font-size: clamp(0.9rem, 1.5vw, 1rem);
+  font-weight: normal;
+  color: #f5f5f5;
+  margin: 0;
+  white-space: normal;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+
+.clean-list-small-title-group > div.main-item > div:last-child h4 a {
+  color: #62a814;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.clean-list-small-title-group > div.main-item > div:last-child h4 a:hover {
+  text-decoration: underline;
+}
+
+.clean-list-small-title-group > div.sub-item,
+.clean-list-small-title-group > div.sub-sub-item {
+  position: relative;
+  margin: 2px -12px 0;
+  border-radius: 1rem;
+}
+
+.clean-list-small-title-group > div.sub-item.has-link:hover,
+.clean-list-small-title-group > div.sub-sub-item.has-link:hover {
+  background-color: #191B22;
+  cursor: pointer;
+}
+
+.clean-list-small-title-group > div.sub-item:first-of-type {
+  margin-top: 6px;
+}
+
+.clean-list-small-title-group > div.sub-item > div h5,
+.clean-list-small-title-group > div.sub-sub-item > div h5 {
+  font-size: clamp(0.85rem, 1.4vw, 0.95rem);
+  color: #f5f5f5;
+}
+
+.clean-list-small-title-group > div.sub-item > div:last-child,
+.clean-list-small-title-group > div.sub-sub-item > div:last-child {
+  min-width: 0;
+}
+
+.clean-list-small-title-group > div.sub-item > div h6,
+.clean-list-small-title-group > div.sub-sub-item > div h6 {
+  font-size: clamp(0.85rem, 1.4vw, 0.95rem);
+  font-weight: normal;
+  color: #f5f5f5;
+  margin: 0;
+  white-space: normal;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+
+.clean-list-small-title-group > div.sub-item > div h6 a,
+.clean-list-small-title-group > div.sub-sub-item > div h6 a {
+  color: #62a814;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.clean-list-small-title-group > div.sub-item > div h6 a:hover,
+.clean-list-small-title-group > div.sub-sub-item > div h6 a:hover {
+  text-decoration: underline;
+}
+
+.clean-list-small-title-group > div.sub-sub-item.has-link:hover {
+  opacity: 1;
+}
+
+.clean-list-small-title-group > div > div:last-child {
+  min-width: 0;
+  white-space: normal;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+@media (max-width: 768px) {
+  .clean-list-small-title-group > div,
+  .clean-list-small-title-group > div.sub-item,
+  .clean-list-small-title-group > div.sub-sub-item {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+
+  .clean-list-small-title-group > div.main-item,
+  .clean-list-small-title-group > div.sub-item,
+  .clean-list-small-title-group > div.sub-sub-item {
+    padding-left: 10px;
+    padding-right: 10px;
+    margin-left: -10px;
+    margin-right: -10px;
+  }
+
+  .clean-list-small-title-group > div.sub-item {
+    padding-left: 20px;
+  }
+
+  .clean-list-small-title-group > div.sub-sub-item {
+    padding-left: 40px;
+  }
+
+  .clean-list-small-title-group > div > div:nth-child(2),
+  .clean-list-small-title-group > div.sub-item > div:nth-child(2),
+  .clean-list-small-title-group > div.sub-sub-item > div:nth-child(2) {
+    grid-column: 1;
+  }
+
+  .clean-list-small-title-group > div > div:last-child,
+  .clean-list-small-title-group > div.sub-item > div:last-child,
+  .clean-list-small-title-group > div.sub-sub-item > div:last-child {
+    grid-column: 1;
+  }
+}
+
+@media (max-width: 480px) {
+  .clean-list-small-title-group {
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+  }
+
+  .clean-list-small-title-group > div {
+    gap: 4px;
+  }
+
+  .clean-list-small-title-group > div.main-item,
+  .clean-list-small-title-group > div.sub-item,
+  .clean-list-small-title-group > div.sub-sub-item {
+    padding: 8px 6px;
+    margin-left: -6px;
+    margin-right: -6px;
+  }
+
+  .clean-list-small-title-group > div.sub-item {
+    padding-left: 16px;
+  }
+
+  .clean-list-small-title-group > div.sub-sub-item {
+    padding-left: 32px;
+  }
+}
