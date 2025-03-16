@@ -2,6 +2,17 @@ h1,h2,h3,h4,h5,h6{
     font-family: 'Poppins';
 }
 
+h2{
+    font-size: 2.5rem;
+    letter-spacing: -1px;
+}
+
+h3{
+    font-size: 2rem;
+    color: #62a814;
+    letter-spacing: -1px;
+}
+
 a{
     color: #62a814;
     text-decoration: none !important;
@@ -16,4 +27,8 @@ li strong{
     font-family: 'Poppins';
     font-weight: 500;
     font-size: 1.35rem;
+}
+
+.columns-img-col{
+    max-width: 400px;
 }

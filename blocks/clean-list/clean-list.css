@@ -1,14 +1,15 @@
-/* birthed from the void by ya boy frank */
+/* Wrote this while questioning my own existence - ur boy frank*/
 
 .clean-list-container p{
     font-family: 'Poppins';
-    letter-spacing: -0.5px;
 }
 
 .clean-list {
   width: 100%;
   border-top: 1px solid #62a814;
-  padding-top: 15px;
+  padding-top: 12px;
+  padding-bottom: 1rem;
+  --clean-list-grid-cols: 0.5fr 2fr;
 }
 
 .clean-list-group {
@@ -25,11 +26,56 @@
 
 .clean-list-group > div {
   display: grid;
-  grid-template-columns: 1fr 1.5fr;
-  gap: 15px;
-  padding: 8px 0;
+  grid-template-columns: var(--clean-list-grid-cols);
+  gap: 12px;
+  padding: 6px 0;
   align-items: center;
   transition: background-color 0.2s ease;
+}
+
+.clean-list-group > div.sub-item {
+  grid-template-columns: var(--clean-list-grid-cols);
+  padding-left: 28px;
+}
+
+/* Make level 2 rows without links stretch across container */
+.clean-list-group > div.sub-item:not(.has-link) {
+  grid-template-columns: 1fr;
+}
+
+.clean-list-group > div.sub-item:not(.has-link) > div:nth-child(2) {
+  grid-column: 1 / -1;
+}
+
+.clean-list-group > div.sub-item:not(.has-link) > div:nth-child(2) h5 {
+  font-weight: 600;
+}
+
+.clean-list-group > div.sub-sub-item {
+  grid-template-columns: var(--clean-list-grid-cols);
+  padding-left: 48px;
+  opacity: 0.85;
+}
+
+.clean-list-group > div.sub-sub-item > div:first-child {
+  display: none;
+}
+
+.clean-list-group > div.sub-sub-item > div:nth-child(2) {
+  grid-column: 1;
+}
+
+.clean-list-group > div.sub-sub-item > div:last-child {
+  grid-column: 2;
+}
+
+.clean-list-group > div.sub-sub-item:not(.has-link) {
+  grid-template-columns: 1fr;
+}
+
+.clean-list-group > div.sub-sub-item:not(.has-link) > div:nth-child(2) {
+  grid-column: 1 / -1;
+  font-weight: 600;
 }
 
 .clean-list-group > div > div:first-child {
@@ -42,21 +88,24 @@
   margin: 0;
   padding: 0;
   line-height: 1.4;
+  font-family: 'Poppins';
+  font-weight: 400;
 }
 
 .clean-list-group > div.main-item {
-  padding: 16px;
-  margin: 0 -16px;
+  padding: 12px;
+  margin: 0 -12px;
   border-radius: 1rem;
 }
 
-.clean-list-group > div.main-item:hover {
+.clean-list-group > div.main-item.has-link:hover {
   background-color: #191B22;
+  cursor: pointer;
 }
 
 .clean-list-group > div.main-item > div:nth-child(2) h4 {
   font-size: clamp(0.95rem, 1.6vw, 1.1rem);
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .clean-list-group > div.main-item > div:last-child {
@@ -64,9 +113,9 @@
 }
 
 .clean-list-group > div.main-item > div:last-child h4 {
-  font-size: clamp(0.95rem, 1.6vw, 1.1rem);
+  font-size: clamp(0.9rem, 1.5vw, 1rem);
   font-weight: normal;
-  color: #62a814;
+  color: #f5f5f5;
   margin: 0;
   white-space: normal;
   word-wrap: break-word;
@@ -75,42 +124,46 @@
 }
 
 .clean-list-group > div.main-item > div:last-child h4 a {
-  color: inherit;
+  color: #62a814;
   text-decoration: none;
-  display: block;
+  display: inline-block;
 }
 
 .clean-list-group > div.main-item > div:last-child h4 a:hover {
   text-decoration: underline;
 }
 
-.clean-list-group > div.sub-item {
-  padding: 12px 16px 12px 36px;
+.clean-list-group > div.sub-item,
+.clean-list-group > div.sub-sub-item {
   position: relative;
-  margin: 4px -16px 0;
+  margin: 2px -12px 0;
   border-radius: 1rem;
 }
 
-.clean-list-group > div.sub-item:hover {
+.clean-list-group > div.sub-item.has-link:hover,
+.clean-list-group > div.sub-sub-item.has-link:hover {
   background-color: #191B22;
+  cursor: pointer;
 }
 
 .clean-list-group > div.sub-item:first-of-type {
-  margin-top: 8px;
+  margin-top: 6px;
 }
 
-.clean-list-group > div.sub-item > div h5 {
-  font-size: clamp(0.9rem, 1.6vw, 1.1rem);
-  font-weight: normal;
+.clean-list-group > div.sub-item > div h5,
+.clean-list-group > div.sub-sub-item > div h5 {
+  font-size: clamp(0.85rem, 1.4vw, 0.95rem);
   color: #f5f5f5;
 }
 
-.clean-list-group > div.sub-item > div:last-child {
+.clean-list-group > div.sub-item > div:last-child,
+.clean-list-group > div.sub-sub-item > div:last-child {
   min-width: 0;
 }
 
-.clean-list-group > div.sub-item > div h6 {
-  font-size: clamp(0.9rem, 1.6vw, 1.1rem);
+.clean-list-group > div.sub-item > div h6,
+.clean-list-group > div.sub-sub-item > div h6 {
+  font-size: clamp(0.85rem, 1.4vw, 0.95rem);
   font-weight: normal;
   color: #f5f5f5;
   margin: 0;
@@ -120,14 +173,20 @@
   hyphens: auto;
 }
 
-.clean-list-group > div.sub-item > div h6 a {
+.clean-list-group > div.sub-item > div h6 a,
+.clean-list-group > div.sub-sub-item > div h6 a {
   color: #62a814;
   text-decoration: none;
-  display: block;
+  display: inline-block;
 }
 
-.clean-list-group > div.sub-item > div h6 a:hover {
+.clean-list-group > div.sub-item > div h6 a:hover,
+.clean-list-group > div.sub-sub-item > div h6 a:hover {
   text-decoration: underline;
+}
+
+.clean-list-group > div.sub-sub-item.has-link:hover {
+  opacity: 1;
 }
 
 .clean-list-group > div > div:last-child {
@@ -137,44 +196,67 @@
   overflow-wrap: break-word;
 }
 
-
 @media (max-width: 768px) {
-  .clean-list-group > div {
+  .clean-list-group > div,
+  .clean-list-group > div.sub-item,
+  .clean-list-group > div.sub-sub-item {
     grid-template-columns: 1fr;
-    gap: 8px;
+    gap: 6px;
   }
 
   .clean-list-group > div.main-item,
-  .clean-list-group > div.sub-item {
-    padding-left: 12px;
-    padding-right: 12px;
-    margin-left: -12px;
-    margin-right: -12px;
+  .clean-list-group > div.sub-item,
+  .clean-list-group > div.sub-sub-item {
+    padding-left: 10px;
+    padding-right: 10px;
+    margin-left: -10px;
+    margin-right: -10px;
   }
 
   .clean-list-group > div.sub-item {
-    padding-left: 24px;
+    padding-left: 20px;
+  }
+
+  .clean-list-group > div.sub-sub-item {
+    padding-left: 40px;
+  }
+
+  .clean-list-group > div > div:nth-child(2),
+  .clean-list-group > div.sub-item > div:nth-child(2),
+  .clean-list-group > div.sub-sub-item > div:nth-child(2) {
+    grid-column: 1;
+  }
+
+  .clean-list-group > div > div:last-child,
+  .clean-list-group > div.sub-item > div:last-child,
+  .clean-list-group > div.sub-sub-item > div:last-child {
+    grid-column: 1;
   }
 }
 
 @media (max-width: 480px) {
   .clean-list-group {
-    margin-bottom: 12px;
-    padding-bottom: 12px;
+    margin-bottom: 10px;
+    padding-bottom: 10px;
   }
 
   .clean-list-group > div {
-    gap: 6px;
+    gap: 4px;
   }
 
   .clean-list-group > div.main-item,
-  .clean-list-group > div.sub-item {
-    padding: 10px 8px;
-    margin-left: -8px;
-    margin-right: -8px;
+  .clean-list-group > div.sub-item,
+  .clean-list-group > div.sub-sub-item {
+    padding: 8px 6px;
+    margin-left: -6px;
+    margin-right: -6px;
   }
 
   .clean-list-group > div.sub-item {
-    padding-left: 20px;
+    padding-left: 16px;
+  }
+
+  .clean-list-group > div.sub-sub-item {
+    padding-left: 32px;
   }
 }
