@@ -1,5 +1,10 @@
 /* Wrote this while questioning my own existence - ur boy frank*/
 
+main > div.section.clean-list-container > div:nth-child(1) > p:nth-child(1) picture img{
+    border-radius: 1rem;
+    box-shadow: 0px 2px 4px rgba(0,0,0,0.15);   
+}
+
 .clean-list-container p{
     font-family: 'Poppins';
 }
