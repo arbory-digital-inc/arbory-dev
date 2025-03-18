@@ -9,14 +9,13 @@ main .section.arbory-blog-hero-container[data-section-status="loaded"]{
     text-decoration: none !important;
 }
 
-
-
-.arbory-blog-hero-wrapper {
-    max-width: 100vw !important;
-    overflow: hidden;
-    padding: 0;
-    margin: 0;
-  }
+.arbory-blog-hero h1{
+  font-family: 'Poppins';
+  font-weight: 700;
+  font-size: 2.25rem;
+  letter-spacing: -1px;
+  text-align: center;
+}
   
   .arbory-blog-hero {
     position: relative;
