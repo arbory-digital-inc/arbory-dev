@@ -1,27 +1,45 @@
 /* manifested with light and shadow energy by ur boy frank */
 
 export default function decorate(block) {
+  // Ensure not processing an already decorated block
+  if (block.querySelector('.left-column')) {
+    return;
+  }
+
   const rows = [...block.children];
   
   // Clear the block's content
   block.textContent = '';
   
   // Create semantic containers for each metadata type
-  const titleContent = rows[0].children[1].textContent;
-  const authorContent = rows[1].children[1].textContent;
-  const dateContent = rows[2].children[1].textContent;
-  const tagsContent = rows[3].children[1].textContent;
+  const titleContent = rows[0]?.children[1]?.textContent || '';
+  const authorContent = rows[1]?.children[1]?.textContent || '';
+  const dateContent = rows[2]?.children[1]?.textContent?.trim() || '';
+  const tagsContent = rows[3]?.children[1]?.textContent || '';
 
   // Format the date
   const formatDate = (dateStr) => {
-    const [month, day, year] = dateStr.split('-').map(num => parseInt(num, 10));
-    const date = new Date(2000 + year, month - 1, day);
-    return date.toLocaleDateString('en-US', {
-      weekday: 'long',
-      month: 'long',
-      day: 'numeric',
-      year: 'numeric'
-    });
+    try {
+      const [month, day, year] = dateStr.split('-').map(num => parseInt(num.trim(), 10));
+      if (!month || !day || !year || isNaN(month) || isNaN(day) || isNaN(year)) {
+        console.warn('Invalid date format:', dateStr);
+        return dateStr;
+      }
+      const date = new Date(2000 + year, month - 1, day);
+      if (isNaN(date.getTime())) {
+        console.warn('Invalid date:', dateStr);
+        return dateStr;
+      }
+      return date.toLocaleDateString('en-US', {
+        weekday: 'long',
+        month: 'long',
+        day: 'numeric',
+        year: 'numeric'
+      });
+    } catch (error) {
+      console.warn('Error formatting date:', error);
+      return dateStr;
+    }
   };
 
   // Create left column
@@ -47,7 +65,8 @@ export default function decorate(block) {
   // Create date section
   const dateSection = document.createElement('div');
   dateSection.className = 'date';
-  dateSection.innerHTML = `<h5>${formatDate(dateContent)}</h5>`;
+  const formattedDate = formatDate(dateContent);
+  dateSection.innerHTML = `<h5>${formattedDate}</h5>`;
 
   // Create tags section
   const tagsSection = document.createElement('div');
