@@ -116,12 +116,12 @@
 
   .liveblog-meta .left-column,
   .liveblog-meta .right-column {
-    text-align: center;
+    text-align: left;
     padding: 0 0.5rem;
   }
 
   .liveblog-meta .tags {
-    justify-content: center;
+    justify-content: flex-start;
   }
   
   .liveblog-meta > div > div {
