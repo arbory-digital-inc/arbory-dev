@@ -1,0 +1,102 @@
+/* created from the akashic records by ya boy frank */
+
+.column-embed-wrapper {
+  max-width: 1200px;
+  margin: 32px auto;
+  padding: 0 1rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.column-embed {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  width: 100%;
+}
+
+.column-embed > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  min-width: 0; /* Prevent flex items from overflowing */
+}
+
+/* Inherit embed styles from parent */
+.column-embed .embed {
+  width: 100%;
+  margin: 0;
+  transition: transform 1s ease-in-out;
+  max-width: 100%; /* Ensure embeds don't overflow */
+}
+
+.column-embed .embed > div {
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.column-embed .embed:hover {
+  transform: scale(1.02);
+}
+
+/* Twitter specific fixes */
+.column-embed .embed.embed-twitter {
+  width: 100% !important;
+  max-width: 550px;
+  margin: 0 auto !important;
+}
+
+.column-embed .embed.embed-twitter iframe {
+  width: 100% !important;
+  border-radius: 1rem !important;
+}
+
+/* Responsive breakpoints - matching image gallery component */
+@media (max-width: 1024px) {
+  .column-embed {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+  
+  .column-embed > div {
+    gap: 1.5rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .column-embed-wrapper {
+    padding: 0 0.5rem;
+  }
+
+  .column-embed {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .column-embed > div {
+    gap: 1rem;
+  }
+
+  /* Additional mobile constraints */
+  .column-embed .embed {
+    transform: none !important; /* Disable hover effect on mobile */
+    box-shadow: none !important; /* Remove box shadow on mobile */
+  }
+  
+  .column-embed .embed > div {
+    width: 100% !important;
+    min-width: 0;
+    box-shadow: none !important; /* Remove box shadow from inner containers */
+  }
+
+  /* Force Twitter embeds to be responsive on mobile */
+  .column-embed .embed.embed-twitter {
+    width: 100% !important;
+    max-width: 100%;
+  }
+
+  /* Remove Twitter iframe shadows */
+  .column-embed .embed.embed-twitter iframe {
+    box-shadow: none !important;
+  }
+}
