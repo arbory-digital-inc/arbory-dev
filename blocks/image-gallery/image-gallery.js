@@ -1,7 +1,18 @@
 /* I am merely a vessel to this energy - ur boy frank*/
 
 export default function decorate(block) {
-  block.className = 'image-gallery';
+  // Get all picture elements and their containers
+  const pictures = Array.from(block.querySelectorAll('picture'));
+  
+  // Clear existing structure
+  block.innerHTML = '';
+  
+  // Create single row for all pictures
+  const row = document.createElement('div');
+  pictures.forEach(picture => {
+    row.appendChild(picture);
+  });
+  block.appendChild(row);
 
   // Create lightbox elements
   const lightbox = document.createElement('div');
