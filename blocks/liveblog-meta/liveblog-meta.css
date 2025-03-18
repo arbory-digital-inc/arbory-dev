@@ -104,8 +104,8 @@
 
 @media (max-width: 768px) {
   .liveblog-meta-wrapper {
-    padding: 0.5rem;
-    margin: 0.5rem;
+    padding: 0.5rem 0;
+    margin: 0.5rem 0;
     width: calc(100% - 1rem);
   }
 
