@@ -28,6 +28,7 @@
 
 .liveblog-meta .right-column {
   text-align: right;
+  align-self: center;
 }
 
 .liveblog-meta > div > div {
