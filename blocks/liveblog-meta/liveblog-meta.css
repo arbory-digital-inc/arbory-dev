@@ -5,6 +5,9 @@
   margin: 1rem auto;
   padding: 0.75rem 0;
   border-radius: 8px;
+  width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
 }
 
 .liveblog-meta {
@@ -14,21 +17,25 @@
   align-items: start;
   border-bottom: 3px solid #62a814;
   padding-bottom: 1rem;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .liveblog-meta .left-column,
 .liveblog-meta .right-column {
   display: grid;
   gap: 0.5rem;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .liveblog-meta .left-column {
   text-align: left;
+  min-width: 0;
 }
 
 .liveblog-meta .right-column {
   text-align: right;
-  align-self: center;
 }
 
 .liveblog-meta > div > div {
@@ -36,6 +43,8 @@
   align-items: baseline;
   gap: 0.5rem;
   font-family: 'Poppins';
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .liveblog-meta .title h3 {
@@ -45,9 +54,17 @@
   color: #62a814;
   font-family: 'Poppins';
   letter-spacing: -1px;
-  text-shadow: 0 0 10px rgba(98, 168, 20, 0.1),
-               0 0 20px rgba(98, 168, 20, 0.07),
+  text-shadow: 0 0 10px rgba(98, 168, 20, 0.15),
+               0 0 20px rgba(98, 168, 20, 0.1),
                0 0 30px rgba(98, 168, 20, 0.05);
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  -webkit-hyphens: auto;
+  -ms-hyphens: auto;
+  hyphens: auto;
+  line-height: 1.2;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .liveblog-meta .author h4 {
@@ -89,6 +106,7 @@
   .liveblog-meta-wrapper {
     padding: 0.5rem;
     margin: 0.5rem;
+    width: calc(100% - 1rem);
   }
 
   .liveblog-meta {
@@ -99,10 +117,35 @@
   .liveblog-meta .left-column,
   .liveblog-meta .right-column {
     text-align: center;
+    padding: 0 0.5rem;
   }
 
   .liveblog-meta .tags {
     justify-content: center;
+  }
+  
+  .liveblog-meta > div > div {
+    font-size: 1.5rem;
+    font-family: 'Poppins';
+  }
+  
+  .liveblog-meta .title h3 {
+    font-size: 1.5rem;
+    max-width: 100%;
+    padding: 0;
+    word-break: break-word;
+  }
+  
+  .liveblog-meta .author h4 {
+    font-size: 1.25rem;
+  }
+  
+  .liveblog-meta .date h5 {
+    font-size: 1rem;
+  }
+  
+  .liveblog-meta .tag {
+    font-size: 0.75rem;
   }
 }
 
