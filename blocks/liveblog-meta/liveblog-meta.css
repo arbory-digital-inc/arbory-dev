@@ -12,6 +12,8 @@
   grid-template-columns: 1fr auto;
   gap: 2rem;
   align-items: start;
+  border-bottom: 3px solid #62a814;
+  padding-bottom: 1rem;
 }
 
 .liveblog-meta .left-column,
@@ -42,6 +44,9 @@
   color: #62a814;
   font-family: 'Poppins';
   letter-spacing: -1px;
+  text-shadow: 0 0 10px rgba(98, 168, 20, 0.1),
+               0 0 20px rgba(98, 168, 20, 0.07),
+               0 0 30px rgba(98, 168, 20, 0.05);
 }
 
 .liveblog-meta .author h4 {
@@ -72,6 +77,7 @@
 .liveblog-meta .tag {
   background: #406e0c;
   padding: 0.15rem 0.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15), 0 1px 2px rgba(0, 0, 0, 0.28);
   border-radius: 1rem;
   font-size: 0.875rem;
   color: #f5f5f5;
