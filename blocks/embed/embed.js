@@ -50,10 +50,12 @@ const loadScript = (url, callback, type) => {
   };
   
   const embedTwitter = (url) => {
-    const embedHTML = `<blockquote class="twitter-tweet"><a href="${url.href}"></a></blockquote>`;
+    console.log(url.href);
+    const embedHTML = `<blockquote class="twitter-tweet"><p lang="en" dir="ltr"><a href="${url.href}"></a></p></blockquote>`;
     loadScript('https://platform.twitter.com/widgets.js');
     return embedHTML;
   };
+
 
   // vidyard videos
 const embedVidyard = (url) => {
