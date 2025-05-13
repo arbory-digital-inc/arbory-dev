@@ -4,7 +4,7 @@
   font-size: 2em;
   text-align: center;
   font-weight: 400;
-  font-family: 'Poppins';
+  font-family: var(--heading-font-family);
 }
 
 .home-resources-container{
@@ -59,7 +59,7 @@
     font-size: 1.25rem;
     line-height: 1.4;
     text-align: center;
-    font-family: 'Poppins';
+    font-family: var(--heading-font-family);
   }
   
   .home-resources-container .card-content p {

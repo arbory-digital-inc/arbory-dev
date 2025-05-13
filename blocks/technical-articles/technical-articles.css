@@ -4,7 +4,7 @@
   font-size: 2em;
   text-align: center;
   font-weight: 400;
-  font-family: 'Poppins';
+  font-family: var(--heading-font-family);
 }
 
 .technical-articles-container{
@@ -75,7 +75,7 @@
   font-size: 1.15rem;
   font-weight: 500;
   color: #406E0C;
-  font-family: 'Poppins';
+  font-family: var(--heading-font-family);
   width: 100%;
   margin-top: 1rem;
   margin-bottom: 0.5rem;

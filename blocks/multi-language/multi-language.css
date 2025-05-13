@@ -13,7 +13,7 @@
   justify-content: flex-start;
   gap: 2rem;
   text-align: center;
-  font-family: 'Poppins';
+  font-family: var(--heading-font-family);
 }
 
 @keyframes subtleTextGlow {
@@ -40,7 +40,7 @@
 
   .multi-language h5 {
     color: #62a814;
-    font-family: 'Poppins';
+    font-family: var(--heading-font-family);
     letter-spacing: -1px;
     padding-left: 1rem;
     font-size: 2.5rem;
@@ -51,7 +51,7 @@
   .multi-language h6 {
     color: #ffffff;
     text-align: left;
-    font-family: 'Poppins';
+    font-family: var(--heading-font-family);
     letter-spacing: -1px;
     font-size: 1.25rem;
     padding-left: 1rem;
@@ -62,7 +62,7 @@
   .multi-language p{
     color: #ffffff;
     text-align: left;
-    font-family: 'Poppins';
+    font-family: var(--heading-font-family);
     font-size: 1.25rem;
     padding-left: 1rem;
   }

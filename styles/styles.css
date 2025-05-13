@@ -9,7 +9,8 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
- @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+ @import "fonts.css";
 
  html, body {
   scroll-behavior: smooth !important;
@@ -49,7 +50,7 @@
 
   /* fonts */
   --body-font-family: roboto, roboto-fallback;
-  --heading-font-family: var(--body-font-family);
+  --heading-font-family: poppins-var, poppins-bold, 'Segoe UI', Helvetica, Arial, sans-serif;
   --fixed-font-family: 'Roboto Mono', menlo, consolas, 'Liberation Mono', monospace;
   --code-font-family: "Roboto Mono", source-code-pro, "Courier New", monospace;
 
@@ -369,7 +370,7 @@ code:not(pre > code) {
 }
 
 .section.hero-container h1{
-  font-family: 'Poppins';
+  font-family: var(--heading-font-family);
   position: relative;
   font-size: 3rem;
   font-weight: 500;

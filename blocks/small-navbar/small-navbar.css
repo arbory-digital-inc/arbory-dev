@@ -51,7 +51,7 @@
     transition: all 0.3s ease;
     background-color: #191B22;
     border-bottom: 2px solid #62a814;
-    font-family: 'Poppins';
+    font-family: var(--heading-font-family);
     margin-right: 1rem;
     width: auto;
     box-sizing: border-box;

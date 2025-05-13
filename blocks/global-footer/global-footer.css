@@ -26,7 +26,7 @@
     display: inline-flex;
     margin: auto;
     padding: 0.5rem;
-    font-family: 'Poppins';
+    font-family: var(--heading-font-family);
 }
 
 .global-footer-container .footer-row-1 > div.button-container.footer-button > p > a{
@@ -44,7 +44,7 @@
 .global-footer-container .footer-row-1 .footer-button {
     justify-self: end;
     display: inline-flex;
-    font-family: 'Poppins';
+    font-family: var(--heading-font-family);
 }
 
 .global-footer-container .footer-row-1 .footer-button a {
@@ -113,6 +113,6 @@
     background-color: transparent;
     color: #f7f7f7;
     font-weight: 300;
-    font-family: 'Poppins';
+    font-family: var(--heading-font-family);
     font-size: 0.6em;
 }

@@ -19,7 +19,7 @@ main .hero h1 {
   margin-left: auto;
   margin-right: auto;
   color: white;
-  font-family: 'Poppins';
+  font-family: var(--heading-font-family);
   text-align: center;
 }
 

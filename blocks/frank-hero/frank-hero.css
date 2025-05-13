@@ -61,7 +61,7 @@
   z-index: 1;
   margin: 0;
   padding-right: 40px;
-  font-family: 'Poppins';
+  font-family: var(--heading-font-family);
 }
 
 /* H6 Container */
@@ -69,7 +69,7 @@
   grid-column: 1;
   top: calc(50% + 80px); /* Position below h1 */
   left: 40px;
-  font-family: 'Poppins';
+  font-family: var(--heading-font-family);
   color: #f7f7f7;
   font-size: 1.125rem;
   font-weight: 400;

@@ -14,7 +14,7 @@
   justify-content: flex-start;
   gap: 2rem;
   text-align: center;
-  font-family: 'Poppins';
+  font-family: var(--heading-font-family);
 }
 
 @keyframes subtleTextGlow {
@@ -67,7 +67,7 @@
 
 .section.thats-fast-container > div:nth-last-child(1) > p {
     text-align: left;
-    font-family: 'Poppins';
+    font-family: var(--heading-font-family);
     letter-spacing: -1px;
     font-size: 1.15rem;
     margin: 0.75rem;
