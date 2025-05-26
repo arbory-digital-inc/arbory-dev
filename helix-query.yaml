@@ -98,6 +98,135 @@ indices:
         select: head > meta[name="description"]
         value: |
           attribute(el, "content")
+
+## Spanish CONTENT
+  arbory-es:
+      include:
+        - /es/**
+      exclude:
+        - /es/drafts/**
+      target: /es-index.json
+      properties:
+        author:
+          select: head > meta[name="author"]
+          value: |
+            attribute(el, "content")
+        title:
+          select: head > meta[property="og:title"]
+          value: |
+            attribute(el, "content")
+        image:
+          select: head > meta[property="og:image"]
+          value: |
+            match(attribute(el, "content"), "https:\/\/[^/]+(/.*)")
+        description:
+          select: head > meta[name="description"]
+          value: |
+            attribute(el, "content")
+
+
+## Italian CONTENT
+  arbory-it:
+      include:
+        - /it/**
+      exclude:
+        - /it/drafts/**
+      target: /it-index.json
+      properties:
+        author:
+          select: head > meta[name="author"]
+          value: |
+            attribute(el, "content")
+        title:
+          select: head > meta[property="og:title"]
+          value: |
+            attribute(el, "content")
+        image:
+          select: head > meta[property="og:image"]
+          value: |
+            match(attribute(el, "content"), "https:\/\/[^/]+(/.*)")
+        description:
+          select: head > meta[name="description"]
+          value: |
+            attribute(el, "content")
+
+## Japanese CONTENT
+  arbory-ja:
+      include:
+        - /ja/**
+      exclude:
+        - /ja/drafts/**
+      target: /ja-index.json
+      properties:
+        author:
+          select: head > meta[name="author"]
+          value: |
+            attribute(el, "content")
+        title:
+          select: head > meta[property="og:title"]
+          value: |
+            attribute(el, "content")
+        image:
+          select: head > meta[property="og:image"]
+          value: |
+            match(attribute(el, "content"), "https:\/\/[^/]+(/.*)")
+        description:
+          select: head > meta[name="description"]
+          value: |
+            attribute(el, "content")
+
+## Korean CONTENT
+  arbory-ko:
+      include:
+        - /ko/**
+      exclude:
+        - /ko/drafts/**
+      target: /ko-index.json
+      properties:
+        author:
+          select: head > meta[name="author"]
+          value: |
+            attribute(el, "content")
+        title:
+          select: head > meta[property="og:title"]
+          value: |
+            attribute(el, "content")
+        image:
+          select: head > meta[property="og:image"]
+          value: |
+            match(attribute(el, "content"), "https:\/\/[^/]+(/.*)")
+        description:
+          select: head > meta[name="description"]
+          value: |
+            attribute(el, "content")
+
+
+## Traditional Chinese CONTENT
+  arbory-tw:
+      include:
+        - /zh-tw/**
+      exclude:
+        - /zh-tw/drafts/**
+      target: /zh-tw-index.json
+      properties:
+        author:
+          select: head > meta[name="author"]
+          value: |
+            attribute(el, "content")
+        title:
+          select: head > meta[property="og:title"]
+          value: |
+            attribute(el, "content")
+        image:
+          select: head > meta[property="og:image"]
+          value: |
+            match(attribute(el, "content"), "https:\/\/[^/]+(/.*)")
+        description:
+          select: head > meta[name="description"]
+          value: |
+            attribute(el, "content")
+
+## Mainland China CONTENT
   arbory-cn:
       include:
         - /zh-cn/**
