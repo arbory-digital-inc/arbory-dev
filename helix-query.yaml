@@ -22,12 +22,12 @@ indices:
         select: head > meta[name="description"]
         value: |
           attribute(el, "content")
-  arbory-en:
+  arbory-fr:
     include:
-      - /en/**
+      - /fr/**
     exclude:
-      - /en/drafts/**
-    target: /en-index.json
+      - /fr/drafts/**
+    target: /fr-index.json
     properties:
       author:
         select: head > meta[name="author"]
@@ -45,12 +45,12 @@ indices:
         select: head > meta[name="description"]
         value: |
           attribute(el, "content")
-  arbory-fr:
+  arbory-en:
     include:
-      - /fr/**
+      - /en/**
     exclude:
-      - /fr/drafts/**
-    target: /fr-index.json
+      - /en/drafts/**
+    target: /en-index.json
     properties:
       author:
         select: head > meta[name="author"]
