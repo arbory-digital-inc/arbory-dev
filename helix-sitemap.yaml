@@ -5,7 +5,7 @@ sitemaps:
      hreflang: en
      lastmod: YYYY-MM-DD
      origin: https://blog.arborydigital.com
-     
+
    international:
     origin: https://blog.arborydigital.com
     lastmod: YYYY-MM-DD
@@ -25,3 +25,33 @@ sitemaps:
         destination: /fr/sitemap.xml
         hreflang: fr
         alternate: /fr/{path}
+      it:
+        source: /it-index.json
+        destination: /it/sitemap.xml
+        hreflang: it
+        alternate: /it/{path}
+      es:
+        source: /es-index.json
+        destination: /es/sitemap.xml
+        hreflang: es
+        alternate: /es/{path}
+      ko:
+        source: /ko-index.json
+        destination: /ko/sitemap.xml
+        hreflang: ko
+        alternate: /ko/{path}
+      ja:
+        source: /ja-index.json
+        destination: /ja/sitemap.xml
+        hreflang: ja
+        alternate: /ja/{path}
+      zh-cn:
+        source: /zh-cn-index.json
+        destination: /zh-cn/sitemap.xml
+        hreflang: zh-cn
+        alternate: /zh-cn/{path}
+      zh-tw:
+        source: /zh-tw-index.json
+        destination: /zh-tw/sitemap.xml
+        hreflang: zh-tw
+        alternate: /zh-tw/{path}
