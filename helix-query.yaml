@@ -22,6 +22,8 @@ indices:
         select: head > meta[name="description"]
         value: |
           attribute(el, "content")
+
+## FRENCH CONTENT
   arbory-fr:
     include:
       - /fr/**
@@ -45,12 +47,14 @@ indices:
         select: head > meta[name="description"]
         value: |
           attribute(el, "content")
-  arbory-en:
+
+## GERMAN CONTENT
+  arbory-de:
     include:
-      - /en/**
+      - /de/**
     exclude:
-      - /en/drafts/**
-    target: /en-index.json
+      - /de/drafts/**
+    target: /de-index.json
     properties:
       author:
         select: head > meta[name="author"]
@@ -68,12 +72,15 @@ indices:
         select: head > meta[name="description"]
         value: |
           attribute(el, "content")
-  arbory-de:
+
+
+## ENGLISH CONTENT
+  arbory-en:
     include:
-      - /de/**
+      - /en/**
     exclude:
-      - /de/drafts/**
-    target: /de-index.json
+      - /en/drafts/**
+    target: /en-index.json
     properties:
       author:
         select: head > meta[name="author"]
