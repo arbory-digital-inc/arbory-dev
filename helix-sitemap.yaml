@@ -3,3 +3,22 @@ sitemaps:
      source: /blog.json
      destination: /sitemap.xml
      hreflang: en
+   international:
+    origin: https://blog.arborydigital.com
+    lastmod: YYYY-MM-DD
+    languages:
+      en:
+        source: /en-index.json
+        destination: /en/sitemap.xml
+        hreflang: en
+        alternate: /en/{path}
+      de:
+        source: /de-index.json
+        destination: /de/sitemap.xml
+        hreflang: de
+        alternate: /de/{path}
+      fr:
+        source: /fr-index.json
+        destination: /fr/sitemap.xml
+        hreflang: fr
+        alternate: /fr/{path}
