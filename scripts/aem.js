@@ -618,9 +618,14 @@ function decorateBlocks(main) {
 /**
  * Loads a block named 'header' into header
  * @param {Element} header header element
+ * @param {string} [headerPath] Optional path to the header content
  * @returns {Promise}
  */
-async function loadHeader(header) {
+async function loadHeader(header, headerPath) {
+  if (headerPath) {
+    // Store the headerPath as a data attribute for the header block to use
+    header.dataset.headerPath = headerPath;
+  }
   const headerBlock = buildBlock('header', '');
   header.append(headerBlock);
   decorateBlock(headerBlock);
@@ -629,10 +634,15 @@ async function loadHeader(header) {
 
 /**
  * Loads a block named 'footer' into footer
- * @param footer footer element
+ * @param {Element} footer footer element
+ * @param {string} [footerPath] Optional path to the footer content
  * @returns {Promise}
  */
-async function loadFooter(footer) {
+async function loadFooter(footer, footerPath) {
+  if (footerPath) {
+    // Store the footerPath as a data attribute for the footer block to use
+    footer.dataset.footerPath = footerPath;
+  }
   const footerBlock = buildBlock('footer', '');
   footer.append(footerBlock);
   decorateBlock(footerBlock);

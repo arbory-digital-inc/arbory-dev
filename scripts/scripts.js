@@ -14,6 +14,13 @@ import {
   sampleRUM,
 } from './aem.js';
 
+import {
+  getLanguage,
+  getLanguageNav,
+  getLanguageFooter,
+  isLanguageSupported
+} from './lang.js';
+
 /**
  * Builds hero block and prepends to main in a new section.
  * @param {Element} main The container element
@@ -34,6 +41,9 @@ function buildHeroBlock(main) {
     main.prepend(section);
   }
 }
+
+const defaultMetaImage = `${window.location.origin}/icons/arbory-share.jpg`;
+
 
 /**
  * load fonts.css and set a session storage flag
@@ -75,11 +85,26 @@ export function decorateMain(main) {
 }
 
 /**
+ * If the metaproperty Image is not present, use the default value
+ * Default metaimage is located in /icons/arbor-share.jpg.
+ */
+function setMetaImage() {
+  const imageMeta = getMetadata('image');
+  if (!imageMeta) {
+    document.querySelector('meta[property="og:image"]')?.setAttribute('content', defaultMetaImage);
+  }
+}
+
+export function getDefaultMetaImage() {
+  return defaultMetaImage;
+}
+
+/**
  * Loads everything needed to get to LCP.
  * @param {Element} doc The container element
  */
 async function loadEager(doc) {
-  document.documentElement.lang = 'en';
+  // Language is already set in lang.js, no need to set it here
   decorateTemplateAndTheme();
   const main = doc.querySelector('main');
   if (main) {
@@ -113,8 +138,11 @@ async function loadLazy(doc) {
   const element = hash ? doc.getElementById(hash.substring(1)) : false;
   if (hash && element) element.scrollIntoView();
 
-  loadHeader(doc.querySelector('header'));
-  loadFooter(doc.querySelector('footer'));
+  // Use language-specific header and footer
+  const headerPath = getLanguageNav();
+  const footerPath = getLanguageFooter();
+  loadHeader(doc.querySelector('header'), headerPath);
+  loadFooter(doc.querySelector('footer'), footerPath);
 
   loadCSS(`${window.hlx.codeBasePath}/styles/lazy-styles.css`);
   loadFonts();
