@@ -79,10 +79,11 @@ async function getJsonFromUrl(route) {
  * @returns {string} path to language nav
  */
 function getLanguageNav(isSKP = null) {
+  const currentLang = getLanguage();
   if (isSKP) {
-    return isLanguageSupported ? `/${lang}/statistics-knowledge-portal/nav` : '/en/statistics-knowledge-portal/nav';
+    return isLanguageSupported(currentLang) ? `/${currentLang}/nav` : '/en/nav';
   }
-  return isLanguageSupported ? `/${lang}/navigation/header` : '/en/navigation/header';
+  return isLanguageSupported(currentLang) ? `/${currentLang}/nav` : '/en/nav';
 }
 
 /**
@@ -91,10 +92,11 @@ function getLanguageNav(isSKP = null) {
  * @returns {string} path to language footer
  */
 function getLanguageFooter(isSKP = null) {
+  const currentLang = getLanguage();
   if (isSKP) {
-    return isLanguageSupported ? `/${lang}/statistics-knowledge-portal/footer` : '/en/statistics-knowledge-portal/footer';
+    return isLanguageSupported(currentLang) ? `/${currentLang}/footer` : '/en/footer';
   }
-  return isLanguageSupported ? `/${lang}/navigation/footer` : '/en/navigation/footer';
+  return isLanguageSupported(currentLang) ? `/${currentLang}/footer` : '/en/footer';
 }
 
 /**

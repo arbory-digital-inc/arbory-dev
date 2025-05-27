@@ -237,9 +237,14 @@ function createLanguageSelector() {
  * @param {Element} block The header block element
  */
 export default async function decorate(block) {
+  // Check if a headerPath was provided via the data attribute
+  const headerPathFromData = block.closest('header').dataset.headerPath;
+  
   // load nav as fragment
   const navMeta = getMetadata('nav');
-  const navPath = navMeta ? new URL(navMeta, window.location).pathname : '/nav';
+  // Use the headerPath if provided, otherwise fall back to metadata or default
+  const navPath = headerPathFromData || (navMeta ? new URL(navMeta, window.location).pathname : '/nav');
+  console.log('Loading header from:', navPath);
   const fragment = await loadFragment(navPath);
 
   // decorate nav DOM
