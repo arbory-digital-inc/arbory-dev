@@ -19,7 +19,8 @@ function isLanguageSupported(language) {
  * @returns {string[]} Array of supported language codes
  */
 function getSupportedLanguages() {
-  return ['en', 'es', 'fr', 'de', 'it', 'ko', 'ja', 'cn', 'zh-cn', 'zh-tw'];
+  // Only include languages that are configured in helix-query.yaml
+  return ['en', 'fr', 'de', 'zh-cn'];
 }
 
 /* Set the html lang property based on the page path. Default to 'en'. */
@@ -97,16 +98,41 @@ function getLanguageFooter(isSKP = null) {
 }
 
 /**
+ * Map language codes to their index file names
+ */
+const languageIndexMap = {
+  'en': 'en-index.json',
+  'fr': 'fr-index.json',
+  'de': 'de-index.json',
+  'zh-cn': 'zh-cn-index.json'
+};
+
+/**
  * Returns the path of the appropriate index based on page language.
  * Default to 'en' if language isn't found.
  * @returns {string} path to language index
  */
 function getLanguageIndex(overwriteLanguage = null) {
-  if (overwriteLanguage) {
-    return isLanguageSupported(overwriteLanguage) ? `/en-${overwriteLanguage}.json` : '/en-index.json';
+  const langCode = overwriteLanguage || lang;
+  
+  if (isLanguageSupported(langCode)) {
+    // Get the correct index file for this language
+    return `/${languageIndexMap[langCode] || `${langCode}-index.json`}`;
   }
-  return isLanguageSupported ? `/en-${lang}.json` : '/en-index.json';
+  
+  // Default to English index
+  return '/en-index.json';
 }
+
+/**
+ * Map language codes to their SKP index file names
+ */
+const skpLanguageIndexMap = {
+  'en': 'skp-en.json',
+  'fr': 'skp-fr.json',
+  'de': 'skp-de.json',
+  'zh-cn': 'skp-zh-cn.json'
+};
 
 /**
  * Returns the path of the appropriate index for SKP based on page language.
@@ -114,7 +140,13 @@ function getLanguageIndex(overwriteLanguage = null) {
  * @returns {string} path to language index
  */
 function getSKPLanguageIndex() {
-  return isLanguageSupported ? `/skp-${lang}.json` : '/skp-en.json';
+  if (isLanguageSupported) {
+    // Get the correct SKP index file for this language
+    return `/${skpLanguageIndexMap[lang] || `skp-${lang}.json`}`;
+  }
+  
+  // Default to English SKP index
+  return '/skp-en.json';
 }
 
 /*
@@ -361,68 +393,132 @@ function pageFilterByFolder(pageSelection, folderPath) {
 }
 
 /**
+ * Map language codes to their actual paths on the server
+ * Some language codes might have different representations in URLs
+ */
+const languageCodeMap = {
+  'cn': 'zh-cn', // Map 'cn' to 'zh-cn' for URL paths
+  'zh-cn': 'zh-cn',
+  'zh-tw': 'zh-tw'
+};
+
+/**
+ * Get the correct URL language code for a given language code
+ * @param {string} code - The language code to map
+ * @returns {string} - The mapped language code for URLs
+ */
+function getUrlLanguageCode(code) {
+  return languageCodeMap[code] || code;
+}
+
+/**
  * Get the URL for a page in a specific language for the language menu
  * @param {string} languageCode - The language code to check
- * @returns {Promise<string|null>} - The URL for the page in the specified language, or null if not available
+ * @returns {Promise<string|null>} - The URL for the page in the specified language, or English version if not available
  */
 async function getLangMenuPageUrl(languageCode) {
-	// Validate input parameters
-	if (!languageCode || typeof languageCode !== 'string') {
-		console.warn('Invalid language code provided to getLangMenuPageUrl:', languageCode);
-		return null;
-	}
-	
-	// Check if language is supported
-	if (!isLanguageSupported(languageCode)) {
-		console.log(`Language ${languageCode} is not in the supported languages list`);
-		return null;
-	}
-	
-	// If current language is requested, return current path
-	if (languageCode === getLanguage()) {
-		return window.location.pathname;
-	}
-	
-	// Extract the current page path without language prefix
-	const pathParts = pagePath.split('/');
-	pathParts.splice(0, 2); // Remove empty first element and language code
-	const currPagePath = pathParts.join('/');
-	
-	// Construct the URL for the page in the specified language
-	const languageCurrPage = `/${languageCode}/${currPagePath}`;
-	
-	// Check if the page exists in the specified language
-	try {
-		const controller = new AbortController();
-		const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 second timeout
-		
-		const response = await fetch(languageCurrPage, {
-			method: 'HEAD', // Only need headers, not the full page
-			signal: controller.signal,
-			cache: 'no-store' // Don't use cached results
-		});
-		
-		clearTimeout(timeoutId);
-		
-		if (response.ok) {
-			return languageCurrPage;
-		} else {
-			// If specific page doesn't exist, try the language home page
-			if (currPagePath) {
-				return `/${languageCode}/`;
-			}
-			return null;
-		}
-	} catch (error) {
-		if (error.name === 'AbortError') {
-			console.warn(`Request timeout checking language URL ${languageCurrPage}`);
-		} else {
-			console.error(`Error checking language URL ${languageCurrPage}:`, error);
-		}
-		
-		// If there's an error, fall back to the language home page
-		return `/${languageCode}/`;
-	}
+  // Validate input parameters
+  if (!languageCode || typeof languageCode !== 'string') {
+    console.warn('Invalid language code provided to getLangMenuPageUrl:', languageCode);
+    return null;
+  }
+  
+  // Check if language is supported
+  if (!isLanguageSupported(languageCode)) {
+    console.log(`Language ${languageCode} is not in the supported languages list`);
+    return null;
+  }
+  
+  // If current language is requested, return current path
+  if (languageCode === getLanguage()) {
+    // Make sure we return a valid URL
+    return window.location.pathname || '/';
+  }
+  
+  // Extract the current page path without language prefix
+  const pathParts = pagePath.split('/');
+  pathParts.splice(0, 2); // Remove empty first element and language code
+  const currPagePath = pathParts.join('/');
+  
+  // Get the correct URL language code (handle special cases like 'cn')
+  const urlLanguageCode = getUrlLanguageCode(languageCode);
+  
+  // Construct the URL for the page in the specified language
+  const languageCurrPage = `/${urlLanguageCode}/${currPagePath}`;
+  
+  // Also prepare the English version as fallback
+  const englishPage = `/en/${currPagePath}`;
+  
+  // Check if the page exists in the specified language
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 second timeout
+    
+    const response = await fetch(languageCurrPage, {
+      method: 'HEAD', // Only need headers, not the full page
+      signal: controller.signal,
+      cache: 'no-store' // Don't use cached results
+    });
+    
+    clearTimeout(timeoutId);
+    
+    if (response.ok) {
+      // Page exists in requested language
+      return languageCurrPage;
+    } else {
+      // Page doesn't exist in requested language, check if it exists in English
+      try {
+        const englishController = new AbortController();
+        const englishTimeoutId = setTimeout(() => englishController.abort(), 3000);
+        
+        const englishResponse = await fetch(englishPage, {
+          method: 'HEAD',
+          signal: englishController.signal,
+          cache: 'no-store'
+        });
+        
+        clearTimeout(englishTimeoutId);
+        
+        if (englishResponse.ok) {
+          // Page exists in English, use that as fallback
+          console.log(`Page not available in ${languageCode}, falling back to English version: ${englishPage}`);
+          return englishPage;
+        } else {
+          // Page doesn't exist in English either, fall back to language home page
+          console.log(`Page not available in any language, falling back to language home page: /${urlLanguageCode}/`);
+          return `/${urlLanguageCode}/`;
+        }
+      } catch (englishError) {
+        // Error checking English version, fall back to language home page
+        console.warn(`Error checking English fallback: ${englishError}`);
+        return `/${urlLanguageCode}/`;
+      }
+    }
+  } catch (error) {
+    if (error.name === 'AbortError') {
+      console.warn(`Request timeout checking language URL ${languageCurrPage}`);
+    } else {
+      console.error(`Error checking language URL ${languageCurrPage}:`, error);
+    }
+    
+    // If there's an error, try the English version
+    try {
+      const englishResponse = await fetch(englishPage, {
+        method: 'HEAD',
+        cache: 'no-store'
+      });
+      
+      if (englishResponse.ok) {
+        console.log(`Error accessing ${languageCode} version, falling back to English`);
+        return englishPage;
+      }
+    } catch (englishError) {
+      console.warn(`Error checking English fallback: ${englishError}`);
+    }
+    
+    // If English version also fails, fall back to language home page
+    return `/${urlLanguageCode}/`;
+  }
 }
 
 function convertStringToJSONObject(stringValue) {
@@ -628,6 +724,160 @@ function writeImagePropertyInList(propertyName, item) {
   return `<span class="${propertyName}"><img src="${imageSrc}"/></span>`;
 }
 
+// getUrlLanguageCode is already defined above
+
+/**
+ * Process all links in a document to add the current language prefix
+ * and handle fallbacks for pages that don't exist in the current language
+ * @param {Element} doc The document element
+ */
+function processLinksForLanguage(doc) {
+  const lang = getLanguage();
+  if (!lang || lang === 'en') return; // Don't modify links if we're on English pages
+  
+  // Function to check if a URL is internal
+  function isInternalLink(href) {
+    if (!href) return false;
+    if (href.startsWith('#') || href.startsWith('javascript:') || href.startsWith('tel:') || href.startsWith('mailto:')) return false;
+    if (href.startsWith('http://') || href.startsWith('https://')) {
+      try {
+        const url = new URL(href);
+        return url.hostname === window.location.hostname;
+      } catch (e) {
+        return false;
+      }
+    }
+    return true;
+  }
+  
+  // Function to check if a URL has a language prefix
+  function hasLanguagePrefix(url) {
+    if (!url.startsWith('/')) return false;
+    
+    const supportedLanguages = getSupportedLanguages();
+    const parts = url.split('/');
+    // Check if the first path segment is a supported language code
+    return parts.length > 1 && supportedLanguages.includes(parts[1]);
+  }
+  
+  // Function to remove existing language prefix
+  function removeLanguagePrefix(url) {
+    if (!hasLanguagePrefix(url)) return url;
+    
+    const parts = url.split('/');
+    parts.splice(1, 1); // Remove the language part
+    return parts.join('/');
+  }
+  
+  // Process all links on the page
+  doc.querySelectorAll('a').forEach((a) => {
+    const href = a.getAttribute('href');
+    if (!href || !isInternalLink(href)) return;
+    
+    // Skip links that already have the current language code
+    if (href.startsWith(`/${lang}/`)) return;
+    
+    // Skip absolute URLs that include the origin
+    if (href.includes('://')) return;
+    
+    // Skip links to files (like PDFs, images, etc.)
+    const fileExtensions = ['.pdf', '.jpg', '.jpeg', '.png', '.gif', '.svg', '.mp4', '.mp3', '.zip', '.doc', '.docx', '.xls', '.xlsx', '.ppt', '.pptx'];
+    if (fileExtensions.some(ext => href.toLowerCase().endsWith(ext))) return;
+    
+    // Check for malformed URLs that already contain the origin
+    if (href.includes(window.location.origin)) {
+      try {
+        // Extract the path from the URL
+        const url = new URL(href);
+        let pathOnly = url.pathname;
+        
+        // Remove any language prefix
+        pathOnly = removeLanguagePrefix(pathOnly);
+        
+        // Create a clean URL with the current language
+        const langUrl = `/${lang}${pathOnly.startsWith('/') ? '' : '/'}${pathOnly}`;
+        a.setAttribute('href', langUrl);
+        return;
+      } catch (e) {
+        console.error('Error parsing URL:', e);
+      }
+    }
+    
+    // Handle normal relative paths
+    let cleanPath = href;
+    if (cleanPath.startsWith('/')) {
+      // Check if it has a language prefix and remove it
+      cleanPath = removeLanguagePrefix(cleanPath);
+    }
+    
+    // Add the current language prefix
+    const langUrl = `/${lang}${cleanPath.startsWith('/') ? '' : '/'}${cleanPath}`;
+    a.setAttribute('href', langUrl);
+  });
+  
+  // Set up a MutationObserver to handle dynamically added links
+  const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      if (mutation.type === 'childList') {
+        mutation.addedNodes.forEach((node) => {
+          if (node.nodeType === 1) { // Element node
+            // Process any links inside the added node
+            node.querySelectorAll('a').forEach((a) => {
+              const href = a.getAttribute('href');
+              if (!href || !isInternalLink(href)) return;
+              
+              // Skip links that already have the current language code
+              if (href.startsWith(`/${lang}/`)) return;
+              
+              // Skip absolute URLs that include the origin
+              if (href.includes('://')) return;
+              
+              // Skip links to files
+              const fileExtensions = ['.pdf', '.jpg', '.jpeg', '.png', '.gif', '.svg', '.mp4', '.mp3', '.zip', '.doc', '.docx', '.xls', '.xlsx', '.ppt', '.pptx'];
+              if (fileExtensions.some(ext => href.toLowerCase().endsWith(ext))) return;
+              
+              // Check for malformed URLs that already contain the origin
+              if (href.includes(window.location.origin)) {
+                try {
+                  // Extract the path from the URL
+                  const url = new URL(href);
+                  let pathOnly = url.pathname;
+                  
+                  // Remove any language prefix
+                  pathOnly = removeLanguagePrefix(pathOnly);
+                  
+                  // Create a clean URL with the current language
+                  const langUrl = `/${lang}${pathOnly.startsWith('/') ? '' : '/'}${pathOnly}`;
+                  a.setAttribute('href', langUrl);
+                  return;
+                } catch (e) {
+                  console.error('Error parsing URL:', e);
+                }
+              }
+              
+              // Handle normal relative paths
+              let cleanPath = href;
+              if (cleanPath.startsWith('/')) {
+                cleanPath = removeLanguagePrefix(cleanPath);
+              }
+              
+              // Add the current language prefix
+              const langUrl = `/${lang}${cleanPath.startsWith('/') ? '' : '/'}${cleanPath}`;
+              a.setAttribute('href', langUrl);
+            });
+          }
+        });
+      }
+    });
+  });
+  
+  // Start observing the document
+  observer.observe(doc.body, { childList: true, subtree: true });
+}
+
+// Make the function available globally
+window.processLinksForLanguage = processLinksForLanguage;
+
 export {
   arrayIncludesAllValues,
   arrayIncludesSomeValues,
@@ -648,11 +898,13 @@ export {
   getLanguageNav,
   getListFilterOptions,
   getSKPLanguageIndex,
+  getSupportedLanguages,
   isLanguageSupported,
   pageAndFilter,
   pageFilterByFolder,
   pageOrFilter,
   parseBlockOptions,
+  processLinksForLanguage,
   sortPageList,
   updateBodyClassOnWindowResize,
   writeImagePropertyInList,

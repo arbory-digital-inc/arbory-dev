@@ -110,17 +110,12 @@ function toggleMenu(nav, navSections, forceExpanded = null) {
  */
 function createLanguageSelector() {
   const currentLang = getLanguage();
+  // Only include languages that are configured in helix-query.yaml
   const supportedLanguages = [
     { code: 'en', label: 'English' },
-    { code: 'es', label: 'Español' },
     { code: 'fr', label: 'Français' },
     { code: 'de', label: 'Deutsch' },
-    { code: 'it', label: 'Italiano' },
-    { code: 'ko', label: 'Korean' },
-    { code: 'ja', label: 'Japanese' },
-    { code: 'cn', label: 'Chinese' },
-    { code: 'zh-cn', label: '简体中文' },
-    { code: 'zh-tw', label: '繁體中文' }
+    { code: 'zh-cn', label: '简体中文' }
   ];
   
   const langSelector = document.createElement('div');
@@ -138,15 +133,20 @@ function createLanguageSelector() {
   // Add current language first
   const currentLangItem = document.createElement('li');
   const currentLangLink = document.createElement('a');
-  currentLangLink.href = '#';
+  // Use javascript:void(0) instead of # to prevent navigation issues
+  currentLangLink.href = 'javascript:void(0)';
   currentLangLink.textContent = supportedLanguages.find(l => l.code === currentLang)?.label || 'English';
   currentLangLink.classList.add('active');
   currentLangItem.appendChild(currentLangLink);
   langDropdown.appendChild(currentLangItem);
   
+  // Add language selector elements to DOM immediately
+  langSelector.appendChild(currentLangButton);
+  langSelector.appendChild(langDropdown);
+  
   // Add other supported languages
-  Promise.all(
-    supportedLanguages
+  const loadLanguageOptions = async () => {
+    const langPromises = supportedLanguages
       .filter(lang => isLanguageSupported(lang.code) && lang.code !== currentLang)
       .map(async (lang) => {
         try {
@@ -155,7 +155,32 @@ function createLanguageSelector() {
           if (langUrl) {
             const langItem = document.createElement('li');
             const langLink = document.createElement('a');
-            langLink.href = langUrl;
+            
+            // Skip if langUrl is null (which happens when the fallback mechanism redirects immediately)
+            if (!langUrl) {
+              return null;
+            }
+            
+            // Make sure the URL is properly formatted
+            if (langUrl.startsWith('/')) {
+              // Ensure it's an absolute URL with origin
+              langLink.href = `${window.location.origin}${langUrl}`;
+            } else {
+              langLink.href = langUrl;
+            }
+            
+            // Use javascript:void(0) to prevent automatic navigation
+            langLink.href = 'javascript:void(0)';
+            
+            // Add click handler to navigate directly to the language home page
+            langLink.addEventListener('click', (e) => {
+              e.preventDefault();
+              // Navigate directly to the language home page
+              window.location.href = `/${lang.code}/`;
+            });
+            
+            // Add data attribute for debugging
+            langLink.setAttribute('data-lang', lang.code);
             langLink.textContent = lang.label;
             langItem.appendChild(langLink);
             return langItem;
@@ -164,19 +189,24 @@ function createLanguageSelector() {
           console.log(`Error checking language ${lang.code}:`, error);
         }
         return null;
-      })
-  ).then(langItems => {
+      });
+      
+    // Wait for all language checks to complete
+    const langItems = await Promise.all(langPromises);
+    
     // Filter out null items and add to dropdown
     langItems.filter(item => item !== null).forEach(item => {
       langDropdown.appendChild(item);
     });
     
-    // Only show dropdown if we have more than just the current language
-    if (langDropdown.children.length > 1) {
-      langSelector.appendChild(currentLangButton);
-      langSelector.appendChild(langDropdown);
+    // If no other languages are available, hide the selector
+    if (langDropdown.children.length <= 1) {
+      langSelector.style.display = 'none';
     }
-  });
+  };
+  
+  // Start loading language options
+  loadLanguageOptions();
   
   // Add event listeners
   currentLangButton.addEventListener('click', () => {
@@ -186,12 +216,18 @@ function createLanguageSelector() {
   });
   
   // Close dropdown when clicking outside
-  document.addEventListener('click', (e) => {
+  const closeDropdownHandler = (e) => {
     if (!langSelector.contains(e.target)) {
       currentLangButton.setAttribute('aria-expanded', 'false');
       langDropdown.style.display = 'none';
     }
-  });
+  };
+  
+  // Use a named function so we can remove it later if needed
+  document.addEventListener('click', closeDropdownHandler);
+  
+  // Store the handler on the langSelector element for potential cleanup
+  langSelector.closeDropdownHandler = closeDropdownHandler;
   
   return langSelector;
 }
