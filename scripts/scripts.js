@@ -14,6 +14,14 @@ import {
   sampleRUM,
 } from './aem.js';
 
+import {
+  getLanguage,
+  getLanguageNav,
+  getLanguageFooter,
+  isLanguageSupported,
+  getSupportedLanguages
+} from './lang.js';
+
 /**
  * Builds hero block and prepends to main in a new section.
  * @param {Element} main The container element
@@ -34,6 +42,9 @@ function buildHeroBlock(main) {
     main.prepend(section);
   }
 }
+
+const defaultMetaImage = `${window.location.origin}/icons/arbory-share.jpg`;
+
 
 /**
  * load fonts.css and set a session storage flag
@@ -75,11 +86,26 @@ export function decorateMain(main) {
 }
 
 /**
+ * If the metaproperty Image is not present, use the default value
+ * Default metaimage is located in /icons/arbor-share.jpg.
+ */
+function setMetaImage() {
+  const imageMeta = getMetadata('image');
+  if (!imageMeta) {
+    document.querySelector('meta[property="og:image"]')?.setAttribute('content', defaultMetaImage);
+  }
+}
+
+export function getDefaultMetaImage() {
+  return defaultMetaImage;
+}
+
+/**
  * Loads everything needed to get to LCP.
  * @param {Element} doc The container element
  */
 async function loadEager(doc) {
-  document.documentElement.lang = 'en';
+  // Language is already set in lang.js, no need to set it here
   decorateTemplateAndTheme();
   const main = doc.querySelector('main');
   if (main) {
@@ -102,6 +128,47 @@ async function loadEager(doc) {
 }
 
 /**
+ * Adds language prefix to internal links to maintain language selection
+ * @param {Element} doc The document element
+ */
+function setupLanguagePreservation(doc) {
+  // Import the processLinksForLanguage function from lang.js if available
+  if (typeof window.processLinksForLanguage === 'function') {
+    window.processLinksForLanguage(doc);
+  } else {
+    // Fallback to basic language prefix for links if the function isn't available
+    const lang = getLanguage();
+    if (!lang || lang === 'en') return; // Don't modify links if we're on English pages
+    
+    doc.querySelectorAll('a').forEach((a) => {
+      const href = a.getAttribute('href');
+      if (!href) return;
+      
+      // Skip external links, anchors, and special protocols
+      if (href.startsWith('http://') || 
+          href.startsWith('https://') || 
+          href.startsWith('#') || 
+          href.startsWith('javascript:') || 
+          href.startsWith('tel:') || 
+          href.startsWith('mailto:')) {
+        return;
+      }
+      
+      // Skip links that already have the current language code
+      if (href.startsWith(`/${lang}/`)) return;
+      
+      // Skip links to files (like PDFs, images, etc.)
+      const fileExtensions = ['.pdf', '.jpg', '.jpeg', '.png', '.gif', '.svg', '.mp4', '.mp3', '.zip', '.doc', '.docx', '.xls', '.xlsx', '.ppt', '.pptx'];
+      if (fileExtensions.some(ext => href.toLowerCase().endsWith(ext))) return;
+      
+      // Add the current language prefix to the link
+      const langUrl = `/${lang}${href.startsWith('/') ? '' : '/'}${href}`;
+      a.setAttribute('href', langUrl);
+    });
+  }
+}
+
+/**
  * Loads everything that doesn't need to be delayed.
  * @param {Element} doc The container element
  */
@@ -113,8 +180,14 @@ async function loadLazy(doc) {
   const element = hash ? doc.getElementById(hash.substring(1)) : false;
   if (hash && element) element.scrollIntoView();
 
-  loadHeader(doc.querySelector('header'));
-  loadFooter(doc.querySelector('footer'));
+  // Use language-specific header and footer
+  const headerPath = getLanguageNav();
+  const footerPath = getLanguageFooter();
+  loadHeader(doc.querySelector('header'), headerPath);
+  loadFooter(doc.querySelector('footer'), footerPath);
+  
+  // Set up language preservation for links
+  setupLanguagePreservation(doc);
 
   loadCSS(`${window.hlx.codeBasePath}/styles/lazy-styles.css`);
   loadFonts();
