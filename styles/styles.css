@@ -167,7 +167,6 @@ main pre {
   border-radius: .25em;
   overflow-x: auto;
   white-space: pre;
-  text-align: center;
 }
 
 a:any-link {
