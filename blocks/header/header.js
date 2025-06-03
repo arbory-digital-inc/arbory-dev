@@ -115,6 +115,11 @@ function createLanguageSelector() {
     { code: 'en', label: 'English' },
     { code: 'fr', label: 'Français' },
     { code: 'de', label: 'Deutsch' },
+    { code: 'es', label: 'Español' },
+    { code: 'it', label: 'Italiano' },
+    { code: 'ko', label: '한국어' },
+    { code: 'ja', label: '日本語' },
+    { code: 'zh-tw', label: '繁體中文' },
     { code: 'zh-cn', label: '简体中文' }
   ];
   
@@ -133,10 +138,14 @@ function createLanguageSelector() {
   // Add current language first
   const currentLangItem = document.createElement('li');
   const currentLangLink = document.createElement('a');
-  // Use javascript:void(0) instead of # to prevent navigation issues
-  currentLangLink.href = 'javascript:void(0)';
+  // Use current page URL for the current language
+  currentLangLink.href = window.location.href;
   currentLangLink.textContent = supportedLanguages.find(l => l.code === currentLang)?.label || 'English';
   currentLangLink.classList.add('active');
+  // Prevent navigation when clicking on current language
+  currentLangLink.addEventListener('click', (e) => {
+    e.preventDefault();
+  });
   currentLangItem.appendChild(currentLangLink);
   langDropdown.appendChild(currentLangItem);
   
@@ -150,43 +159,30 @@ function createLanguageSelector() {
       .filter(lang => isLanguageSupported(lang.code) && lang.code !== currentLang)
       .map(async (lang) => {
         try {
-          // Get language URL for this language
-          const langUrl = await getLangMenuPageUrl(lang.code);
-          if (langUrl) {
-            const langItem = document.createElement('li');
-            const langLink = document.createElement('a');
-            
-            // Skip if langUrl is null (which happens when the fallback mechanism redirects immediately)
-            if (!langUrl) {
-              return null;
-            }
-            
-            // Make sure the URL is properly formatted
-            if (langUrl.startsWith('/')) {
-              // Ensure it's an absolute URL with origin
-              langLink.href = `${window.location.origin}${langUrl}`;
-            } else {
-              langLink.href = langUrl;
-            }
-            
-            // Use javascript:void(0) to prevent automatic navigation
-            langLink.href = 'javascript:void(0)';
-            
-            // Add click handler to navigate directly to the language home page
-            langLink.addEventListener('click', (e) => {
-              e.preventDefault();
-              // Navigate directly to the language home page
-              window.location.href = `/${lang.code}/`;
-            });
-            
-            // Add data attribute for debugging
-            langLink.setAttribute('data-lang', lang.code);
-            langLink.textContent = lang.label;
-            langItem.appendChild(langLink);
-            return langItem;
-          }
+          // Create a simple language switch link without checking page existence
+          // This avoids the .html extension issues
+          const langItem = document.createElement('li');
+          const langLink = document.createElement('a');
+          
+          // Get the current path without language prefix
+          const pathParts = window.location.pathname.split('/');
+          // Remove empty first element and language code if present
+          pathParts.splice(0, pathParts[1] && pathParts[1].length <= 5 ? 2 : 1);
+          const currPagePath = pathParts.join('/');
+          
+          // Construct direct language URL
+          const langUrl = `/${lang.code}/${currPagePath}`;
+          
+          // Ensure it's an absolute URL with origin
+          langLink.href = `${window.location.origin}${langUrl}`;
+          
+          // Add data attribute for debugging
+          langLink.setAttribute('data-lang', lang.code);
+          langLink.textContent = lang.label;
+          langItem.appendChild(langLink);
+          return langItem;
         } catch (error) {
-          console.log(`Error checking language ${lang.code}:`, error);
+          console.log(`Error creating language link for ${lang.code}:`, error);
         }
         return null;
       });

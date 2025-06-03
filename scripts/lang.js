@@ -19,8 +19,8 @@ function isLanguageSupported(language) {
  * @returns {string[]} Array of supported language codes
  */
 function getSupportedLanguages() {
-  // Only include languages that are configured in helix-query.yaml
-  return ['en', 'fr', 'de', 'zh-cn'];
+  // Include all languages configured in helix-query.yaml
+  return ['en', 'de', 'fr', 'es', 'it', 'ko', 'ja', 'zh-tw', 'zh-cn'];
 }
 
 /* Set the html lang property based on the page path. Default to 'en'. */
@@ -416,9 +416,9 @@ function getUrlLanguageCode(code) {
 /**
  * Get the URL for a page in a specific language for the language menu
  * @param {string} languageCode - The language code to check
- * @returns {Promise<string|null>} - The URL for the page in the specified language, or English version if not available
+ * @returns {string|null} - The URL for the page in the specified language
  */
-async function getLangMenuPageUrl(languageCode) {
+function getLangMenuPageUrl(languageCode) {
   // Validate input parameters
   if (!languageCode || typeof languageCode !== 'string') {
     console.warn('Invalid language code provided to getLangMenuPageUrl:', languageCode);
@@ -438,89 +438,13 @@ async function getLangMenuPageUrl(languageCode) {
   }
   
   // Extract the current page path without language prefix
-  const pathParts = pagePath.split('/');
-  pathParts.splice(0, 2); // Remove empty first element and language code
+  const pathParts = window.location.pathname.split('/');
+  // Remove empty first element and language code if present
+  pathParts.splice(0, pathParts[1] && pathParts[1].length <= 5 ? 2 : 1);
   const currPagePath = pathParts.join('/');
   
-  // Get the correct URL language code (handle special cases like 'cn')
-  const urlLanguageCode = getUrlLanguageCode(languageCode);
-  
   // Construct the URL for the page in the specified language
-  const languageCurrPage = `/${urlLanguageCode}/${currPagePath}`;
-  
-  // Also prepare the English version as fallback
-  const englishPage = `/en/${currPagePath}`;
-  
-  // Check if the page exists in the specified language
-  try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 second timeout
-    
-    const response = await fetch(languageCurrPage, {
-      method: 'HEAD', // Only need headers, not the full page
-      signal: controller.signal,
-      cache: 'no-store' // Don't use cached results
-    });
-    
-    clearTimeout(timeoutId);
-    
-    if (response.ok) {
-      // Page exists in requested language
-      return languageCurrPage;
-    } else {
-      // Page doesn't exist in requested language, check if it exists in English
-      try {
-        const englishController = new AbortController();
-        const englishTimeoutId = setTimeout(() => englishController.abort(), 3000);
-        
-        const englishResponse = await fetch(englishPage, {
-          method: 'HEAD',
-          signal: englishController.signal,
-          cache: 'no-store'
-        });
-        
-        clearTimeout(englishTimeoutId);
-        
-        if (englishResponse.ok) {
-          // Page exists in English, use that as fallback
-          console.log(`Page not available in ${languageCode}, falling back to English version: ${englishPage}`);
-          return englishPage;
-        } else {
-          // Page doesn't exist in English either, fall back to language home page
-          console.log(`Page not available in any language, falling back to language home page: /${urlLanguageCode}/`);
-          return `/${urlLanguageCode}/`;
-        }
-      } catch (englishError) {
-        // Error checking English version, fall back to language home page
-        console.warn(`Error checking English fallback: ${englishError}`);
-        return `/${urlLanguageCode}/`;
-      }
-    }
-  } catch (error) {
-    if (error.name === 'AbortError') {
-      console.warn(`Request timeout checking language URL ${languageCurrPage}`);
-    } else {
-      console.error(`Error checking language URL ${languageCurrPage}:`, error);
-    }
-    
-    // If there's an error, try the English version
-    try {
-      const englishResponse = await fetch(englishPage, {
-        method: 'HEAD',
-        cache: 'no-store'
-      });
-      
-      if (englishResponse.ok) {
-        console.log(`Error accessing ${languageCode} version, falling back to English`);
-        return englishPage;
-      }
-    } catch (englishError) {
-      console.warn(`Error checking English fallback: ${englishError}`);
-    }
-    
-    // If English version also fails, fall back to language home page
-    return `/${urlLanguageCode}/`;
-  }
+  return `/${languageCode}/${currPagePath}`;
 }
 
 function convertStringToJSONObject(stringValue) {
