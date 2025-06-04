@@ -1,8 +1,18 @@
 import { getConfig } from '../../scripts/nx.js';
 import createPicture from '../../scripts/utils/picture.js';
 
-const QUERY_PATH = '/blog.json';
-const AUTHOR_PATH = '/blog.json';
+// const QUERY_PATH = '/blog.json';
+// const AUTHOR_PATH = '/blog.json';
+
+console.log(window.location.href);
+const url = window.location.href;
+const bits = url.split("/");
+console.log(bits);
+const langcode = bits[3];
+console.log(langcode);
+
+const QUERY_PATH = `${langcode}/blog.json`;
+const AUTHOR_PATH = `${langcode}/blog.json`;
 
 let fetchingAuthors;
 
