@@ -11,8 +11,9 @@ console.log(bits);
 const langcode = bits[3];
 console.log(langcode);
 
-const QUERY_PATH = `${langcode}/blog.json`;
-const AUTHOR_PATH = `${langcode}/blog.json`;
+const QUERY_PATH = `${langcode}-index.json`;
+const AUTHOR_PATH = `${langcode}-index.json`;
+console.log(QUERY_PATH);
 
 let fetchingAuthors;
 
