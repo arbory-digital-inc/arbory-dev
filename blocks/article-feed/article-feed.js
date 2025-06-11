@@ -11,6 +11,9 @@ const langcode = bits[3];
 const QUERY_PATH = `/${langcode}-index.json`;
 const AUTHOR_PATH = `/${langcode}-index.json`;
 
+console.log(langcode);
+console.log(QUERY_PATH);
+
 let fetchingAuthors;
 
 function calculateExcelDate(excelDate) {
