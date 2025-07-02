@@ -22,6 +22,14 @@ indices:
         select: head > meta[name="description"]
         value: |
           attribute(el, "content")
+      category:
+        select: head > meta[name="category"]
+        value: |
+          attribute(el, "content")
+      tags:
+        select: head > meta[property="article:tag"]
+        value: |
+          attribute(el, "content")
 
 ## FRENCH CONTENT
   arbory-fr:
@@ -45,6 +53,14 @@ indices:
           match(attribute(el, "content"), "https:\/\/[^/]+(/.*)")
       description:
         select: head > meta[name="description"]
+        value: |
+          attribute(el, "content")
+      category:
+        select: head > meta[name="category"]
+        value: |
+          attribute(el, "content")
+      tags:
+        select: head > meta[property="article:tag"]
         value: |
           attribute(el, "content")
 
@@ -72,7 +88,14 @@ indices:
         select: head > meta[name="description"]
         value: |
           attribute(el, "content")
-
+      category:
+        select: head > meta[name="category"]
+        value: |
+          attribute(el, "content")
+      tags:
+        select: head > meta[property="article:tag"]
+        value: |
+          attribute(el, "content")
 
 ## ENGLISH CONTENT
   arbory-en:
@@ -96,6 +119,14 @@ indices:
           match(attribute(el, "content"), "https:\/\/[^/]+(/.*)")
       description:
         select: head > meta[name="description"]
+        value: |
+          attribute(el, "content")
+      category:
+        select: head > meta[name="category"]
+        value: |
+          attribute(el, "content")
+      tags:
+        select: head > meta[property="article:tag"]
         value: |
           attribute(el, "content")
 
@@ -123,6 +154,14 @@ indices:
           select: head > meta[name="description"]
           value: |
             attribute(el, "content")
+      category:
+        select: head > meta[name="category"]
+        value: |
+          attribute(el, "content")
+      tags:
+        select: head > meta[property="article:tag"]
+        value: |
+          attribute(el, "content")
 
 
 ## Italian CONTENT
@@ -149,6 +188,14 @@ indices:
           select: head > meta[name="description"]
           value: |
             attribute(el, "content")
+      category:
+        select: head > meta[name="category"]
+        value: |
+          attribute(el, "content")
+      tags:
+        select: head > meta[property="article:tag"]
+        value: |
+          attribute(el, "content")
 
 ## Japanese CONTENT
   arbory-ja:
@@ -174,6 +221,14 @@ indices:
           select: head > meta[name="description"]
           value: |
             attribute(el, "content")
+      category:
+        select: head > meta[name="category"]
+        value: |
+          attribute(el, "content")
+      tags:
+        select: head > meta[property="article:tag"]
+        value: |
+          attribute(el, "content")
 
 ## Korean CONTENT
   arbory-ko:
@@ -199,7 +254,14 @@ indices:
           select: head > meta[name="description"]
           value: |
             attribute(el, "content")
-
+      category:
+        select: head > meta[name="category"]
+        value: |
+          attribute(el, "content")
+      tags:
+        select: head > meta[property="article:tag"]
+        value: |
+          attribute(el, "content")
 
 ## Traditional Chinese CONTENT
   arbory-tw:
@@ -225,6 +287,14 @@ indices:
           select: head > meta[name="description"]
           value: |
             attribute(el, "content")
+      category:
+        select: head > meta[name="category"]
+        value: |
+          attribute(el, "content")
+      tags:
+        select: head > meta[property="article:tag"]
+        value: |
+          attribute(el, "content")
 
 ## Mainland China CONTENT
   arbory-cn:
@@ -250,3 +320,11 @@ indices:
           select: head > meta[name="description"]
           value: |
             attribute(el, "content")
+      category:
+        select: head > meta[name="category"]
+        value: |
+          attribute(el, "content")
+      tags:
+        select: head > meta[property="article:tag"]
+        value: |
+          attribute(el, "content")
