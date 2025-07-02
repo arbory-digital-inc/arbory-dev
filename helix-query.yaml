@@ -28,7 +28,7 @@ indices:
           attribute(el, "content")
       tags:
         select: head > meta[property="article:tag"]
-        value: |
+        values: |
           attribute(el, "content")
 
 ## FRENCH CONTENT
@@ -61,7 +61,7 @@ indices:
           attribute(el, "content")
       tags:
         select: head > meta[property="article:tag"]
-        value: |
+        values: |
           attribute(el, "content")
 
 ## GERMAN CONTENT
@@ -94,7 +94,7 @@ indices:
           attribute(el, "content")
       tags:
         select: head > meta[property="article:tag"]
-        value: |
+        values: |
           attribute(el, "content")
 
 ## ENGLISH CONTENT
@@ -127,7 +127,7 @@ indices:
           attribute(el, "content")
       tags:
         select: head > meta[property="article:tag"]
-        value: |
+        values: |
           attribute(el, "content")
 
 ## Spanish CONTENT
@@ -160,7 +160,7 @@ indices:
             attribute(el, "content")
         tags:
           select: head > meta[property="article:tag"]
-          value: |
+          values: |
             attribute(el, "content")
 
 
@@ -194,7 +194,7 @@ indices:
             attribute(el, "content")
         tags:
           select: head > meta[property="article:tag"]
-          value: |
+          values: |
             attribute(el, "content")
 
 ## Japanese CONTENT
@@ -227,7 +227,7 @@ indices:
             attribute(el, "content")
         tags:
           select: head > meta[property="article:tag"]
-          value: |
+          values: |
             attribute(el, "content")
 
 ## Korean CONTENT
@@ -260,7 +260,7 @@ indices:
             attribute(el, "content")
         tags:
           select: head > meta[property="article:tag"]
-          value: |
+          values: |
             attribute(el, "content")
 
 ## Traditional Chinese CONTENT
@@ -293,7 +293,7 @@ indices:
             attribute(el, "content")
         tags:
           select: head > meta[property="article:tag"]
-          value: |
+          values: |
             attribute(el, "content")
 
 ## Mainland China CONTENT
@@ -326,5 +326,5 @@ indices:
             attribute(el, "content")
         tags:
           select: head > meta[property="article:tag"]
-          value: |
+          values: |
             attribute(el, "content")
