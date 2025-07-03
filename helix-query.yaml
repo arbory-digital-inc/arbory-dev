@@ -22,6 +22,14 @@ indices:
         select: head > meta[name="description"]
         value: |
           attribute(el, "content")
+      category:
+        select: head > meta[name="category"]
+        value: |
+          attribute(el, "content")
+      tags:
+        select: head > meta[property="article:tag"]
+        values: |
+          attribute(el, "content")
 
 ## FRENCH CONTENT
   arbory-fr:
@@ -46,6 +54,14 @@ indices:
       description:
         select: head > meta[name="description"]
         value: |
+          attribute(el, "content")
+      category:
+        select: head > meta[name="category"]
+        value: |
+          attribute(el, "content")
+      tags:
+        select: head > meta[property="article:tag"]
+        values: |
           attribute(el, "content")
 
 ## GERMAN CONTENT
@@ -72,7 +88,14 @@ indices:
         select: head > meta[name="description"]
         value: |
           attribute(el, "content")
-
+      category:
+        select: head > meta[name="category"]
+        value: |
+          attribute(el, "content")
+      tags:
+        select: head > meta[property="article:tag"]
+        values: |
+          attribute(el, "content")
 
 ## ENGLISH CONTENT
   arbory-en:
@@ -98,6 +121,14 @@ indices:
         select: head > meta[name="description"]
         value: |
           attribute(el, "content")
+      category:
+        select: head > meta[name="category"]
+        value: |
+          attribute(el, "content")
+      tags:
+        select: head > meta[property="article:tag"]
+        values: |
+          attribute(el, "content")
 
 ## Spanish CONTENT
   arbory-es:
@@ -122,6 +153,14 @@ indices:
         description:
           select: head > meta[name="description"]
           value: |
+            attribute(el, "content")
+        category:
+          select: head > meta[name="category"]
+          value: |
+            attribute(el, "content")
+        tags:
+          select: head > meta[property="article:tag"]
+          values: |
             attribute(el, "content")
 
 
@@ -149,6 +188,14 @@ indices:
           select: head > meta[name="description"]
           value: |
             attribute(el, "content")
+        category:
+          select: head > meta[name="category"]
+          value: |
+            attribute(el, "content")
+        tags:
+          select: head > meta[property="article:tag"]
+          values: |
+            attribute(el, "content")
 
 ## Japanese CONTENT
   arbory-ja:
@@ -173,6 +220,14 @@ indices:
         description:
           select: head > meta[name="description"]
           value: |
+            attribute(el, "content")
+        category:
+          select: head > meta[name="category"]
+          value: |
+            attribute(el, "content")
+        tags:
+          select: head > meta[property="article:tag"]
+          values: |
             attribute(el, "content")
 
 ## Korean CONTENT
@@ -199,7 +254,14 @@ indices:
           select: head > meta[name="description"]
           value: |
             attribute(el, "content")
-
+        category:
+          select: head > meta[name="category"]
+          value: |
+            attribute(el, "content")
+        tags:
+          select: head > meta[property="article:tag"]
+          values: |
+            attribute(el, "content")
 
 ## Traditional Chinese CONTENT
   arbory-tw:
@@ -225,6 +287,14 @@ indices:
           select: head > meta[name="description"]
           value: |
             attribute(el, "content")
+        category:
+          select: head > meta[name="category"]
+          value: |
+            attribute(el, "content")
+        tags:
+          select: head > meta[property="article:tag"]
+          values: |
+            attribute(el, "content")
 
 ## Mainland China CONTENT
   arbory-cn:
@@ -249,4 +319,12 @@ indices:
         description:
           select: head > meta[name="description"]
           value: |
+            attribute(el, "content")
+        category:
+          select: head > meta[name="category"]
+          value: |
+            attribute(el, "content")
+        tags:
+          select: head > meta[property="article:tag"]
+          values: |
             attribute(el, "content")
