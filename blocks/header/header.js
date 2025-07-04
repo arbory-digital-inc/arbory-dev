@@ -117,8 +117,10 @@ function createLanguageSelector() {
     { code: 'de', label: 'Deutsch' },
     { code: 'es', label: 'Español' },
     { code: 'it', label: 'Italiano' },
-    { code: 'ko', label: '한국어' },
     { code: 'ja', label: '日本語' },
+    { code: 'pt', label: 'Português' },
+    { code: 'pl', label: 'Polski' },
+    { code: 'ko', label: '한국어' },
     { code: 'zh-tw', label: '繁體中文' },
     { code: 'zh-cn', label: '简体中文' }
   ];
