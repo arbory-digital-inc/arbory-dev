@@ -35,6 +35,17 @@ sitemaps:
         destination: /es/sitemap.xml
         hreflang: es
         alternate: /es/{path}
+      pt:
+        source: /pt-index.json
+        destination: /pt/sitemap.xml
+        hreflang: pt
+        alternate: /pt/{path}
+      pl:
+        source: /pl-index.json
+        destination: /pl/sitemap.xml
+        hreflang: pl
+        alternate: /pl/{path}
+
       ko:
         source: /ko-index.json
         destination: /ko/sitemap.xml
