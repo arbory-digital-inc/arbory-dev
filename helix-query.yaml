@@ -28,7 +28,7 @@ indices:
           attribute(el, "content")
       tags:
         select: head > meta[property="article:tag"]
-        value: |
+        values: |
           attribute(el, "content")
       date:
           select: head > meta[name="date"]
@@ -65,7 +65,7 @@ indices:
           attribute(el, "content")
       tags:
         select: head > meta[property="article:tag"]
-        value: |
+        values: |
           attribute(el, "content")
       date:
           select: head > meta[name="date"]
@@ -102,7 +102,7 @@ indices:
           attribute(el, "content")
       tags:
         select: head > meta[property="article:tag"]
-        value: |
+        values: |
           attribute(el, "content")
       date:
           select: head > meta[name="date"]
@@ -139,7 +139,7 @@ indices:
           attribute(el, "content")
       tags:
         select: head > meta[property="article:tag"]
-        value: |
+        values: |
           attribute(el, "content")
       date:
           select: head > meta[name="date"]
@@ -176,7 +176,7 @@ indices:
             attribute(el, "content")
         tags:
           select: head > meta[property="article:tag"]
-          value: |
+          values: |
             attribute(el, "content")
         date:
           select: head > meta[name="date"]
@@ -214,7 +214,7 @@ indices:
             attribute(el, "content")
         tags:
           select: head > meta[property="article:tag"]
-          value: |
+          values: |
             attribute(el, "content")
         date:
           select: head > meta[name="date"]
@@ -251,7 +251,7 @@ indices:
             attribute(el, "content")
         tags:
           select: head > meta[property="article:tag"]
-          value: |
+          values: |
             attribute(el, "content")
         date:
           select: head > meta[name="date"]
@@ -288,7 +288,7 @@ indices:
             attribute(el, "content")
         tags:
           select: head > meta[property="article:tag"]
-          value: |
+          values: |
             attribute(el, "content")
         date:
           select: head > meta[name="date"]
@@ -325,7 +325,7 @@ indices:
             attribute(el, "content")
         tags:
           select: head > meta[property="article:tag"]
-          value: |
+          values: |
             attribute(el, "content")
         date:
           select: head > meta[name="date"]
@@ -362,7 +362,7 @@ indices:
             attribute(el, "content")
         tags:
           select: head > meta[property="article:tag"]
-          value: |
+          values: |
             attribute(el, "content")
         date:
           select: head > meta[name="date"]
@@ -399,7 +399,7 @@ indices:
           attribute(el, "content")
       tags:
         select: head > meta[property="article:tag"]
-        value: |
+        values: |
           attribute(el, "content")  
       date:
           select: head > meta[name="date"]
@@ -435,7 +435,7 @@ indices:
           attribute(el, "content")
       tags:
         select: head > meta[property="article:tag"]
-        value: |
+        values: |
           attribute(el, "content") 
       date:
           select: head > meta[name="date"]
