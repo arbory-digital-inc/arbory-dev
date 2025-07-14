@@ -467,6 +467,8 @@ export default async function init(el) {
       uniquePaths.add(item.path);
       return true;
     });
+
+    filtered = sortFeed(filtered);
     
     // Limit number of cards if specified
     let numCards = blockMeta['number of cards'] ? 
