@@ -27,8 +27,8 @@ indices:
         value: |
           attribute(el, "content")
       tags:
-        select: head > meta[property="article:tag"]
-        values: |
+        select: head > meta[name="tags"]
+        value: |
           attribute(el, "content")
       date:
         select: head > meta[name="date"]
@@ -64,8 +64,8 @@ indices:
         value: |
           attribute(el, "content")
       tags:
-        select: head > meta[property="article:tag"]
-        values: |
+        select: head > meta[name="tags"]
+        value: |
           attribute(el, "content")
       date:
         select: head > meta[name="date"]
@@ -101,8 +101,8 @@ indices:
         value: |
           attribute(el, "content")
       tags:
-        select: head > meta[property="article:tag"]
-        values: |
+        select: head > meta[name="tags"]
+        value: |
           attribute(el, "content")
       date:
         select: head > meta[name="date"]
@@ -138,14 +138,13 @@ indices:
         value: |
           attribute(el, "content")
       tags:
-        select: head > meta[property="article:tag"]
-        values: |
+        select: head > meta[name="tags"]
+        value: |
           attribute(el, "content")
       date:
         select: head > meta[name="date"]
         value: |
-          attribute(el, "content")
-
+          attribute(el, "content")    
 
 ## Spanish CONTENT
   arbory-es:
@@ -176,14 +175,13 @@ indices:
           value: |
             attribute(el, "content")
         tags:
-          select: head > meta[property="article:tag"]
-          values: |
+          select: head > meta[name="tags"]
+          value: |
             attribute(el, "content")
         date:
           select: head > meta[name="date"]
           value: |
             attribute(el, "content")
-
 
 ## Italian CONTENT
   arbory-it:
@@ -214,8 +212,8 @@ indices:
           value: |
             attribute(el, "content")
         tags:
-          select: head > meta[property="article:tag"]
-          values: |
+          select: head > meta[name="tags"]
+          value: |
             attribute(el, "content")
         date:
           select: head > meta[name="date"]
@@ -251,8 +249,8 @@ indices:
           value: |
             attribute(el, "content")
         tags:
-          select: head > meta[property="article:tag"]
-          values: |
+          select: head > meta[name="tags"]
+          value: |
             attribute(el, "content")
         date:
           select: head > meta[name="date"]
@@ -288,8 +286,8 @@ indices:
           value: |
             attribute(el, "content")
         tags:
-          select: head > meta[property="article:tag"]
-          values: |
+          select: head > meta[name="tags"]
+          value: |
             attribute(el, "content")
         date:
           select: head > meta[name="date"]
@@ -325,8 +323,8 @@ indices:
           value: |
             attribute(el, "content")
         tags:
-          select: head > meta[property="article:tag"]
-          values: |
+          select: head > meta[name="tags"]
+          value: |
             attribute(el, "content")
         date:
           select: head > meta[name="date"]
@@ -362,85 +360,10 @@ indices:
           value: |
             attribute(el, "content")
         tags:
-          select: head > meta[property="article:tag"]
-          values: |
+          select: head > meta[name="tags"]
+          value: |
             attribute(el, "content")
         date:
           select: head > meta[name="date"]
           value: |
             attribute(el, "content")
-            
-## Portuguese CONTENT
-  arbory-pt:
-    include:
-      - /pt/**
-    exclude:
-      - /pt/drafts/**
-    target: /pt-index.json
-    properties:
-      author:
-        select: head > meta[name="author"]
-        value: |
-          attribute(el, "content")
-      title:
-        select: head > meta[property="og:title"]
-        value: |
-          attribute(el, "content")
-      image:
-        select: head > meta[property="og:image"]
-        value: |
-          match(attribute(el, "content"), "https:\/\/[^/]+(/.*)")
-      description:
-        select: head > meta[name="description"]
-        value: |
-          attribute(el, "content")
-      category:
-        select: head > meta[name="category"]
-        value: |
-          attribute(el, "content")
-      tags:
-        select: head > meta[property="article:tag"]
-        values: |
-          attribute(el, "content")  
-      date:
-        select: head > meta[name="date"]
-        value: |
-          attribute(el, "content")
-
-
-## Portuguese CONTENT
-  arbory-pl:
-    include:
-      - /pl/**
-    exclude:
-      - /pl/drafts/**
-    target: /pl-index.json
-    properties:
-      author:
-        select: head > meta[name="author"]
-        value: |
-          attribute(el, "content")
-      title:
-        select: head > meta[property="og:title"]
-        value: |
-          attribute(el, "content")
-      image:
-        select: head > meta[property="og:image"]
-        value: |
-          match(attribute(el, "content"), "https:\/\/[^/]+(/.*)")
-      description:
-        select: head > meta[name="description"]
-        value: |
-          attribute(el, "content")
-      category:
-        select: head > meta[name="category"]
-        value: |
-          attribute(el, "content")
-      tags:
-        select: head > meta[property="article:tag"]
-        values: |
-          attribute(el, "content") 
-      date:
-        select: head > meta[name="date"]
-        value: |
-          attribute(el, "content")
