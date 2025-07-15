@@ -363,7 +363,6 @@ function filterByTags(tagString, data) {
   
   // Split tags by comma and trim whitespace
   const tags = tagString.split(',').map(tag => tag.trim().toLowerCase()).filter(tag => tag !== '');
-  console.log(tags);
   if (tags.length === 0) {
     return data;
   }
@@ -376,9 +375,9 @@ function filterByTags(tagString, data) {
     
     // Convert article tags to array
     const articleTags = article.tags.map(v => v.toLowerCase());;
-    console.log(articleTags);
-    console.log(article.title);
-    console.log(articleTags.includes("eds"))
+    // console.log(articleTags);
+    // console.log(article.title);
+    // console.log(articleTags.includes("eds"))
     
     // Check if any of the article tags match any of the filter tags
     return tags.some(tag => articleTags.includes(tag));
@@ -464,10 +463,15 @@ export default async function init(el) {
     
     // Remove any duplicate articles that might have been introduced during filtering
     const uniquePaths = new Set();
+    const alocalPath = bits.slice(3).join("/");
+    const localPath = "/" + alocalPath;
     filtered = filtered.filter(item => {
       if (uniquePaths.has(item.path)) {
         return false;
       }
+      if (item.path === localPath) {
+        return false;
+      };
       uniquePaths.add(item.path);
       return true;
     });
