@@ -8,8 +8,11 @@ const USE_TEST_FILE = false;
 // Get language code from URL
 const url = window.location.href;
 const bits = url.split("/");
-const langcode = bits[3] || 'en'; // Default to 'en' if not found
+let langcode = bits[3] || 'en'; // Default to 'en' if not found
 
+if (langcode === "0-sandbox"){ // Set to 'en' if in the drafts folder
+  langcode = "en";
+};
 // Define paths for data
 const QUERY_PATH = `/${langcode}-index.json`;
 const TEST_PATH = '/en-index-test.json'; // Always use en-index-test.json for testing
