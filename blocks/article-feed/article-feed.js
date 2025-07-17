@@ -10,7 +10,7 @@ const url = window.location.href;
 const bits = url.split("/");
 let langcode = bits[3] || 'en'; // Default to 'en' if not found
 
-if (langcode === "0-sandbox"){ // Set to 'en' if in the drafts folder
+if (langcode === "0-sandbox" || langcode === "docs"){ // Set to 'en' if in the drafts folder
   langcode = "en";
 };
 // Define paths for data
