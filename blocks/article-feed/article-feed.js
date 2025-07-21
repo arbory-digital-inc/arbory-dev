@@ -360,6 +360,35 @@ function filterByCategories(categoryString, data) {
   return filtered;
 }
 
+function filterByAuthors(authorString, data) {
+  if (!authorString) return data;
+  
+  
+  // Split authors by comma and trim whitespace
+  const authors = authorString.split(',').map(author => author.trim().toLowerCase()).filter(author => author !== '');
+  if (authors.length === 0) {
+    return data;
+  }
+  
+  const filtered = data.filter(article => {
+    // Skip articles without authors
+    if (!article.author) {
+      return false;
+    }
+    
+    // Convert article authors to array
+    const articleAuthors = article.author.split(',').map(author => author.trim().toLowerCase()).filter(author => author !== '');
+    // console.log(articleTags);
+    // console.log(article.title);
+    // console.log(articleTags.includes("eds"))
+    
+    // Check if any of the article authors match any of the filter authors
+    return authors.some(author => articleAuthors.includes(author));
+  });
+  
+  return filtered;
+};
+
 function filterByTags(tagString, data) {
   if (!tagString) return data;
   
@@ -449,10 +478,10 @@ export default async function init(el) {
 
     const { data } = await resp.json();
     
-    const sorted = sortFeed(data);
+    // const sorted = sortFeed(data);
     
     // Apply filters based on block metadata
-    let filtered = sorted;
+    let filtered = data;
     
     // Filter by category if specified
     if (blockMeta.category) {
@@ -462,6 +491,10 @@ export default async function init(el) {
     // Filter by tags if specified
     if (blockMeta.tags) {
       filtered = filterByTags(blockMeta.tags.text, filtered);
+    }
+
+    if (blockMeta.authors) {
+      filtered = filterByAuthors(blockMeta.authors.text, filtered);
     }
     
     // Remove any duplicate articles that might have been introduced during filtering
