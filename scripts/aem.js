@@ -12,6 +12,8 @@
 /* Cloned from Adobe aem-boilerplate 25 Sept 2024 */
 
 
+
+
 /* eslint-env browser */
 function sampleRUM(checkpoint, data) {
   // eslint-disable-next-line max-len
