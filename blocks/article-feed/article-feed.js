@@ -166,57 +166,63 @@ function decorateFeed(data, opts) {
       // Add title to the content column
       contentColumn.append(titleLink);
       
-      // Create author-date container
-      const authorDateContainer = document.createElement('div');
-      authorDateContainer.className = 'article-feed-author-date-container';
+      // Create separate containers for author and date
+      const metadataContainer = document.createElement('div');
+      metadataContainer.className = 'article-feed-metadata-container';
       
-      // Create author element and add to container
+      // Create author container and add to metadata container
       if (item.author) {
+        const authorContainer = document.createElement('div');
+        authorContainer.className = 'article-feed-author-container';
+        
         const author = createAuthorEl(item);
         author.className = 'article-feed-article-author-wrapper';
-        authorDateContainer.append(author);
+        authorContainer.append(author);
+        
+        metadataContainer.append(authorContainer);
       }
       
-      // Create date element and add to container
+      // Create date container and add to metadata container
       if (item.date) {
-        // Add separator if author exists
-        if (item.author) {
-          const separator = document.createElement('span');
-          separator.className = 'article-feed-separator';
-          separator.innerHTML = '|';
-          authorDateContainer.append(separator);
-        }
+        const dateContainer = document.createElement('div');
+        dateContainer.className = 'article-feed-date-container';
         
         const date = document.createElement('span');
         date.className = 'article-feed-article-date';
         date.innerText = formatDate(item.date);
-        authorDateContainer.append(date);
+        dateContainer.append(date);
+        
+        metadataContainer.append(dateContainer);
       }
       
-      // Add the author-date container to the content column
-      contentColumn.append(authorDateContainer);
+      // Add the metadata container to the content column
+      contentColumn.append(metadataContainer);
       
       // Create tags container if tags exist and add below author-date
-      // if (item.tags) {
-      //   const tagsContainer = document.createElement('div');
-      //   tagsContainer.className = 'article-feed-tags';
+      if (item.tags) {
+        const tagsContainer = document.createElement('div');
+        tagsContainer.className = 'article-feed-tags';
         
-      //   const tags = item.tags;
-      //   tags.sort((a, b) => a.length - b.length || a.localeCompare(b));
-      //   tags.forEach(tag => {
-      //     if (tag) {
-      //       const tagEl = document.createElement('span');
-      //       tagEl.className = 'article-feed-tag';
-      //       tagEl.textContent = tag;
-      //       tagsContainer.appendChild(tagEl);
-      //     }
-      //   });
+        const tags = item.tags;
+        // Sort tags by length and limit to 5
+        const limitedTags = tags
+          .sort((a, b) => a.length - b.length || a.localeCompare(b))
+          .slice(0, 5);
+          
+        limitedTags.forEach(tag => {
+          if (tag) {
+            const tagEl = document.createElement('span');
+            tagEl.className = 'article-feed-tag';
+            tagEl.textContent = tag;
+            tagsContainer.appendChild(tagEl);
+          }
+        });
         
-      //   // Add tags below author-date if they exist
-      //   if (tagsContainer.children.length > 0) {
-      //     contentColumn.append(tagsContainer);
-      //   }
-      // }
+        // Add tags below author-date if they exist
+        if (tagsContainer.children.length > 0) {
+          contentColumn.append(tagsContainer);
+        }
+      }
       
       // Add the content column to the container
       contentContainer.append(contentColumn);
@@ -239,57 +245,63 @@ function decorateFeed(data, opts) {
       // Add title to the left column
       leftColumn.append(titleLink);
       
-      // Create author-date container for the row
-      const authorDateContainer = document.createElement('div');
-      authorDateContainer.className = 'article-feed-author-date-container';
+      // Create separate containers for author and date
+      const metadataContainer = document.createElement('div');
+      metadataContainer.className = 'article-feed-metadata-container';
       
-      // Create author element and add to container
+      // Create author container and add to metadata container
       if (item.author) {
+        const authorContainer = document.createElement('div');
+        authorContainer.className = 'article-feed-author-container';
+        
         const author = createAuthorEl(item);
         author.className = 'article-feed-article-author-wrapper';
-        authorDateContainer.append(author);
+        authorContainer.append(author);
+        
+        metadataContainer.append(authorContainer);
       }
       
-      // Create date element and add to container
+      // Create date container and add to metadata container
       if (item.date) {
-        // Add separator if author exists
-        if (item.author) {
-          const separator = document.createElement('span');
-          separator.className = 'article-feed-separator';
-          separator.innerHTML = '|';
-          authorDateContainer.append(separator);
-        }
+        const dateContainer = document.createElement('div');
+        dateContainer.className = 'article-feed-date-container';
         
         const date = document.createElement('span');
         date.className = 'article-feed-article-date';
         date.innerText = formatDate(item.date);
-        authorDateContainer.append(date);
+        dateContainer.append(date);
+        
+        metadataContainer.append(dateContainer);
       }
       
-      // Add the author-date container to the left column
-      leftColumn.append(authorDateContainer);
+      // Add the metadata container to the left column
+      leftColumn.append(metadataContainer);
       
       // Create tags container if tags exist and add to right column
-      // if (item.tags) {
-      //   const tagsContainer = document.createElement('div');
-      //   tagsContainer.className = 'article-feed-tags';
+      if (item.tags) {
+        const tagsContainer = document.createElement('div');
+        tagsContainer.className = 'article-feed-tags';
         
-      //   const tags = item.tags;
-      //   tags.sort((a, b) => a.length - b.length || a.localeCompare(b));
-      //   tags.forEach(tag => {
-      //     if (tag) {
-      //       const tagEl = document.createElement('span');
-      //       tagEl.className = 'article-feed-tag';
-      //       tagEl.textContent = tag;
-      //       tagsContainer.appendChild(tagEl);
-      //     }
-      //   });
+        const tags = item.tags;
+        // Sort tags by length and limit to 5
+        const limitedTags = tags
+          .sort((a, b) => a.length - b.length || a.localeCompare(b))
+          .slice(0, 5);
+          
+        limitedTags.forEach(tag => {
+          if (tag) {
+            const tagEl = document.createElement('span');
+            tagEl.className = 'article-feed-tag';
+            tagEl.textContent = tag;
+            tagsContainer.appendChild(tagEl);
+          }
+        });
         
-      //   // Add tags to the right column if they exist
-      //   if (tagsContainer.children.length > 0) {
-      //     rightColumn.append(tagsContainer);
-      //   }
-      // }
+        // Add tags to the right column if they exist
+        if (tagsContainer.children.length > 0) {
+          rightColumn.append(tagsContainer);
+        }
+      }
       
       // Add both columns to the content container
       contentContainer.append(leftColumn, rightColumn);
@@ -460,6 +472,15 @@ export default async function init(el) {
   
   // Process block metadata
   
+  // Apply card background color if specified
+  if (blockMeta['card-background-color'] && blockMeta['card-background-color'].text) {
+    const bgColor = blockMeta['card-background-color'].text.trim();
+    // Only apply if it's a valid hex color
+    if (/^#([0-9A-F]{3}){1,2}$/i.test(bgColor)) {
+      el.style.setProperty('--card-background-color', bgColor);
+    }
+  }
+  
   try {
     // Determine which JSON file to use based on configuration
     const jsonPath = USE_TEST_FILE ? TEST_PATH : QUERY_PATH;
@@ -550,9 +571,13 @@ export default async function init(el) {
 
     // Default to 1 row initially
     let initialRows = 1;
-
-    // Check for 'number of rows' in the block's metadata
-    if (blockMeta && blockMeta['number of rows'] && blockMeta['number of rows'].text) {
+    
+    // For 4-card variant, always use 2 rows initially
+    if (el.classList.contains('card-4')) {
+      initialRows = 2;
+    }
+    // For other variants, check metadata
+    else if (blockMeta && blockMeta['number of rows'] && blockMeta['number of rows'].text) {
       const rowValue = parseInt(blockMeta['number of rows'].text, 10);
       if (!isNaN(rowValue) && rowValue > 0) {
         initialRows = rowValue;
