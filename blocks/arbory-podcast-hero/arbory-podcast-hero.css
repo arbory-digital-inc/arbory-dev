@@ -122,7 +122,7 @@ main .section.arbory-podcast-hero-container[data-section-status="loaded"] {
 
 .arbory-podcast-hero>div:nth-child(4)>div {
 	display: grid;
-	grid-template-columns: 20% 80%;
+	grid-template-columns: 40% 60%;
 	grid-template-rows: auto auto auto;
 	grid-template-areas:
 		"podcast-image podcast-title"
