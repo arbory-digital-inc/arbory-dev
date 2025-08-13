@@ -408,7 +408,7 @@ div.border-bottom-glow{
   border-bottom: 2px solid;
   border-color: var(--link-hover-color);
   box-shadow: 0 4px 12px var(--background-color-1), var(--shadow-lg);
-  animation: glowPulse2 9s infinite ease-in-out;
+  animation: glowPulse2 6s infinite ease-in-out;
 }
 @keyframes glowPulse2 {
   0% {

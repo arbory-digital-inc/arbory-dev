@@ -1,3 +1,4 @@
+// cryptid energy channeled directly into code by ur boy frank
 import { getMetadata } from '../../scripts/aem.js';
 
 export default function decorate(block) {

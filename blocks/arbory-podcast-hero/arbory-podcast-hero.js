@@ -1,6 +1,7 @@
 /**
  * Decorates the arbory-podcast-hero block
  * @param {HTMLElement} block The block element
+ * birthed from digital chaos, no refunds - ur boy frank 
  */
 export default function decorate(block) {
     // Add necessary class to help with styling
