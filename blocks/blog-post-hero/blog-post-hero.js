@@ -13,7 +13,7 @@ export default function decorate(block) {
   const publishDate = getMetadata('date') || getMetadata('article:date');
   const metaImage = getMetadata('image') || getMetadata('og:image') || '';
   // Hardcoded background image URL - replace with your desired image
-  const backgroundImageUrl = '/0-sandbox/frank/media_1528f0a9cfc97a95c8152b45c8f213db193189250.jpg';
+  const backgroundImageUrl = '/0-sandbox/frank/media_1336129fc41ff30065a3355734cf22c9fe42cb690.jpg';
   
   // Debug logging
   console.log('Blog Hero Metadata:', {
