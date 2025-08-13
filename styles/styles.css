@@ -275,12 +275,12 @@ main img {
 }
 
 main .section {
-  padding: 64px 16px;
+  padding: 48px 16px;
 }
 
 @media (min-width: 600px) {
   main .section {
-    padding: 64px 32px;
+    padding: 48px 32px;
   }
 }
 
@@ -393,6 +393,13 @@ div.blog-post-bg-fade{
   animation-range: 0% 100%;
   border-bottom: 2px solid var(--link-color);
   box-shadow: var(--shadow-xl);
+  padding-top: 64px;
+}
+
+@media (max-width: 600px) {
+  div.blog-post-bg-fade{
+    padding-top: 32px;
+  }
 }
 
 @keyframes scroll-color-fade {
