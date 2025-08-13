@@ -391,16 +391,33 @@ div.blog-post-bg-fade{
   animation: scroll-color-fade linear;
   animation-timeline: scroll();
   animation-range: 0% 100%;
+  border-bottom: 2px solid var(--link-color);
+  box-shadow: var(--shadow-xl);
 }
 
 @keyframes scroll-color-fade {
   0% {
     background-color: var(--bg-color-2);
   }
-  50% {
+  100% {
     background-color: var(--bg-color-1);
   }
+}
+
+div.border-bottom-glow{
+  border-bottom: 2px solid;
+  border-color: var(--link-hover-color);
+  box-shadow: 0 4px 12px var(--background-color-1), var(--shadow-lg);
+  animation: glowPulse2 9s infinite ease-in-out;
+}
+@keyframes glowPulse2 {
+  0% {
+    border-color: rgba(64, 110, 12, 0.3);
+  }
+  50% {
+    border-color: rgba(64, 110, 12, 1);
+  }
   100% {
-    background-color: var(--bg-color-2);
+    border-color: rgba(64, 110, 12, 0.3);
   }
 }
