@@ -12,6 +12,8 @@ export default function decorate(block) {
   const author = getMetadata('author') || '';
   const publishDate = getMetadata('date') || getMetadata('article:date');
   const metaImage = getMetadata('image') || getMetadata('og:image') || '';
+  // Hardcoded background image URL - replace with your desired image
+  const backgroundImageUrl = '/0-sandbox/frank/media_1528f0a9cfc97a95c8152b45c8f213db193189250.jpg';
   
   // Debug logging
   console.log('Blog Hero Metadata:', {
@@ -20,52 +22,88 @@ export default function decorate(block) {
     tags,
     author,
     publishDate,
-    metaImage
+    metaImage,
+    backgroundImageUrl
   });
   
   // Clear the block content
   block.innerHTML = '';
   
-  // Set background image if available
-  if (backgroundPicture) {
+  // Set background image - prioritize URL from metadata, fallback to picture element
+  let backgroundImageSrc = '';
+  
+  if (backgroundImageUrl) {
+    // Use URL from metadata
+    backgroundImageSrc = backgroundImageUrl;
+  } else if (backgroundPicture) {
+    // Fallback to picture element
     const bgImg = backgroundPicture.querySelector('img');
     if (bgImg) {
-      section.style.backgroundImage = `url(${bgImg.src})`;
-      section.style.backgroundSize = 'cover';
-      section.style.backgroundPosition = 'center bottom'; // Start from bottom for upward parallax
-      section.style.backgroundRepeat = 'no-repeat';
+      backgroundImageSrc = bgImg.src;
+    }
+  }
+  
+  if (backgroundImageSrc) {
+    section.style.backgroundImage = `url(${backgroundImageSrc})`;
+    section.style.backgroundSize = 'cover';
+    section.style.backgroundPosition = 'center bottom'; // Start from bottom for upward parallax
+    section.style.backgroundRepeat = 'no-repeat';
+    
+    // Add parallax effect for desktop only
+    const isDesktop = window.matchMedia('(min-width: 900px)');
+    
+    function updateParallax() {
+      const scrolled = window.pageYOffset;
+      const rect = section.getBoundingClientRect();
       
-      // Add parallax effect for desktop only
-      const isDesktop = window.matchMedia('(min-width: 900px)');
-      
-      function updateParallax() {
-        if (isDesktop.matches) {
-          const scrolled = window.pageYOffset;
-          const rect = section.getBoundingClientRect();
-          const speed = 0.5; // Parallax speed (0.5 = half speed)
-          
-          // Only apply parallax when section is in viewport
-          if (rect.bottom >= 0 && rect.top <= window.innerHeight) {
-            const yPos = scrolled * speed; // Positive value moves background up when scrolling down
-            section.style.backgroundPosition = `center calc(100% + ${yPos}px)`;
-          }
-        } else {
-          // Reset to normal position on mobile
-          section.style.backgroundPosition = 'center bottom';
+      if (isDesktop.matches) {
+        const speed = 0.5; // Parallax speed (0.5 = half speed)
+        
+        // Only apply parallax when section is in viewport
+        if (rect.bottom >= 0 && rect.top <= window.innerHeight) {
+          const yPos = scrolled * speed; // Positive value moves background up when scrolling down
+          section.style.backgroundPosition = `center calc(100% + ${yPos}px)`;
         }
+      } else {
+        // Reset to normal position on mobile
+        section.style.backgroundPosition = 'center bottom';
       }
       
-      // Initial setup
-      updateParallax();
-      
-      // Add scroll listener for parallax effect
-      window.addEventListener('scroll', updateParallax, { passive: true });
-      
-      // Update on resize
-      isDesktop.addEventListener('change', updateParallax);
+      // Color transition based on scroll
+      const heroContentCol = section.querySelector('.hero-content-col');
+      if (heroContentCol) {
+        // Calculate scroll progress based on section position
+        const sectionTop = rect.top;
+        const sectionHeight = rect.height;
+        const windowHeight = window.innerHeight;
+        
+        // Calculate progress (0 to 1) based on how much the section has scrolled
+        let progress = 0;
+        if (sectionTop <= 0) {
+          // Section has started scrolling past the top
+          progress = Math.min(Math.abs(sectionTop) / (sectionHeight * 0.5), 1);
+        }
+        
+        // Interpolate between bg-color-1 and bg-color-2
+        // Using CSS custom properties for smooth transition
+        heroContentCol.style.setProperty('--scroll-progress', progress);
+        heroContentCol.style.background = `color-mix(in srgb, var(--bg-color-2) ${progress * 100}%, var(--bg-color-1) ${(1 - progress) * 100}%)`;
+      }
     }
-    // Hide the original picture element
-    backgroundPicture.style.display = 'none';
+    
+    // Initial setup
+    updateParallax();
+    
+    // Add scroll listener for parallax effect
+    window.addEventListener('scroll', updateParallax, { passive: true });
+    
+    // Update on resize
+    isDesktop.addEventListener('change', updateParallax);
+    
+    // Hide the original picture element if it exists
+    if (backgroundPicture) {
+      backgroundPicture.style.display = 'none';
+    }
   }
   
   // Create the main container
