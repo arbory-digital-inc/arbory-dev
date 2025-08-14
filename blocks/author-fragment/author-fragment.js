@@ -1,27 +1,35 @@
-export default function decorate(block) {
-  // Get the style variation from data attributes if specified
-  const style = block.getAttribute('data-style') || 'default';
-  block.classList.add(`style-${style}`);
+export default async function decorate(block) {
+  const fragmentName = block.textContent.trim();
+  
+  if (!fragmentName.startsWith('author-fragment-')) {
+    console.warn(`Author block: Invalid fragment name "${fragmentName}"`);
+    return;
+  }
 
-  // Ensure images are loaded lazily and have proper alt text
-  const images = block.querySelectorAll('img');
-  images.forEach(img => {
-    if (!img.getAttribute('loading')) {
-      img.setAttribute('loading', 'lazy');
-    }
-    if (!img.getAttribute('alt')) {
-      const nameElement = img.closest('div').nextElementSibling?.querySelector('strong');
-      if (nameElement) {
-        img.setAttribute('alt', `Photo of ${nameElement.textContent}`);
-      }
-    }
-  });
+  // Build the relative path to /authors/<fragmentName>
+  const fragmentPath = `/authors/${fragmentName}`;
 
-  // Add proper ARIA labels to LinkedIn buttons
-  const buttons = block.querySelectorAll('.button');
-  buttons.forEach(button => {
-    if (!button.getAttribute('aria-label')) {
-      button.setAttribute('aria-label', button.textContent);
+  try {
+    // Fetch published HTML of the fragment
+    const resp = await fetch(fragmentPath);
+    if (!resp.ok) {
+      console.error(`Failed to fetch fragment at ${fragmentPath}`);
+      return;
     }
-  });
+
+    const html = await resp.text();
+
+    // Create a container to parse HTML
+    const temp = document.createElement('div');
+    temp.innerHTML = html;
+
+    // Grab the main content (or a specific element like author-rows)
+    const mainContent = temp.querySelector('main') || temp;
+
+    // Replace the block's content with the fragment's content
+    block.innerHTML = mainContent.innerHTML;
+
+  } catch (err) {
+    console.error('Error loading author fragment:', err);
+  }
 }
