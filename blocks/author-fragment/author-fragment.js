@@ -1,27 +1,25 @@
-export default async function decorate(block) {
-  const fragmentName = block.textContent.trim();
-  if (!fragmentName.startsWith('author-fragment-')) {
-    console.warn(`Author block: Invalid fragment name "${fragmentName}"`);
-    return;
+/* crafted under the full moons gaze by yo boy frank */
+
+export default function decorate(block) {
+    // Ensure images are loaded lazily and have proper alt text
+    const images = block.querySelectorAll('img');
+    images.forEach(img => {
+      if (!img.getAttribute('loading')) {
+        img.setAttribute('loading', 'lazy');
+      }
+      if (!img.getAttribute('alt')) {
+        const nameElement = img.closest('div').nextElementSibling?.querySelector('strong');
+        if (nameElement) {
+          img.setAttribute('alt', `Photo of ${nameElement.textContent}`);
+        }
+      }
+    });
+  
+    // Add proper ARIA labels to LinkedIn buttons
+    const buttons = block.querySelectorAll('.button');
+    buttons.forEach(button => {
+      if (!button.getAttribute('aria-label')) {
+        button.setAttribute('aria-label', button.textContent);
+      }
+    });
   }
-
-  // Build the relative path to /authors/<fragmentName>
-  const fragmentPath = `/authors/${fragmentName}`;
-
-  try {
-    // Fetch published HTML of the fragment
-    const resp = await fetch(fragmentPath);
-    if (!resp.ok) {
-      console.error(`Failed to fetch fragment at ${fragmentPath}`);
-      return;
-    }
-
-
-    const temp = document.createElement('div');
-    temp.innerHTML = html;
-    const mainContent = temp.querySelector('main') || temp;
-    block.innerHTML = mainContent.innerHTML;
-  } catch (err) {
-    console.error('Error loading author fragment:', err);
-  }
-}
