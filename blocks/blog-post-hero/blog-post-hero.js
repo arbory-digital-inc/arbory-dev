@@ -14,7 +14,7 @@ export default function decorate(block) {
   const publishDate = getMetadata('date') || getMetadata('article:date');
   const metaImage = getMetadata('image') || getMetadata('og:image') || '';
   // Hardcoded background image URL - replace with your desired image
-  const backgroundImageUrl = '/0-sandbox/frank/media_1336129fc41ff30065a3355734cf22c9fe42cb690.jpg';
+  const backgroundImageUrl = '/assets/media_1336129fc41ff30065a3355734cf22c9fe42cb690.jpg';
   
   // Debug logging
   console.log('Blog Hero Metadata:', {
@@ -44,7 +44,7 @@ export default function decorate(block) {
     }
   }
   
-  if (backgroundImageSrc) {
+  if (backgroundImageSrc && window.innerWidth >= 1100) {
     section.style.backgroundImage = `url(${backgroundImageSrc})`;
     section.style.backgroundSize = 'cover';
     section.style.backgroundPosition = 'center bottom'; // Start from bottom for upward parallax
@@ -52,6 +52,18 @@ export default function decorate(block) {
     
     // Add parallax effect for desktop only
     const isDesktop = window.matchMedia('(min-width: 900px)');
+    const isLargeScreen = window.matchMedia('(min-width: 1100px)');
+    
+    function updateBackgroundVisibility() {
+      if (isLargeScreen.matches) {
+        section.style.backgroundImage = `url(${backgroundImageSrc})`;
+        section.style.backgroundSize = 'cover';
+        section.style.backgroundPosition = 'center bottom';
+        section.style.backgroundRepeat = 'no-repeat';
+      } else {
+        section.style.backgroundImage = 'none';
+      }
+    }
     
     function updateParallax() {
       const scrolled = window.pageYOffset;
@@ -93,6 +105,7 @@ export default function decorate(block) {
     }
     
     // Initial setup
+    updateBackgroundVisibility();
     updateParallax();
     
     // Add scroll listener for parallax effect
@@ -100,6 +113,7 @@ export default function decorate(block) {
     
     // Update on resize
     isDesktop.addEventListener('change', updateParallax);
+    isLargeScreen.addEventListener('change', updateBackgroundVisibility);
     
     // Hide the original picture element if it exists
     if (backgroundPicture) {
