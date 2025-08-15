@@ -5,8 +5,8 @@ export default async function decorate(block) {
     return;
   }
 
-  // Build the relative path to /authors/<fragmentName>
-  const fragmentPath = `/authors/${fragmentName}`;
+  // Build the absolute path to /authors/<fragmentName>
+  const fragmentPath = `/0-sandbox/noah/authors/${fragmentName}`;
 
   try {
     // Fetch published HTML of the fragment
