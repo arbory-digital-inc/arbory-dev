@@ -1,10 +1,10 @@
 /**
- * Decorates the arbory-blog-hero block
+ * Decorates customer-spotlight-cta block
  * @param {HTMLElement} block The block element
  */
 export default function decorate(block) {
   // Add necessary class to help with styling
-  block.classList.add("arbory-blog-hero");
+  block.classList.add("customer-spotlight-cta");
 
   // For CSS compatibility, we need to maintain a 4-row structure:
   // Row 1: Background image
