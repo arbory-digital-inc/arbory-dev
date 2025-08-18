@@ -1,5 +1,5 @@
 /**
- * Decorates customer-spotlight-cta block
+ * Decorates the customer-spotlight-cta block
  * @param {HTMLElement} block The block element
  */
 export default function decorate(block) {
@@ -42,7 +42,7 @@ export default function decorate(block) {
       } else {
         // If no "must read" text, create an empty one for structure
         const emptyMustRead = document.createElement("p");
-        emptyMustRead.textContent = "Our Must Read Article";
+        emptyMustRead.textContent = "Customer Spotlight";
         mustReadContent.appendChild(emptyMustRead);
       }
 
