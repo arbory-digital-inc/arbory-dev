@@ -63,7 +63,6 @@ main .section.arbory-blog-hero-container[data-section-status="loaded"]{
     object-position: center;
   }
   
-  /* Add an overlay gradient for better text visibility */
   .arbory-blog-hero::after {
     content: "";
     position: absolute;
@@ -183,7 +182,7 @@ main .section.arbory-blog-hero-container[data-section-status="loaded"]{
     line-height: 1.2;
   }
   
-  /* Target the actual paragraph containing description */
+ 
   .arbory-blog-hero > div:nth-child(4) > div > p {
     grid-area: article-description;
     margin: 0;
@@ -194,7 +193,7 @@ main .section.arbory-blog-hero-container[data-section-status="loaded"]{
     max-width: 100%;
   }
   
-/* Responsive adjustments */
+
 
 @media (min-width: 900px){
   .arbory-blog-hero-container > .arbory-blog-hero-wrapper{
