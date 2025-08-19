@@ -1,4 +1,3 @@
-js 
 export default async function decorate(block) {
   const fragmentName = block.textContent.trim();
   if (!fragmentName.startsWith('author-fragment-')) {
