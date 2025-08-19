@@ -71,7 +71,7 @@ main .section.arbory-blog-hero-container[data-section-status="loaded"]{
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.7));
+    
     z-index: 1;
   }
   
@@ -114,47 +114,70 @@ main .section.arbory-blog-hero-container[data-section-status="loaded"]{
     max-width: 1200px;
     display: flex;
     justify-self: center;
-    overflow: hidden;
+    overflow: visible;
+    padding: 0 20px;
   }
   
   .arbory-blog-hero > div:nth-child(4) > div {
     display: grid;
-    grid-template-columns: auto;
+    grid-template-columns: 1fr auto;
     grid-template-rows: auto auto;
     grid-template-areas: 
-      "article-image article-title"
-      "article-image article-description";
+      "article-title article-image"
+      "article-description article-image";
     gap: 20px;
     max-height: 100%;
-    padding: 10px 20px 32px 20px;
-    row-gap: 6px;
+    padding: 32px;
+    row-gap: 16px;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.7));
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1),
+                0 0 0 1px #406E0C,
+                0 0 20px rgba(98, 168, 20, 0.2);
+    margin: 20px;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    cursor: pointer;
+    transform: scale(1) translateZ(0);
+    backface-visibility: hidden;
+  }
+
+.arbory-blog-hero > div:nth-child(4) > div:hover {
+    transform: scale(1.02) translateZ(0);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2),
+                0 0 0 1px #62a814,
+                0 0 30px rgba(98, 168, 20, 0.4);
   }
   
   .arbory-blog-hero > div:nth-child(4) picture {
     grid-area: article-image;
-    max-width: 300px;
+    max-width: 400px;
     display: flex;
     border: 2px solid #406e0c80;
     border-radius: 0.5rem;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
-    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    margin-left: 20px;
+    overflow: hidden;
   }
   
   .arbory-blog-hero > div:nth-child(4) img {
     width: 100%;
     object-fit: cover;
     border-radius: 4px;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
+
   
   .arbory-blog-hero > div:nth-child(4) h3 {
     grid-area: article-title;
-    font-size: 24px;
-    align-self: flex-end;
+    font-size: 32px;
+    align-self: flex-start;
     overflow: hidden;
     text-overflow: ellipsis;
     max-width: 100%;
     font-family: var(--heading-font-family);
     margin: 0;
+    line-height: 1.2;
   }
   
   /* Target the actual paragraph containing description */
@@ -176,13 +199,12 @@ main .section.arbory-blog-hero-container[data-section-status="loaded"]{
   }
 }
   
-  @media (max-width: 480px) {
+  @media (max-width: 768px) {
     .arbory-blog-hero {
       min-height: 300px;
       padding: 0;
     }
     
-    /* Ensure background image covers the entire height on mobile */
     .arbory-blog-hero > div:first-child {
       height: 100%;
     }
@@ -193,14 +215,13 @@ main .section.arbory-blog-hero-container[data-section-status="loaded"]{
 
     .arbory-blog-hero > div:nth-child(3) h1 {
       text-align: center;
-  }
+    }
     
     .arbory-blog-hero > div:first-child img {
       height: 100%;
       object-fit: cover;
       object-position: center;
     }
-    
     
     .arbory-blog-hero > div:nth-child(3) {
       margin-bottom: 5px;
@@ -210,24 +231,30 @@ main .section.arbory-blog-hero-container[data-section-status="loaded"]{
     
     .arbory-blog-hero > div:nth-child(4) > div {
       grid-template-areas: 
-        "article-image article-image"
-        "article-title article-title"
-        "article-description article-description";
+        "article-image"
+        "article-title"
+        "article-description";
       grid-template-columns: 1fr;
       grid-template-rows: auto auto auto;
       text-align: center;
       justify-items: center;
+      margin: 16px;
+      padding: 24px;
     }
     
+    .arbory-blog-hero > div:nth-child(4) picture {
+      max-width: 100%;
+      margin: 0 0 20px 0;
+    }
+
     .arbory-blog-hero > div:nth-child(4) img {
       max-width: 100%;
       margin: 0;
       padding: 0;
-      border: none;
     }
 
-    .arbory-blog-hero > div:nth-child(4) h3{
+    .arbory-blog-hero > div:nth-child(4) h3 {
       padding-top: 12px;
+      font-size: 24px;
     }
-    
   }
