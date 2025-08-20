@@ -32,3 +32,12 @@ jobs:
           streamx_key=$(echo "${{ github.event.client_payload.path }}" | sed 's/\.md$//g')
           echo "StreamX key: $streamx_key"
           echo "streamx_key=$streamx_key" >> "$GITHUB_OUTPUT"
+
+      - name: Run unpublish from StreamX
+        uses: streamx-dev/streamx-common-github-actions/.github/actions/connector-github@v1
+        with:
+          action: unpublish
+          channel: pages
+          key: ${{ steps.vars.outputs.streamx_key }}
+          streamx-ingestion-token: ${{ secrets.STREAMX_INGESTION_TOKEN }}
+          streamx-ingestion-url: ${{ vars.STREAMX_INGESTION_URL }}

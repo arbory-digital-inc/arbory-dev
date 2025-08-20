@@ -35,3 +35,15 @@ jobs:
           echo "StreamX key: $streamx_key"
           echo "streamx_key=$streamx_key" >> "$GITHUB_OUTPUT"
           echo "eds_page_url=$eds_page_url" >> "$GITHUB_OUTPUT"
+
+      - name: Run publish to StreamX
+        uses: streamx-dev/streamx-common-github-actions/.github/actions/connector-github@v1
+        with:
+          action: publish
+          source-provider: ExternalSourceProvider
+          channel: pages
+          type: 'page/blog'
+          external-resource-url: ${{ steps.vars.outputs.eds_page_url }}
+          key: ${{ steps.vars.outputs.streamx_key }}
+          streamx-ingestion-token: ${{ secrets.STREAMX_INGESTION_TOKEN }}
+          streamx-ingestion-url: ${{ vars.STREAMX_INGESTION_URL }}
