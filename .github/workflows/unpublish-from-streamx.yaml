@@ -48,7 +48,7 @@ jobs:
         uses: streamx-dev/streamx-common-github-actions/.github/actions/connector-github@v1
         with:
           action: unpublish
-          channel: web-resources
+          channel: pages
           key: ${{ steps.vars.outputs.streamx_plain_key }}
           streamx-ingestion-token: ${{ secrets.STREAMX_INGESTION_TOKEN }}
           streamx-ingestion-url: ${{ vars.STREAMX_INGESTION_URL }}
