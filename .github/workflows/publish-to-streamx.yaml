@@ -1,7 +1,9 @@
 name: Publish to StreamX
 
 on:
-  repository_dispatch:  
+  repository_dispatch:
+    types:
+      - resource-published
 
 permissions:
   id-token: write
@@ -11,10 +13,6 @@ jobs:
   check-event-status:
     runs-on: ubuntu-latest
     steps:
-      - name: Dump GitHub context
-        env:
-          GITHUB_CONTEXT: ${{ toJson(github) }}
-        run: echo "$GITHUB_CONTEXT"    
       - env:
           CLIENT_PAYLOAD: ${{ toJSON(github.event.client_payload) }}
         run: |
@@ -23,7 +21,7 @@ jobs:
           echo "Path: ${{ github.event.client_payload.path }}"
 
   publish-to-streamx:
-    if: github.event.type == 'resource-published' && (github.event.client_payload.status == 200 || github.event.client_payload.status == 204) && endsWith(github.event.client_payload.path, '.md')
+    if: (github.event.client_payload.status == 200 || github.event.client_payload.status == 204) && endsWith(github.event.client_payload.path, '.md')
     runs-on: ubuntu-latest
     steps:
       - name: Prepare ingestion variables
@@ -61,8 +59,8 @@ jobs:
         with:
           action: publish
           source-provider: ExternalSourceProvider
-          channel: pages
-          type: 'page/noindex'
+          channel: web-resources
+          type: 'web-resource/static'
           external-resource-url: ${{ steps.vars.outputs.eds_plain_page_url }}
           key: ${{ steps.vars.outputs.streamx_plain_key }}
           streamx-ingestion-token: ${{ secrets.STREAMX_INGESTION_TOKEN }}
