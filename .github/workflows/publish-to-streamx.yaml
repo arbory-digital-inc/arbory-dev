@@ -11,6 +11,10 @@ jobs:
   check-event-status:
     runs-on: ubuntu-latest
     steps:
+      - name: Dump GitHub context
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: echo "$GITHUB_CONTEXT"    
       - env:
           CLIENT_PAYLOAD: ${{ toJSON(github.event.client_payload) }}
         run: |
