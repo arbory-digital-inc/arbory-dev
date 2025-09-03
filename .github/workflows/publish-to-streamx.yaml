@@ -54,3 +54,14 @@ jobs:
           streamx-ingestion-token: ${{ secrets.STREAMX_INGESTION_TOKEN }}
           streamx-ingestion-url: ${{ vars.STREAMX_INGESTION_URL }}
 
+      - name: Run publish plain to StreamX
+        uses: streamx-dev/streamx-common-github-actions/.github/actions/connector-github@v1
+        with:
+          action: publish
+          source-provider: ExternalSourceProvider
+          channel: web-resources
+          type: 'web-resource/static'
+          external-resource-url: ${{ steps.vars.outputs.eds_plain_page_url }}
+          key: ${{ steps.vars.outputs.streamx_plain_key }}
+          streamx-ingestion-token: ${{ secrets.STREAMX_INGESTION_TOKEN }}
+          streamx-ingestion-url: ${{ vars.STREAMX_INGESTION_URL }}
