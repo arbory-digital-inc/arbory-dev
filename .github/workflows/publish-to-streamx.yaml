@@ -1,9 +1,7 @@
 name: Publish to StreamX
 
 on:
-  repository_dispatch:
-    types:
-      - resource-published
+  repository_dispatch:  
 
 permissions:
   id-token: write
@@ -21,7 +19,7 @@ jobs:
           echo "Path: ${{ github.event.client_payload.path }}"
 
   publish-to-streamx:
-    if: (github.event.client_payload.status == 200 || github.event.client_payload.status == 204) && endsWith(github.event.client_payload.path, '.md')
+    if: github.event.type == 'resource-published' && (github.event.client_payload.status == 200 || github.event.client_payload.status == 204) && endsWith(github.event.client_payload.path, '.md')
     runs-on: ubuntu-latest
     steps:
       - name: Prepare ingestion variables
