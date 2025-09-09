@@ -10,16 +10,6 @@ permissions:
   contents: read
 
 jobs:
-  check-event-status:
-    runs-on: ubuntu-latest
-    steps:
-      - env:
-          CLIENT_PAYLOAD: ${{ toJSON(github.event.client_payload) }}
-        run: |
-          echo $CLIENT_PAYLOAD
-          echo "Status: ${{ github.event.client_payload.status }}"
-          echo "Path: ${{ github.event.client_payload.path }}"
-
   publish-to-streamx:
     if: (github.event.client_payload.status == 200 || github.event.client_payload.status == 204) && endsWith(github.event.client_payload.path, '.md')
     runs-on: ubuntu-latest
@@ -51,7 +41,7 @@ jobs:
           type: 'page/blog'
           external-resource-url: ${{ steps.vars.outputs.eds_page_url }}
           key: ${{ steps.vars.outputs.streamx_key }}
-          streamx-ingestion-token: ${{ secrets.STREAMX_INGESTION_TOKEN }}
+          streamx-ingestion-token: ${{ secrets.STREAMX_INGESTION_EDS_TOKEN }}
           streamx-ingestion-url: ${{ vars.STREAMX_INGESTION_URL }}
 
       - name: Run publish plain to StreamX
@@ -64,5 +54,5 @@ jobs:
           type: 'web-resource/static'
           external-resource-url: ${{ steps.vars.outputs.eds_plain_page_url }}
           key: ${{ steps.vars.outputs.streamx_plain_key }}
-          streamx-ingestion-token: ${{ secrets.STREAMX_INGESTION_TOKEN }}
+          streamx-ingestion-token: ${{ secrets.STREAMX_INGESTION_EDS_TOKEN }}
           streamx-ingestion-url: ${{ vars.STREAMX_INGESTION_URL }}

@@ -41,7 +41,7 @@ jobs:
           action: unpublish
           channel: pages
           key: ${{ steps.vars.outputs.streamx_key }}
-          streamx-ingestion-token: ${{ secrets.STREAMX_INGESTION_TOKEN }}
+          streamx-ingestion-token: ${{ secrets.STREAMX_INGESTION_EDS_TOKEN }}
           streamx-ingestion-url: ${{ vars.STREAMX_INGESTION_URL }}
 
       - name: Run unpublish plain from StreamX
@@ -50,5 +50,5 @@ jobs:
           action: unpublish
           channel: pages
           key: ${{ steps.vars.outputs.streamx_plain_key }}
-          streamx-ingestion-token: ${{ secrets.STREAMX_INGESTION_TOKEN }}
+          streamx-ingestion-token: ${{ secrets.STREAMX_INGESTION_EDS_TOKEN }}
           streamx-ingestion-url: ${{ vars.STREAMX_INGESTION_URL }}
