@@ -30,6 +30,8 @@ jobs:
 
       - name: Run sync with StreamX
         uses: streamx-dev/streamx-common-github-actions/.github/actions/connector-github@v1
+        env:
+          STREAMX_CONNECTION_SOCKET_TIMEOUT: 3000
         with:
           action: sync
           channel: web-resources
@@ -48,6 +50,8 @@ jobs:
 
       - name: Run full sync with StreamX
         uses: streamx-dev/streamx-common-github-actions/.github/actions/connector-github@v1
+        env:
+          STREAMX_CONNECTION_SOCKET_TIMEOUT: 3000
         with:
           action: publish
           channel: web-resources
