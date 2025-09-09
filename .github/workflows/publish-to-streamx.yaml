@@ -34,6 +34,8 @@ jobs:
 
       - name: Run publish to StreamX
         uses: streamx-dev/streamx-common-github-actions/.github/actions/connector-github@v1
+        env:
+          STREAMX_CONNECTION_SOCKET_TIMEOUT: 3000
         with:
           action: publish
           source-provider: ExternalSourceProvider
@@ -47,6 +49,8 @@ jobs:
       - name: Run publish plain to StreamX
         if: (endsWith(steps.vars.outputs.streamx_plain_key, 'nav.plain.html') || endsWith(steps.vars.outputs.streamx_plain_key, 'footer.plain.html'))
         uses: streamx-dev/streamx-common-github-actions/.github/actions/connector-github@v1
+        env:
+          STREAMX_CONNECTION_SOCKET_TIMEOUT: 3000
         with:
           action: publish
           source-provider: ExternalSourceProvider
