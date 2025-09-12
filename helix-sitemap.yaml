@@ -4,10 +4,10 @@ sitemaps:
      destination: /sitemap.xml
      hreflang: en
      lastmod: YYYY-MM-DD
-     origin: https://blog.arborydigital.com
+     origin: https://main--arbory-dev--arbory-digital-inc.aem.live
 
    international:
-    origin: https://blog.arborydigital.com
+    origin: https://main--arbory-dev--arbory-digital-inc.aem.live
     lastmod: YYYY-MM-DD
     languages:
       en:
