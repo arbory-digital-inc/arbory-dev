@@ -19,7 +19,7 @@ jobs:
         shell: bash
         run: |
           sleep 1s
-          streamx_key=$(echo "${{ github.event.client_payload.path }}" | sed 's/\.md$//g')
+          streamx_key=$(echo "${{ github.event.client_payload.path }}" | sed 's/\.md$//g' | sed 's/index//g')
           page_path=$(echo "${{ github.event.client_payload.path }}" | sed 's/\.md$//g' | sed 's/index//g')
           eds_page_url="${{ vars.EDS_DOMAIN_URL }}$page_path"
           eds_plain_page_url="${{ vars.EDS_DOMAIN_URL }}$streamx_key.plain.html"
