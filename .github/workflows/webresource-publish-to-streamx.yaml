@@ -1,4 +1,4 @@
-name: Publish/Unpublish web resources on StreamX
+name: Sunc web resources with StreamX
 
 on:
   workflow_dispatch:
