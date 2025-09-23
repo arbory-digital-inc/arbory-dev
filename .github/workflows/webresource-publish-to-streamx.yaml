@@ -1,4 +1,4 @@
-name: Sunc web resources with StreamX
+name: Sync web resources with StreamX
 
 on:
   workflow_dispatch:
