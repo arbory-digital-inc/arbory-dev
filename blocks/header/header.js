@@ -1,6 +1,6 @@
 import { getMetadata } from '../../scripts/aem.js';
 import { loadFragment } from '../fragment/fragment.js';
-import { getLanguage, getLangMenuPageUrl, isLanguageSupported } from '../../scripts/lang.js';
+import { getLanguage, isLanguageSupported } from '../../scripts/lang.js';
 
 // media query match that indicates mobile/tablet width
 const isDesktop = window.matchMedia('(min-width: 900px)');
@@ -122,27 +122,27 @@ function createLanguageSelector() {
     { code: 'pl', label: 'Polski' },
     { code: 'ko', label: '한국어' },
     { code: 'zh-tw', label: '繁體中文' },
-    { code: 'zh-cn', label: '简体中文' }
+    { code: 'zh-cn', label: '简体中文' },
   ];
-  
+
   const langSelector = document.createElement('div');
   langSelector.className = 'language-selector';
-  
+
   const currentLangButton = document.createElement('button');
   currentLangButton.className = 'current-language';
   currentLangButton.textContent = currentLang.toUpperCase();
   currentLangButton.setAttribute('aria-label', 'Select language');
   currentLangButton.setAttribute('aria-expanded', 'false');
-  
+
   const langDropdown = document.createElement('ul');
   langDropdown.className = 'language-dropdown';
-  
+
   // Add current language first
   const currentLangItem = document.createElement('li');
   const currentLangLink = document.createElement('a');
   // Use current page URL for the current language
   currentLangLink.href = window.location.href;
-  currentLangLink.textContent = supportedLanguages.find(l => l.code === currentLang)?.label || 'English';
+  currentLangLink.textContent = supportedLanguages.find((l) => l.code === currentLang)?.label || 'English';
   currentLangLink.classList.add('active');
   // Prevent navigation when clicking on current language
   currentLangLink.addEventListener('click', (e) => {
@@ -150,69 +150,121 @@ function createLanguageSelector() {
   });
   currentLangItem.appendChild(currentLangLink);
   langDropdown.appendChild(currentLangItem);
-  
+
   // Add language selector elements to DOM immediately
   langSelector.appendChild(currentLangButton);
   langSelector.appendChild(langDropdown);
-  
+
   // Add other supported languages
   const loadLanguageOptions = async () => {
     const langPromises = supportedLanguages
-      .filter(lang => isLanguageSupported(lang.code) && lang.code !== currentLang)
+      .filter((lang) => isLanguageSupported(lang.code) && lang.code !== currentLang)
       .map(async (lang) => {
         try {
           // Create a simple language switch link without checking page existence
           // This avoids the .html extension issues
           const langItem = document.createElement('li');
           const langLink = document.createElement('a');
-          
+
           // Get the current path without language prefix
           const pathParts = window.location.pathname.split('/');
           // Remove empty first element and language code if present
           pathParts.splice(0, pathParts[1] && pathParts[1].length <= 5 ? 2 : 1);
           const currPagePath = pathParts.join('/');
-          
+
           // Construct direct language URL
           const langUrl = `/${lang.code}/${currPagePath}`;
-          
+
           // Ensure it's an absolute URL with origin
           langLink.href = `${window.location.origin}${langUrl}`;
-          
+
           // Add data attribute for debugging
           langLink.setAttribute('data-lang', lang.code);
           langLink.textContent = lang.label;
           langItem.appendChild(langLink);
           return langItem;
         } catch (error) {
-          console.log(`Error creating language link for ${lang.code}:`, error);
+          // console.log(`Error creating language link for ${lang.code}:`, error);
         }
         return null;
       });
-      
+
     // Wait for all language checks to complete
     const langItems = await Promise.all(langPromises);
-    
+
     // Filter out null items and add to dropdown
-    langItems.filter(item => item !== null).forEach(item => {
+    langItems.filter((item) => item !== null).forEach((item) => {
       langDropdown.appendChild(item);
     });
-    
+
     // If no other languages are available, hide the selector
     if (langDropdown.children.length <= 1) {
       langSelector.style.display = 'none';
     }
   };
-  
+
   // Start loading language options
   loadLanguageOptions();
-  
+
+  // Build and show mobile full-screen modal
+  const openMobileModal = () => {
+    const overlay = document.createElement('div');
+    overlay.className = 'language-modal-overlay';
+
+    const modal = document.createElement('div');
+    modal.className = 'language-modal';
+    modal.setAttribute('role', 'dialog');
+    modal.setAttribute('aria-modal', 'true');
+    modal.setAttribute('aria-label', 'Select language');
+
+    const modalHeader = document.createElement('div');
+    modalHeader.className = 'language-modal-header';
+
+    const title = document.createElement('span');
+    title.textContent = 'Select Language';
+
+    const closeBtn = document.createElement('button');
+    closeBtn.className = 'language-modal-close';
+    closeBtn.setAttribute('aria-label', 'Close language selector');
+    closeBtn.innerHTML = '&times;';
+
+    modalHeader.appendChild(title);
+    modalHeader.appendChild(closeBtn);
+
+    const langList = document.createElement('ul');
+    langList.className = 'language-modal-list';
+    Array.from(langDropdown.children).forEach((item) => {
+      langList.appendChild(item.cloneNode(true));
+    });
+
+    modal.appendChild(modalHeader);
+    modal.appendChild(langList);
+    overlay.appendChild(modal);
+    document.body.appendChild(overlay);
+
+    const close = () => overlay.remove();
+
+    closeBtn.addEventListener('click', close);
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) close();
+    });
+    langList.addEventListener('click', (e) => {
+      const link = e.target.closest('a');
+      if (link && !link.classList.contains('active')) close();
+    });
+  };
+
   // Add event listeners
   currentLangButton.addEventListener('click', () => {
+    if (!isDesktop.matches) {
+      openMobileModal();
+      return;
+    }
     const expanded = currentLangButton.getAttribute('aria-expanded') === 'true';
     currentLangButton.setAttribute('aria-expanded', expanded ? 'false' : 'true');
     langDropdown.style.display = expanded ? 'none' : 'block';
   });
-  
+
   // Close dropdown when clicking outside
   const closeDropdownHandler = (e) => {
     if (!langSelector.contains(e.target)) {
@@ -220,14 +272,73 @@ function createLanguageSelector() {
       langDropdown.style.display = 'none';
     }
   };
-  
+
   // Use a named function so we can remove it later if needed
   document.addEventListener('click', closeDropdownHandler);
-  
+
   // Store the handler on the langSelector element for potential cleanup
   langSelector.closeDropdownHandler = closeDropdownHandler;
-  
+
   return langSelector;
+}
+
+/**
+ * Builds an expanding search box from the search icon authored in the nav document
+ * @param {Element} icon The authored search icon span
+ * @returns {Element} The nav search element
+ */
+function createNavSearch(icon) {
+  const navSearch = document.createElement('div');
+  navSearch.className = 'nav-search';
+
+  const toggle = document.createElement('button');
+  toggle.type = 'button';
+  toggle.className = 'nav-search-toggle';
+  toggle.setAttribute('aria-label', 'Open search');
+  toggle.setAttribute('aria-expanded', 'false');
+  toggle.append(icon);
+
+  const form = document.createElement('form');
+  form.className = 'nav-search-form';
+  form.setAttribute('role', 'search');
+
+  const input = document.createElement('input');
+  input.type = 'search';
+  input.className = 'nav-search-input';
+  input.placeholder = 'Search…';
+  input.setAttribute('aria-label', 'Search');
+  form.append(input);
+
+  // search is not wired to an endpoint yet
+  form.addEventListener('submit', (e) => e.preventDefault());
+
+  const setExpanded = (expanded) => {
+    navSearch.classList.toggle('expanded', expanded);
+    toggle.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+    toggle.setAttribute('aria-label', expanded ? 'Close search' : 'Open search');
+    if (expanded) input.focus();
+    // the mobile takeover is transient: dismissing it also clears the query
+    else if (!isDesktop.matches) input.value = '';
+  };
+
+  toggle.addEventListener('click', () => {
+    setExpanded(!navSearch.classList.contains('expanded'));
+  });
+
+  input.addEventListener('keydown', (e) => {
+    if (e.code === 'Escape') {
+      setExpanded(false);
+      toggle.focus();
+    }
+  });
+
+  // collapse when clicking outside the search element
+  document.addEventListener('click', (e) => {
+    if (!navSearch.contains(e.target)) setExpanded(false);
+  });
+
+  navSearch.append(toggle, form);
+  return navSearch;
 }
 
 /**
@@ -237,12 +348,11 @@ function createLanguageSelector() {
 export default async function decorate(block) {
   // Check if a headerPath was provided via the data attribute
   const headerPathFromData = block.closest('header').dataset.headerPath;
-  
+
   // load nav as fragment
   const navMeta = getMetadata('nav');
   // Use the headerPath if provided, otherwise fall back to metadata or default
   const navPath = headerPathFromData || (navMeta ? new URL(navMeta, window.location).pathname : '/nav');
-  console.log('Loading header from:', navPath);
   const fragment = await loadFragment(navPath);
 
   // decorate nav DOM
@@ -277,10 +387,19 @@ export default async function decorate(block) {
       });
     });
   }
-  
+
   // Add language selector to tools section
   const navTools = nav.querySelector('.nav-tools');
   if (navTools) {
+    // decorate the authored search icon into an expanding search box
+    const searchIcon = navTools.querySelector('span.icon-search');
+    if (searchIcon) {
+      const iconContainer = searchIcon.closest('p');
+      const navSearch = createNavSearch(searchIcon);
+      if (iconContainer) iconContainer.replaceWith(navSearch);
+      else navTools.prepend(navSearch);
+    }
+
     const langSelector = createLanguageSelector();
     if (langSelector) {
       navTools.appendChild(langSelector);

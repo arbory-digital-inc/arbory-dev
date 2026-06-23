@@ -46,6 +46,8 @@
   margin: 0;
   border-radius: 1rem;
   box-shadow: var(--shadow-xl);
+  border: 1.5px solid #406e0c66;
+  animation: glowPulseHero 10s infinite ease-in-out;
   overflow: hidden;
 }
 @media (max-width: 600px) {
@@ -53,12 +55,35 @@
     border-radius: 0;
   }
 }
+@keyframes glowPulseHero {
+  0% {
+    border-color: rgba(64, 110, 12, 0.3);
+  }
+  50% {
+    border-color: rgba(64, 110, 12, 1);
+  }
+  100% {
+    border-color: rgba(64, 110, 12, 0.3);
+  }
+}
 
-/* Image column - 16:9 aspect ratio */
+/* Image column - dynamic sizing based on aspect ratio */
 .hero-image-col {
   flex: 0 0 auto; /* Size based on content */
+  display: flex;
+  align-items: center;
+}
+
+/* 16:9 aspect ratio (default) */
+.hero-image-col.aspect-16-9 {
   width: 700px;
   height: 393.75px; /* 700px * 9/16 = 393.75px for 16:9 aspect ratio */
+}
+
+/* 1:1 aspect ratio (square) */
+.hero-image-col.aspect-1-1 {
+  width: 393.75px;
+  height: 393.75px; /* Square aspect ratio */
 }
 
 .hero-image-col img {
@@ -72,7 +97,7 @@
 /* Content column - takes remaining space */
 .hero-content-col {
   flex: 1; /* Takes remaining space */
-  padding: 2rem;
+  padding: 1.25rem;
   background-color: var(--bg-color-1); /* Initial color, will be overridden by JS */
   border-radius: 0;
   display: flex;
@@ -83,16 +108,27 @@
   height: 393.75px; /* Match image column height */
 }
 
+/* Content column adjustments for different aspect ratios */
+.hero-content-col.with-square-image {
+  /* More space available when image is square */
+  padding: 2rem;
+}
+
+.hero-content-col.with-square-image h1 {
+  font-size: 1.75rem;
+  margin-bottom: 1.25rem;
+}
+
 /* Typography */
 .hero-content-col h1 {
   margin: 0 0 1rem 0;
-  font-size: 1.85rem;
+  font-size: 1.5rem;
   line-height: 1.2;
   color: var(--text-color);
 }
 
 .hero-category {
-  font-size: 1.25rem;
+  font-size: 1rem;
   color: var(--link-color);
   font-weight: 600;
   letter-spacing: -0.5px;
@@ -106,14 +142,14 @@
   flex-wrap: wrap;
   gap: 8px;
   padding: 0;
-  margin: 1rem 0;
+  margin: 0.5rem 0 0 0;
   list-style: none;
 }
 
 .hero-tags li {
   color: var(--link-color);
   border: 1.5px solid var(--link-color);
-  padding: 4px 8px;
+  padding: 2px 4px;
   border-radius: 2px;
   font-size: 0.7rem;
   font-weight: 600;
@@ -129,7 +165,7 @@
 }
 
 .hero-tags{
-  border-top: 1px solid #333;
+  border-top: 1px solid #406e0c8c;
   margin-top: 0.5rem;
   padding-top: 0.5rem;
   font-family: var(--heading-font-family);
@@ -147,13 +183,18 @@
 .hero-author {
   color: var(--text-color);
   font-weight: 500;
-  font-size: 1.1rem;
+  font-size: 1rem;
+}
+
+/* Space after hero to offset the negative margin overlap */
+.blog-post-hero-container + .section {
+  padding-top: 6rem;
 }
 
 /* Mobile layout - stack vertically */
 @media (max-width: 858px) {
   .blog-post-hero-container {
-    width: 100vw;
+    width: 100%;
     max-width: 100%;
     overflow-x: hidden;
   }
@@ -189,7 +230,15 @@
     width: 100% !important;
     max-width: 100%;
     height: auto !important;
-    aspect-ratio: 16/9; /* Maintain 16:9 aspect ratio */
+  }
+  
+  /* Maintain aspect ratios on mobile */
+  .hero-image-col.aspect-16-9 img {
+    aspect-ratio: 16/9;
+  }
+  
+  .hero-image-col.aspect-1-1 img {
+    aspect-ratio: 1/1;
   }
   
   .hero-content-col {
