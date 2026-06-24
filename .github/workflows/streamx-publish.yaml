@@ -43,7 +43,7 @@ jobs:
           echo "eds_plain_page_url=$eds_plain_page_url" >> "$GITHUB_OUTPUT"
 
       - name: Run publish to StreamX
-        uses: streamx-hub/streamx-common-github-actions/.github/actions/connector-github@v1
+        uses: streamx-hub/streamx-common-github-actions/.github/actions/connector-github@v2
         env:
           STREAMX_CONNECTION_SOCKET_TIMEOUT: 30000
           STREAMX_CONNECTION_TIMEOUT: 3000
@@ -58,7 +58,7 @@ jobs:
 
       - name: Run publish plain nav/footer to StreamX
         if: (endsWith(steps.vars.outputs.streamx_subject_plain, 'nav.plain.html') || endsWith(steps.vars.outputs.streamx_subject_plain, 'footer.plain.html'))
-        uses: streamx-hub/streamx-common-github-actions/.github/actions/connector-github@v1
+        uses: streamx-hub/streamx-common-github-actions/.github/actions/connector-github@v2
         env:
           STREAMX_CONNECTION_SOCKET_TIMEOUT: 30000
           STREAMX_CONNECTION_TIMEOUT: 3000
@@ -89,7 +89,7 @@ jobs:
           echo "eds_webresource_url=$eds_webresource_url" >> "$GITHUB_OUTPUT"
 
       - name: Run publish web-resource to StreamX
-        uses: streamx-hub/streamx-common-github-actions/.github/actions/connector-github@v1
+        uses: streamx-hub/streamx-common-github-actions/.github/actions/connector-github@v2
         env:
           STREAMX_CONNECTION_SOCKET_TIMEOUT: 3000
         with:
