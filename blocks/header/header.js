@@ -309,6 +309,8 @@ function createNavSearch(icon) {
   input.setAttribute('aria-label', 'Search');
   form.append(input);
 
+  const getInput = () => form.querySelector('input');
+
   // search is not wired to an endpoint yet
   form.addEventListener('submit', (e) => e.preventDefault());
 
@@ -316,16 +318,16 @@ function createNavSearch(icon) {
     navSearch.classList.toggle('expanded', expanded);
     toggle.setAttribute('aria-expanded', expanded ? 'true' : 'false');
     toggle.setAttribute('aria-label', expanded ? 'Close search' : 'Open search');
-    if (expanded) input.focus();
+    if (expanded) getInput().focus();
     // the mobile takeover is transient: dismissing it also clears the query
-    else if (!isDesktop.matches) input.value = '';
+    if (!isDesktop.matches) getInput().value = '';
   };
 
   toggle.addEventListener('click', () => {
     setExpanded(!navSearch.classList.contains('expanded'));
   });
 
-  input.addEventListener('keydown', (e) => {
+  getInput().addEventListener('keydown', (e) => {
     if (e.code === 'Escape') {
       setExpanded(false);
       toggle.focus();

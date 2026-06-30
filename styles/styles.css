@@ -47,7 +47,7 @@
   --overlay-background-color: #272B36;
   --highlight-background-color: #232323;
   --text-color: #FFFFFF;
-  
+
 
   /* fonts */
   --body-font-family: roboto, roboto-fallback;
@@ -446,4 +446,17 @@ div.border-bottom-glow{
   100% {
     border-color: rgba(64, 110, 12, 0.3);
   }
+}
+
+.stx-query-input {
+/* search */
+  --stx-color-text: #fff;
+  --stx-color-background: var(--background-color);
+  --stx-color-border: var(--link-color);
+
+  font-size: 1rem;
+}
+
+.stx-suggestion__item em {
+  color: var(--link-color);
 }

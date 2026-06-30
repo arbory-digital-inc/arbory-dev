@@ -390,6 +390,11 @@ header nav .nav-search.expanded .nav-search-input {
     visibility 0s;
 }
 
+/* stylelint-disable-next-line selector-class-pattern */
+header nav .nav-search:not(.expanded) .stx-query-input__clear-button {
+  display: none;
+}
+
 /* mobile: expanded search becomes a full-width takeover bar over the header */
 @media (max-width: 899px) {
   header nav .nav-search.expanded .nav-search-form {

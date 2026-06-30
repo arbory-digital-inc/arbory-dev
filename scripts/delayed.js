@@ -1,8 +1,23 @@
 // eslint-disable-next-line import/no-cycle
-import { sampleRUM } from './aem.js';
+import { sampleRUM, loadCSS } from './aem.js';
+
+async function loadInlineSearch() {
+  loadCSS('/scripts/search/streamx-search.css');
+  const { createSearchInput } = await import('./search/streamx-search-inline.js');
+
+  const streamxSearchInput = createSearchInput({
+    searchOpenElementSelector: '',
+    searchApiUrl: 'https://so-streamxlabs-arborytest-397e4.eu-west-par-edge.prod-ext.streamx.cloud/search/pages',
+
+  }, document.querySelector('.nav-search-input'));
+
+  streamxSearchInput.querySelector('input').classList.add('nav-search-input');
+}
 
 // Core Web Vitals RUM collection
 sampleRUM('cwv');
+
+loadInlineSearch();
 
 // add more delayed functionality here
 /* Add in ALI ARMS RUM CODE */

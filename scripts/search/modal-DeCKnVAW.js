@@ -1,0 +1,38 @@
+import { a as html, c as trapFocus, t as creatQueryInput } from "./common-CExKURVS.js";
+//#region src/inline-search/modal/modal.ts
+var createSearchModal = (config) => {
+	const { element: queryInput, inputEl } = creatQueryInput(config.input);
+	const dialogEl = html`
+    <dialog class="stx-search-modal">${queryInput}</dialog>
+  `;
+	let restoreFocus;
+	if (!dialogEl || !inputEl) throw new Error("test");
+	const openModal = () => {
+		if (dialogEl.open) return;
+		restoreFocus = trapFocus();
+		if (config.useNonModal) dialogEl.show();
+		else dialogEl.showModal();
+		inputEl.focus();
+		config?.analytics?.({ type: "streamx_modal_search_open" });
+	};
+	const closeModal = () => {
+		if (!dialogEl.open) return;
+		dialogEl.close();
+	};
+	dialogEl.addEventListener("close", () => {
+		if (restoreFocus) restoreFocus();
+		config?.analytics?.({ type: "streamx_modal_search_close" });
+	});
+	dialogEl.addEventListener("click", (e) => {
+		if (e.target && e.target === dialogEl) dialogEl.close();
+	});
+	return {
+		element: dialogEl,
+		openModal,
+		closeModal
+	};
+};
+//#endregion
+export { createSearchModal as t };
+
+//# sourceMappingURL=modal-DeCKnVAW.js.map
