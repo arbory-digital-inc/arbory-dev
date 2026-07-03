@@ -43,7 +43,18 @@ var replaceElWithError = (root, error) => {
   `;
 	root.append(errorEl);
 };
+var generatePannelLabels = (config) => {
+	const lables = {};
+	if (config.paginationInfo) lables.paginationInfo = (currentPage, pageNumber) => renderEDSLableTemplate(config.paginationInfo, {
+		currentPage,
+		pageNumber
+	});
+	if (config.totalResults) lables.totalResults = (totalCount) => renderEDSLableTemplate(config.totalResults, { totalCount });
+	if (config.ariaPaginationGoToPage) lables.ariaPaginationGoToPage = (pageNumber) => renderEDSLableTemplate(config.ariaPaginationGoToPage, { pageNumber });
+	if (config.ariaPaginationNavigation) lables.ariaPaginationNavigation = config.ariaPaginationNavigation;
+	return lables;
+};
 //#endregion
-export { replaceElWithError as i, loadCssFile as n, renderEDSLableTemplate as r, getEDSConfig as t };
+export { replaceElWithError as i, getEDSConfig as n, loadCssFile as r, generatePannelLabels as t };
 
-//# sourceMappingURL=eds-helper-CnTHYa0p.js.map
+//# sourceMappingURL=eds-helper-NkKtY9o8.js.map

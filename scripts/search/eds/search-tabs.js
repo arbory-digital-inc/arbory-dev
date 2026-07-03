@@ -1,5 +1,5 @@
 import { t as createSearchTabs } from "../search-tabs-DnOw8MkO.js";
-import { i as replaceElWithError, n as loadCssFile, r as renderEDSLableTemplate, t as getEDSConfig } from "../eds-helper-CnTHYa0p.js";
+import { i as replaceElWithError, n as getEDSConfig, r as loadCssFile, t as generatePannelLabels } from "../eds-helper-NkKtY9o8.js";
 //#region src/exports/eds/decorate-search-tabs.ts
 function decorate(block, tabSelector, renderers) {
 	loadCssFile("/scripts/search/streamx-search.css");
@@ -42,15 +42,7 @@ function decorate(block, tabSelector, renderers) {
 			results: {
 				pageSize: Number(tabConfig.pageSize) || 10,
 				dataSources: [tabConfig.dataSources],
-				labels: {
-					paginationInfo: (currentPage, pageNumber) => renderEDSLableTemplate(tabConfig.paginationInfo, {
-						currentPage,
-						pageNumber
-					}),
-					totalResults: (totalCount) => renderEDSLableTemplate(tabConfig.totalResults, { totalCount }),
-					ariaPaginationGoToPage: (pageNumber) => renderEDSLableTemplate(tabConfig.ariaPaginationGoToPage, { pageNumber }),
-					ariaPaginationNavigation: tabConfig.ariaPaginationNavigation
-				}
+				labels: generatePannelLabels(tabConfig)
 			}
 		};
 	});

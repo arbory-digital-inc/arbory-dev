@@ -1,5 +1,5 @@
 import { t as createResultsPanel } from "../search-results-panel-XEbvRceR.js";
-import { i as replaceElWithError, n as loadCssFile, r as renderEDSLableTemplate, t as getEDSConfig } from "../eds-helper-CnTHYa0p.js";
+import { i as replaceElWithError, n as getEDSConfig, r as loadCssFile, t as generatePannelLabels } from "../eds-helper-NkKtY9o8.js";
 //#region src/exports/eds/decorate-results-panel.ts
 function decorate(block, renderers) {
 	loadCssFile("/scripts/search/streamx-search.css");
@@ -26,15 +26,7 @@ function decorate(block, renderers) {
 		pageSize: Number(config.pageSize) || 10,
 		dataSources: config.dataSources ? [config.dataSources] : [],
 		renderers: resultsRenderers,
-		labels: {
-			paginationInfo: (currentPage, pageNumber) => renderEDSLableTemplate(config.paginationInfo, {
-				currentPage,
-				pageNumber
-			}),
-			totalResults: (totalCount) => renderEDSLableTemplate(config.totalResults, { totalCount }),
-			ariaPaginationGoToPage: (pageNumber) => renderEDSLableTemplate(config.ariaPaginationGoToPage, { pageNumber }),
-			ariaPaginationNavigation: config.ariaPaginationNavigation
-		}
+		labels: generatePannelLabels(config)
 	});
 	block.append(resultPanel);
 }
