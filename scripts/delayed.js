@@ -1,16 +1,22 @@
 // eslint-disable-next-line import/no-cycle
 import { sampleRUM, loadCSS } from './aem.js';
 
-// ./search/streamx-search-inline.js
 async function loadInlineSearch() {
-  // loadCSS('/scripts/search/streamx-search.css');
-  const { createSearchInput } = await import('streamx-search/search-inline');
+  loadCSS('/scripts/search/streamx-search.css');
+  const { createSearchInput } = await import('./search/streamx-search-inline.js');
+  const navSearchInput = document.querySelector('.nav-search-input');
+
+  if (!navSearchInput) {
+    // eslint-disable-next-line no-console
+    console.error('nav search input field is not defined!');
+    return;
+  }
 
   const streamxSearchInput = createSearchInput({
     searchOpenElementSelector: '',
     searchApiUrl: 'https://so-streamxlabs-arborytest-397e4.eu-west-par-edge.prod-ext.streamx.cloud/search/pages',
 
-  }, document.querySelector('.nav-search-input'));
+  }, navSearchInput);
 
   streamxSearchInput.querySelector('input').classList.add('nav-search-input');
 }
