@@ -1,5 +1,5 @@
-import { n as DEFAULT_CONFIG, t as creatQueryInput } from "./common-CExKURVS.js";
-import { t as createSearchModal } from "./modal-DeCKnVAW.js";
+import { n as defaultConfig, t as createQueryInput } from "./common-CzdFOaSu.js";
+import { t as createSearchModal } from "./modal-CTqFzm0O.js";
 //#region src/exports/search-inline.ts
 var getTriggerOpenEl = (searchOpenElementSelector) => {
 	if (!searchOpenElementSelector) throw new Error("No trigger selector provided!");
@@ -19,19 +19,19 @@ var bootstrapModal = (config) => {
 		closeModal
 	};
 };
-function createSearchInModal(customConfig) {
+function mountSearchModal(customConfig) {
 	const config = {
-		...DEFAULT_CONFIG,
+		...defaultConfig,
 		...customConfig,
 		input: {
-			...DEFAULT_CONFIG.input,
+			...defaultConfig.input,
 			...customConfig.input,
 			labels: {
-				...DEFAULT_CONFIG.input.labels,
+				...defaultConfig.input.labels,
 				...customConfig.input.labels
 			},
 			renderers: {
-				...DEFAULT_CONFIG.input.renderers,
+				...defaultConfig.input.renderers,
 				...customConfig.input.renderers
 			}
 		}
@@ -51,12 +51,12 @@ function createSearchInModal(customConfig) {
 	}
 }
 function createSearchInput(customConfig, mountPoint) {
-	const { element } = creatQueryInput(customConfig);
+	const { element } = createQueryInput(customConfig);
 	if (mountPoint.tagName === "INPUT") mountPoint.replaceWith(element);
 	else mountPoint.append(element);
 	return element;
 }
 //#endregion
-export { createSearchInModal, createSearchInput };
+export { createSearchInput, mountSearchModal };
 
 //# sourceMappingURL=streamx-search-inline.js.map

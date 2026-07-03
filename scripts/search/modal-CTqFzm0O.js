@@ -1,7 +1,7 @@
-import { a as html, c as trapFocus, t as creatQueryInput } from "./common-CExKURVS.js";
+import { a as html, c as trapFocus, t as createQueryInput } from "./common-CzdFOaSu.js";
 //#region src/inline-search/modal/modal.ts
 var createSearchModal = (config) => {
-	const { element: queryInput, inputEl } = creatQueryInput(config.input);
+	const { element: queryInput, inputEl } = createQueryInput(config.input);
 	const dialogEl = html`
     <dialog class="stx-search-modal">${queryInput}</dialog>
   `;
@@ -35,4 +35,4 @@ var createSearchModal = (config) => {
 //#endregion
 export { createSearchModal as t };
 
-//# sourceMappingURL=modal-DeCKnVAW.js.map
+//# sourceMappingURL=modal-CTqFzm0O.js.map

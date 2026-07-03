@@ -159,7 +159,7 @@ var fetchSearchResults = async (url, query, signal) => {
 *
 * @param buildFunction Function creating the element.
 */
-var lazyBuildComponent = (buildFunction) => {
+var createLazyComponent = (buildFunction) => {
 	let isBuild = false;
 	const placeholderEl = html`
     <div data-lazy-build="true"></div>
@@ -175,10 +175,10 @@ var lazyBuildComponent = (buildFunction) => {
 		build
 	};
 };
-var sendUrlChagneEvent = () => {
+var dispatchUrlChangeEvent = () => {
 	window.dispatchEvent(new Event("urlchange"));
 };
-var addUrlChangeListener = (handler) => {
+var onUrlChange = (handler) => {
 	window.addEventListener("urlchange", () => {
 		handler();
 	});
@@ -216,7 +216,7 @@ function searchIcon() {
 }
 //#endregion
 //#region src/inline-search/default-config.ts
-var DEFAULT_CONFIG = {
+var defaultConfig = {
 	input: {
 		minSearchLength: 3,
 		groupByCategory: true,
@@ -283,19 +283,19 @@ var createSuggestions = (response, config) => {
 //#region src/components/query-input/query-input.ts
 var resolveConfig = (customConfig) => {
 	return {
-		...DEFAULT_CONFIG.input,
+		...defaultConfig.input,
 		...customConfig,
 		renderers: {
-			...DEFAULT_CONFIG.input.renderers,
+			...defaultConfig.input.renderers,
 			...customConfig.renderers
 		},
 		labels: {
-			...DEFAULT_CONFIG.input.labels,
-			...customConfig.labels
+			...defaultConfig.input.labels,
+			...Object.fromEntries(Object.entries(customConfig.labels || {}).filter(([, value]) => value !== void 0))
 		}
 	};
 };
-var debouceSearch = (url, callback) => {
+var createDebouncedSearch = (url, callback) => {
 	let controller = null;
 	return debounce(async (query) => {
 		controller?.abort();
@@ -308,15 +308,15 @@ var debouceSearch = (url, callback) => {
 		}
 	}, 300);
 };
-var saveSerachQueryInUrl = (query) => {
+var updateSearchQuery = (query) => {
 	const url = new URL(window.location.href);
 	const SEARCH_QUERY_PARAM_NAME = "stx-search";
 	url.searchParams.delete(SEARCH_QUERY_PARAM_NAME);
 	url.searchParams.set(SEARCH_QUERY_PARAM_NAME, query);
 	window.history.pushState({}, "", url);
-	sendUrlChagneEvent();
+	dispatchUrlChangeEvent();
 };
-function creatQueryInput(customConfig) {
+function createQueryInput(customConfig) {
 	const config = resolveConfig(customConfig);
 	const inputTextId = crypto.randomUUID();
 	const suggestionWrapperId = crypto.randomUUID();
@@ -386,7 +386,7 @@ function creatQueryInput(customConfig) {
 		let url = "";
 		if (typeof config.searchApiUrl === "string") url = config.searchApiUrl;
 		else url = config.searchApiUrl();
-		onSearch = debouceSearch(url, (results) => {
+		onSearch = createDebouncedSearch(url, (results) => {
 			const suggestionEl = createSuggestions(results, config);
 			suggestionListLenght = results.hits.hits?.length || 0;
 			activeIndex = -1;
@@ -412,7 +412,7 @@ function creatQueryInput(customConfig) {
 			} else if (config.searchPageUrl) {
 				const link = config.searchPageUrl(inputEl.value);
 				window.location.href = link.toString();
-			} else saveSerachQueryInUrl(inputEl.value);
+			} else updateSearchQuery(inputEl.value);
 			if (!suggestionListLenght) return;
 			const maxIndex = suggestionListLenght;
 			if (key === "ArrowDown") {
@@ -457,6 +457,6 @@ function creatQueryInput(customConfig) {
 	};
 }
 //#endregion
-export { html as a, trapFocus as c, fetchSearchResults as i, DEFAULT_CONFIG as n, lazyBuildComponent as o, addUrlChangeListener as r, normalizeLabels as s, creatQueryInput as t };
+export { html as a, trapFocus as c, fetchSearchResults as i, defaultConfig as n, normalizeLabels as o, createLazyComponent as r, onUrlChange as s, createQueryInput as t };
 
-//# sourceMappingURL=common-CExKURVS.js.map
+//# sourceMappingURL=common-CzdFOaSu.js.map

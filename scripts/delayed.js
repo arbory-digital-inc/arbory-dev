@@ -1,9 +1,10 @@
 // eslint-disable-next-line import/no-cycle
 import { sampleRUM, loadCSS } from './aem.js';
 
+// ./search/streamx-search-inline.js
 async function loadInlineSearch() {
-  loadCSS('/scripts/search/streamx-search.css');
-  const { createSearchInput } = await import('./search/streamx-search-inline.js');
+  // loadCSS('/scripts/search/streamx-search.css');
+  const { createSearchInput } = await import('streamx-search/search-inline');
 
   const streamxSearchInput = createSearchInput({
     searchOpenElementSelector: '',

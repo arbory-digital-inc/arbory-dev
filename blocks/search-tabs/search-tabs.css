@@ -1,0 +1,22 @@
+/* stylelint-disable selector-class-pattern */
+
+:root main {
+  --stx-color-text: #fff;
+  --stx-color-muted: #b9bec9;
+  --stx-color-background: #191b22;
+  --stx-color-surface: #272b36;
+  --stx-color-border: #3b4252;
+  --stx-color-focus: #62a814;
+}
+
+.search-tabs .stx-query-input__input {
+  max-width: 100%;
+  border: 1px solid transparent;
+  border-bottom: 1px solid var(--stx-color-border);
+}
+
+.search-tabs .stx-query-input__search-button {
+  min-width: 40px;
+  height: 40px;
+  margin-left: 10px;
+}

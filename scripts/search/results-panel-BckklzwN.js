@@ -1,9 +1,65 @@
-import { a as html, i as fetchSearchResults, r as addUrlChangeListener, s as normalizeLabels } from "./common-CExKURVS.js";
+import { a as html, i as fetchSearchResults, o as normalizeLabels, s as onUrlChange } from "./common-CzdFOaSu.js";
 //#region src/config.ts
 var config = { debug: false };
 //#endregion
+//#region src/components/results-panel/pagination.ts
+var createPagination = (data, results, currentPage) => {
+	const totalNumber = data.hits.total.value;
+	const { pageSize } = results;
+	const pagesCount = Math.ceil(totalNumber / pageSize);
+	const paginationButtonList = [];
+	let paginationStartPage = currentPage - 2;
+	if (pagesCount <= 1) return "";
+	if (currentPage <= 3) paginationStartPage = 1;
+	else if (currentPage >= pagesCount - 2) paginationStartPage = pagesCount - 4;
+	if (paginationStartPage > 1) paginationButtonList.push(html`<li class="stx-results-panel__pagination-list-item">
+        <button data-page-number="1" aria-label="${results.labels.ariaPaginationGoToPage(1)}">1</a>
+      </li>`);
+	if (paginationStartPage > 2) paginationButtonList.push(html`<li
+        class="stx-results-panel__pagination-list-item stx-results-panel__pagination-dots "
+        aria-hidden="true"
+      >
+        ...
+      </li>`);
+	const paginationEndIndex = pagesCount < 5 ? pagesCount + 1 : paginationStartPage + 5;
+	for (let i = paginationStartPage; i < paginationEndIndex; i++) paginationButtonList.push(html`<li class="stx-results-panel__pagination-list-item">
+        <button
+          data-page-number="${i}"
+          class="${currentPage === i ? "stx-is-active" : ""}"
+          aria-current="${currentPage === i ? "page" : null}"
+          aria-label="${results.labels.ariaPaginationGoToPage(i)}"
+        >
+          ${i}
+        </button>
+      </li>`);
+	if (paginationStartPage < pagesCount - 5) paginationButtonList.push(html`<li
+        class="stx-results-panel__pagination-list-item stx-results-panel__pagination-dots"
+        aria-hidden="true"
+      >
+        ...
+      </li>`);
+	if (paginationStartPage < pagesCount - 4) paginationButtonList.push(html` <li class="stx-results-panel__pagination-list-item">
+        <button
+          data-page-number="${pagesCount}"
+          aria-label="${results.labels.ariaPaginationGoToPage(pagesCount)}"
+        >
+          ${pagesCount}
+        </button>
+      </li>`);
+	return html`
+    <nav
+      aria-label="${results.labels.ariaPaginationNavigation()}"
+      class="stx-results-panel__pagination-container"
+    >
+      <ul class="stx-results-panel__pagination-list">
+        ${paginationButtonList}
+      </ul>
+    </nav>
+  `;
+};
+//#endregion
 //#region src/components/results-panel/renderers.ts
-var defaultRenderLoader = () => {
+var renderDefaultLoader = () => {
 	return html`
     <span>
       <svg
@@ -26,7 +82,7 @@ var defaultRenderLoader = () => {
     </span>
   `;
 };
-var noItemRenderer = (item) => {
+var renderNoItem = (item) => {
 	if (config.debug) return html`
       <div class="stx-results-panel__no-item-renderer">
         No custom renderer for type: ${item._source.type}
@@ -34,7 +90,7 @@ var noItemRenderer = (item) => {
     `;
 	return "";
 };
-var resultsPanelErrorRenderer = () => {
+var renderResultsPanelError = () => {
 	return html`
     <div class="stx-results-panel__error">
       <span class="stx-results-panel__error-heading">
@@ -48,32 +104,32 @@ var resultsPanelErrorRenderer = () => {
 };
 //#endregion
 //#region src/components/results-panel/results-panel.ts
-var DEFAULT_RESULTS_CONFIG = {
+var defaultConfig = {
 	pageSize: 20,
 	renderers: {
-		loader: defaultRenderLoader,
-		error: resultsPanelErrorRenderer
+		loader: renderDefaultLoader,
+		error: renderResultsPanelError
 	},
 	labels: {
 		paginationInfo: (currentPage, pageNumber) => `Page ${currentPage} of ${pageNumber}`,
 		totalResults: (totalCount) => `${totalCount} results found.`,
 		ariaPaginationGoToPage: (pageNumber) => `Go to page ${pageNumber}`,
-		ariaPaginationNavigation: "Pagination"
+		ariaPaginationNavigation: () => "Pagination"
 	}
 };
 var resolveConfig = (resultsConfig) => {
-	const defaultLabels = normalizeLabels(DEFAULT_RESULTS_CONFIG.labels);
+	const defaultLabels = normalizeLabels(defaultConfig.labels);
 	const configLabels = resultsConfig.labels ? normalizeLabels(resultsConfig.labels) : {};
 	return {
-		...DEFAULT_RESULTS_CONFIG,
+		...defaultConfig,
 		...resultsConfig,
 		renderers: {
-			...DEFAULT_RESULTS_CONFIG.renderers,
+			...defaultConfig.renderers,
 			...resultsConfig.renderers
 		},
 		labels: {
 			...defaultLabels,
-			...configLabels
+			...Object.fromEntries(Object.entries(configLabels).filter(([, value]) => value !== void 0))
 		}
 	};
 };
@@ -134,60 +190,6 @@ var createResultsNumber = (data, results, currentPage) => {
     </div>
   `;
 };
-var createPagination = (data, results, currentPage) => {
-	const totalNumber = data.hits.total.value;
-	const { pageSize } = results;
-	const pagesCount = Math.ceil(totalNumber / pageSize);
-	const paginationButtonList = [];
-	let paginationStartPage = currentPage - 2;
-	if (pagesCount <= 1) return "";
-	if (currentPage <= 3) paginationStartPage = 1;
-	else if (currentPage >= pagesCount - 2) paginationStartPage = pagesCount - 4;
-	if (paginationStartPage > 1) paginationButtonList.push(html`<li class="stx-results-panel__pagination-list-item">
-        <button data-page-number="1" aria-label="${results.labels.ariaPaginationGoToPage(1)}">1</a>
-      </li>`);
-	if (paginationStartPage > 2) paginationButtonList.push(html`<li
-        class="stx-results-panel__pagination-list-item stx-results-panel__pagination-dots "
-        aria-hidden="true"
-      >
-        ...
-      </li>`);
-	const paginationEndIndex = pagesCount < 5 ? pagesCount + 1 : paginationStartPage + 5;
-	for (let i = paginationStartPage; i < paginationEndIndex; i++) paginationButtonList.push(html`<li class="stx-results-panel__pagination-list-item">
-        <button
-          data-page-number="${i}"
-          class="${currentPage === i ? "stx-is-active" : ""}"
-          aria-current="${currentPage === i ? "page" : null}"
-          aria-label="${results.labels.ariaPaginationGoToPage(i)}"
-        >
-          ${i}
-        </button>
-      </li>`);
-	if (paginationStartPage < pagesCount - 5) paginationButtonList.push(html`<li
-        class="stx-results-panel__pagination-list-item stx-results-panel__pagination-dots"
-        aria-hidden="true"
-      >
-        ...
-      </li>`);
-	if (paginationStartPage < pagesCount - 4) paginationButtonList.push(html` <li class="stx-results-panel__pagination-list-item">
-        <button
-          data-page-number="${pagesCount}"
-          aria-label="${results.labels.ariaPaginationGoToPage(pagesCount)}"
-        >
-          ${pagesCount}
-        </button>
-      </li>`);
-	return html`
-    <nav
-      aria-label="${results.labels.ariaPaginationNavigation()}"
-      class="stx-results-panel__pagination-container"
-    >
-      <ul class="stx-results-panel__pagination-list">
-        ${paginationButtonList}
-      </ul>
-    </nav>
-  `;
-};
 var createItems = (data, renderers) => {
 	return data.hits.hits?.map((item) => {
 		const { type } = item._source;
@@ -196,12 +198,12 @@ var createItems = (data, renderers) => {
 			itemContent = renderers[`item-${type}`](item);
 		} catch (error) {
 			console.error(error);
-			return noItemRenderer(item);
+			return renderNoItem(item);
 		}
 		else itemContent = html`
-        <span>
-          <span>${item._id}</span>
-          <span>${item._source?.type}</span>
+        <span class="stx-results-panel__missing-renderer">
+          <span>Missing renderer for "item-${item?._source?.type}"</span>
+          <span>${JSON.stringify(item)}</span>
         </span>
       `;
 		return html`
@@ -256,7 +258,7 @@ var addOnSearchParamChangeAction = (resultsPanel, results) => {
 	window.addEventListener("popstate", () => {
 		onUrlChagne();
 	});
-	addUrlChangeListener(() => {
+	onUrlChange(() => {
 		onUrlChagne();
 	});
 };
@@ -277,4 +279,4 @@ var createResultsPanel = (resultsConfig) => {
 //#endregion
 export { config as n, createResultsPanel as t };
 
-//# sourceMappingURL=results-panel-C-8PM_EN.js.map
+//# sourceMappingURL=results-panel-BckklzwN.js.map
