@@ -14,7 +14,7 @@ async function loadInlineSearch() {
 
   const streamxSearchInput = createSearchInput({
     searchOpenElementSelector: '',
-    searchApiUrl: 'https://so-streamxlabs-arborytest-397e4.eu-west-par-edge.prod-ext.streamx.cloud/search/pages',
+    searchApiUrl: 'https://blog-dev.arborydigital.com/search/pages',
 
   }, navSearchInput);
 
