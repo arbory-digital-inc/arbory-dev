@@ -28,5 +28,3 @@ loadInlineSearch();
 
 // add more delayed functionality here
 
-// cache-invalidation-diagnostic 2026-07-09T-marker-B (safe to remove)
-
