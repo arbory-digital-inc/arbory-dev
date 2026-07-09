@@ -14,7 +14,7 @@ async function loadInlineSearch() {
 
   const streamxSearchInput = createSearchInput({
     searchOpenElementSelector: '',
-    searchApiUrl: 'https://blog-dev.arborydigital.com/search/pages',
+    searchApiUrl: '/search/pages',
 
   }, navSearchInput);
 
