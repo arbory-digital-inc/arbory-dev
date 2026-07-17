@@ -8,6 +8,7 @@ export default function decorate(block) {
     el.innerHTML = `
       <div class="results-panel-item">
         <span class="results-panel-item__title">${item._source.payload.title}</span>
+        <br/>
         <span class="results-panel-item__type">${item._source.type}</span>
       </div>
     `;

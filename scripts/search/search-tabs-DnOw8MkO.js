@@ -54,11 +54,22 @@ var createTabContent = (tabData, isSelected) => {
 };
 function createTabs(tabsConfig, customRenderers) {
 	const tabs = resolvedTab(tabsConfig, customRenderers);
-	const buttonList = tabs.map((el, index) => createTabButton(el, !index));
+	// Active tab is persisted in the URL so it survives reloads and is deep-linkable.
+	// The param is only present when a non-default (non-first) tab is active.
+	const SEARCH_TAB_PARAM = "stx-tab";
+	const initialTabParam = new URLSearchParams(window.location.search).get(SEARCH_TAB_PARAM);
+	const initialIndex = Math.max(0, tabs.findIndex((tab) => String(tab.id) === initialTabParam));
+	const updateActiveTabParam = (tabId, isDefault) => {
+		const url = new URL(window.location.href);
+		if (isDefault) url.searchParams.delete(SEARCH_TAB_PARAM);
+		else url.searchParams.set(SEARCH_TAB_PARAM, tabId);
+		window.history.replaceState({}, "", url);
+	};
+	const buttonList = tabs.map((el, index) => createTabButton(el, index === initialIndex));
 	const tabsLazyMounts = [];
 	const contentList = [];
 	tabs.forEach((el, index) => {
-		const { element, build } = createTabContent(el, !index);
+		const { element, build } = createTabContent(el, index === initialIndex);
 		tabsLazyMounts.push(build);
 		contentList.push(element);
 	});
@@ -69,8 +80,9 @@ function createTabs(tabsConfig, customRenderers) {
     </div>
   `;
 	const activateTab = (selectedTabButton) => {
+		const selectedIndex = buttonList.indexOf(selectedTabButton);
 		buttonList.forEach((button, index) => {
-			const isSelected = button === selectedTabButton;
+			const isSelected = index === selectedIndex;
 			const contentElId = button.getAttribute("aria-controls");
 			const contentEl = tabsEl.querySelector(`#${contentElId}`);
 			button.setAttribute("aria-selected", String(isSelected));
@@ -80,8 +92,9 @@ function createTabs(tabsConfig, customRenderers) {
 				if (isSelected) tabsLazyMounts[index]();
 			}
 		});
+		if (selectedIndex >= 0) updateActiveTabParam(String(tabs[selectedIndex].id), selectedIndex === 0);
 	};
-	tabsLazyMounts[0]();
+	tabsLazyMounts[initialIndex]();
 	const onKeyDown = (e) => {
 		const { target } = e;
 		if (!(target instanceof HTMLButtonElement)) return;

@@ -452,6 +452,8 @@ div.border-bottom-glow{
 /* search */
   --stx-color-text: #fff;
   --stx-color-background: var(--background-color);
+  --stx-color-surface: var(--background-color-2);
+  --stx-color-muted: #b8bcc6;
   --stx-color-border: var(--link-color);
 
   font-size: 1rem;
