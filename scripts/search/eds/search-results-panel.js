@@ -9,18 +9,19 @@ function decorate(block, renderers) {
 		replaceElWithError(block, "The <em>Results panel</em> block requires <i>searchApiUrl</i>");
 		return;
 	}
+	// URL param carrying the query; shared by the input (writer) and panel (reader).
+	const queryParam = config.queryParam || "query";
 	const inputConfig = {
 		searchApiUrl: config.searchApiUrl,
-		searchPageUrl: config.searchPageUrl ? (query) => `${config.searchPageUrl}?stx-search=${encodeURIComponent(query)}` : void 0,
+		searchPageUrl: config.searchPageUrl ? (query) => `${config.searchPageUrl}?${queryParam}=${encodeURIComponent(query)}` : void 0,
 		minSearchLength: Number(config.minSearchLength) || 3,
 		// Typeahead uses the same GET request as the header search; submitting
 		// (Enter / picking a suggestion / search button) refreshes the adjacent
-		// results panel in place via the stx-search URL param (POST fetch below).
+		// results panel in place via the query URL param (POST fetch below).
 		submitInPlace: true,
-		// Optional preconfigured query: shows highlights on focus when the input
-		// is empty and there's no stx-search param in the URL.
+		queryParam,
+		// Optional preconfigured query: fetched at render, shown on focus while the input is empty.
 		initialQuery: config.initialQuery || void 0,
-		initialResultsSize: config.initialResultsSize ? Number(config.initialResultsSize) : void 0,
 		labels: {
 			inputPlaceholder: config.inputPlaceholder,
 			inputLabel: config.inputLabel,
@@ -34,6 +35,9 @@ function decorate(block, renderers) {
 		pageSize: Number(config.pageSize) || 10,
 		dataSources: config.dataSources ? [config.dataSources] : [],
 		method: "POST",
+		queryParam,
+		// Facet nesting depth for this query (default flat / level 0 only).
+		facetDepthLevel: Number(config.facetDepthLevel) || void 0,
 		renderers: resultsRenderers,
 		labels: generatePannelLabels(config)
 	});

@@ -344,6 +344,24 @@ function createNavSearch(icon) {
 }
 
 /**
+ * Parses an authored config block (two-column key|value rows) into an object.
+ * Mirrors the search module's getEDSConfig so the nav search is authored the
+ * same way as the search blocks, without coupling to the hashed search bundle.
+ * @param {Element} block The `.search-config` block whose rows hold the config
+ * @returns {Object} Parsed key/value config
+ */
+function parseSearchConfig(block) {
+  const config = {};
+  block.querySelectorAll(':scope > div').forEach((row) => {
+    const [keyEl, valueEl] = row.querySelectorAll(':scope > div');
+    const key = keyEl?.textContent?.trim();
+    const value = valueEl?.textContent?.trim();
+    if (key && value) config[key] = value;
+  });
+  return config;
+}
+
+/**
  * loads and decorates the header, mainly the nav
  * @param {Element} block The header block element
  */
@@ -400,6 +418,16 @@ export default async function decorate(block) {
       const navSearch = createNavSearch(searchIcon);
       if (iconContainer) iconContainer.replaceWith(navSearch);
       else navTools.prepend(navSearch);
+
+      // Apply the authored search config (a `search-config` block in the nav).
+      // It's parsed, removed from the DOM, and stashed on the input for delayed.js.
+      const searchConfigBlock = nav.querySelector('.search-config');
+      if (searchConfigBlock) {
+        const searchConfig = parseSearchConfig(searchConfigBlock);
+        searchConfigBlock.remove();
+        const searchInput = navSearch.querySelector('.nav-search-input');
+        if (searchInput) searchInput.dataset.searchConfig = JSON.stringify(searchConfig);
+      }
     }
 
     const langSelector = createLanguageSelector();

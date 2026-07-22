@@ -148,53 +148,42 @@ function debounce(fn, delay) {
 	};
 }
 
-const exampleOfQUeryRequestBody = {
-    "id": "eds-pages",
-    "params": {
-        "from": 0,
-        "size": 20,
-        "facets": {
-            "fields": [
-                {
-                    "name": "category_level0",
-                    "size": 20,
-                    "children": [
-                        {
-                            "name": "category_level1",
-                            "size": 20,
-                            "children": [
-                                {
-                                    "name": "category_level2",
-                                    "size": 20,
-                                    "last": true
-                                }
-                            ],
-                            "last": true
-                        }
-                    ],
-                    "last": true
-                }
-            ]
-        }
-    }
-}
-
+// The query id sent to the search endpoint.
+var SEARCH_REQUEST_ID = "eds-pages";
+var FACET_FIELD_SIZE = 20;
+/**
+* Builds the facet-aggregation request `depth` levels deep — `category_level0`
+* nesting down to `category_level{depth-1}`. Depth is per-query configurable
+* (`facetDepthLevel`); when missing/invalid it falls back to a single flat level.
+*/
+var buildFacetFields = (depth) => {
+	const levels = Math.max(1, Math.trunc(Number(depth)) || 1);
+	const buildLevel = (index) => {
+		const field = {
+			name: `category_level${index}`,
+			size: FACET_FIELD_SIZE
+		};
+		if (index < levels - 1) field.children = [buildLevel(index + 1)];
+		field.last = true;
+		return field;
+	};
+	return { fields: [buildLevel(0)] };
+};
 // Every selected facet value is filtered against this single field, using the
 // value's full hierarchical path (e.g. "Electronics>Tablet").
 var FILTER_QUERY_FIELD = "category_hierarchy";
 /**
 * Builds the POST request body for the OpenSearch-backed search endpoint.
-* The facets field configuration is taken from `exampleOfQUeryRequestBody` so
-* the request/response shapes stay in sync while the API is being built.
+* `facetDepthLevel` controls how deep the facet aggregations nest (default flat).
 * Selected filters become `params.filter_query.fields`: one entry per facet group
 * (values within a group are OR-ed; groups are AND-ed), with `last: true` on the
 * final entry.
 */
-var buildSearchRequestBody = ({ from = 0, size = 20, query = "", filters } = {}) => {
+var buildSearchRequestBody = ({ from = 0, size = 20, query = "", filters, facetDepthLevel } = {}) => {
 	const params = {
 		from,
 		size,
-		facets: exampleOfQUeryRequestBody.params.facets
+		facets: buildFacetFields(facetDepthLevel)
 	};
 	if (query) params.query = query;
 	const filterValueGroups = filters ? Object.values(filters).filter((values) => values.length > 0) : [];
@@ -207,7 +196,7 @@ var buildSearchRequestBody = ({ from = 0, size = 20, query = "", filters } = {})
 		return entry;
 	}) };
 	return {
-		id: exampleOfQUeryRequestBody.id,
+		id: SEARCH_REQUEST_ID,
 		params
 	};
 };
@@ -404,17 +393,19 @@ var createDebouncedSearch = (url, callback, buildRequestOptions) => {
 		}
 	}, 300);
 };
-// URL param that carries the active search query across the search components.
-var SEARCH_QUERY_PARAM = "stx-search";
-var updateSearchQuery = (query) => {
+// Default URL param carrying the active search query across the search
+// components; overridable per component via `config.queryParam`.
+var DEFAULT_QUERY_PARAM = "query";
+var updateSearchQuery = (query, queryParam = DEFAULT_QUERY_PARAM) => {
 	const url = new URL(window.location.href);
-	url.searchParams.delete(SEARCH_QUERY_PARAM);
-	url.searchParams.set(SEARCH_QUERY_PARAM, query);
+	url.searchParams.delete(queryParam);
+	url.searchParams.set(queryParam, query);
 	window.history.pushState({}, "", url);
 	dispatchUrlChangeEvent();
 };
 function createQueryInput(customConfig) {
 	const config = resolveConfig(customConfig);
+	const queryParam = config.queryParam || DEFAULT_QUERY_PARAM;
 	const inputTextId = crypto.randomUUID();
 	const suggestionWrapperId = crypto.randomUUID();
 	const { labels, renderers } = config;
@@ -462,25 +453,29 @@ function createQueryInput(customConfig) {
 	const searchButton = queryInputEl.querySelector(".stx-query-input__search-button");
 	let activeIndex = -1;
 	let suggestionListLenght = 0;
+	// Tracks whether the dropdown currently holds initial-query results, so typing
+	// can drop them without clearing (and flickering) live typeahead results.
+	let showingInitialSuggestions = false;
 	const closeSuggestions = () => {
 		activeIndex = -1;
 		suggestionListLenght = 0;
+		showingInitialSuggestions = false;
 		if (suggestionContainer) suggestionContainer.innerHTML = "";
 	};
 	// Submitting the query. The header variant navigates to the search page;
 	// the results-page variant (submitInPlace) refreshes the adjacent panel by
-	// writing the `stx-search` URL param, which triggers the POST results fetch.
+	// writing the query URL param (config.queryParam), which triggers the POST fetch.
 	const submitQuery = (query) => {
 		if (config.submitInPlace) {
-			updateSearchQuery(query);
+			updateSearchQuery(query, queryParam);
 			closeSuggestions();
 		} else if (config.searchPageUrl) window.location.href = config.searchPageUrl(query).toString();
-		else updateSearchQuery(query);
+		else updateSearchQuery(query, queryParam);
 	};
 	if (config.submitInPlace && inputEl) {
-		const initialQuery = new URLSearchParams(window.location.search).get(SEARCH_QUERY_PARAM) || "";
-		if (initialQuery) {
-			inputEl.value = initialQuery;
+		const urlQuery = new URLSearchParams(window.location.search).get(queryParam) || "";
+		if (urlQuery) {
+			inputEl.value = urlQuery;
 			if (clearButton) clearButton.classList.remove("stx-hidden");
 		}
 	}
@@ -505,13 +500,6 @@ function createQueryInput(customConfig) {
 		let url = "";
 		if (typeof config.searchApiUrl === "string") url = config.searchApiUrl;
 		else url = config.searchApiUrl();
-		const buildRequestOptions = config.method === "POST" ? (query) => ({
-			method: "POST",
-			body: buildSearchRequestBody({
-				size: config.suggestionsSize || 20,
-				query
-			})
-		}) : void 0;
 		onSearch = createDebouncedSearch(url, (results) => {
 			const suggestionEl = createSuggestions(results, config);
 			suggestionListLenght = results.hits.hits?.length || 0;
@@ -520,26 +508,15 @@ function createQueryInput(customConfig) {
 				suggestionContainer.innerHTML = "";
 				suggestionContainer.append(suggestionEl.element);
 			}
-		}, buildRequestOptions);
-		// Initial query: when `initialQuery` is configured, prefetch its highlights
-		// (GET) so that — as long as the user hasn't typed anything and there's no
-		// `stx-search` param in the URL — focusing the input shows a few
-		// (`initialResultsSize`, default 5) proposed results instantly.
-		const initialResultsSize = config.initialResultsSize || 5;
-		const hasUrlQuery = () => Boolean(new URLSearchParams(window.location.search).get(SEARCH_QUERY_PARAM));
+			showingInitialSuggestions = false;
+		});
+		// Initial query: when `initialQuery` is configured, fetch its dropdown
+		// results (GET) once at render, then show them when the input is focused
+		// while empty (no other value) — regardless of any URL query.
 		let initialSuggestionsPromise = null;
 		const prefetchInitialSuggestions = () => {
-			if (!config.initialQuery) return null;
-			if (!initialSuggestionsPromise) initialSuggestionsPromise = fetchSearchResults(url, config.initialQuery).then((response) => {
-				const hits = (response.hits?.hits || []).slice(0, initialResultsSize);
-				return {
-					...response,
-					hits: {
-						...response.hits,
-						hits
-					}
-				};
-			}).catch((error) => {
+			if (!config.initialQuery) { config.initialQuery = "ArBory" };
+			if (!initialSuggestionsPromise) initialSuggestionsPromise = fetchSearchResults(url, config.initialQuery).catch((error) => {
 				console.error(error);
 				initialSuggestionsPromise = null;
 				return null;
@@ -547,29 +524,41 @@ function createQueryInput(customConfig) {
 			return initialSuggestionsPromise;
 		};
 		const showInitialSuggestions = async () => {
-			if (!config.initialQuery || !suggestionContainer) return;
-			if (inputEl.value || hasUrlQuery()) return;
+			if (!config.initialQuery || !suggestionContainer || inputEl.value) return;
 			const response = await prefetchInitialSuggestions();
-			if (!response || inputEl.value || hasUrlQuery()) return;
+			if (!response || inputEl.value) return;
 			const suggestionEl = createSuggestions(response, config);
 			suggestionListLenght = response.hits?.hits?.length || 0;
 			activeIndex = -1;
 			suggestionContainer.innerHTML = "";
 			suggestionContainer.append(suggestionEl.element);
+			showingInitialSuggestions = true;
 		};
-		if (config.initialQuery && !inputEl.value && !hasUrlQuery()) prefetchInitialSuggestions();
+		if (config.initialQuery) prefetchInitialSuggestions();
+		// Focus is not a reliable trigger on its own: `.focus()` fires no event when
+		// the input is already focused, and a toggle that opens the input lives
+		// outside `.stx-query-input` (so its click closes the dropdown). React to
+		// clicks too, and expose a manual trigger for programmatic openers.
 		inputEl.addEventListener("focus", () => {
 			showInitialSuggestions();
 		});
+		inputEl.addEventListener("click", () => {
+			showInitialSuggestions();
+		});
+		queryInputEl.showInitialSuggestions = showInitialSuggestions;
 		inputEl.addEventListener("input", async (event) => {
 			const { value } = event.target;
 			clearButton.classList.toggle("stx-hidden", !value.length);
-			if (value.length >= config.minSearchLength) onSearch(inputEl.value);
-			if (!value.length && suggestionContainer) {
-				suggestionContainer.innerHTML = "";
-				suggestionListLenght = 0;
+			// Empty again: fall back to the preconfigured initial-query dropdown.
+			if (!value.length) {
+				closeSuggestions();
 				showInitialSuggestions();
+				return;
 			}
+			// Typing drops the initial-query results; below `minSearchLength` there
+			// is nothing to show until enough characters are typed.
+			if (showingInitialSuggestions || value.length < config.minSearchLength) closeSuggestions();
+			if (value.length >= config.minSearchLength && onSearch) onSearch(value);
 		});
 		inputEl.addEventListener("keydown", (e) => {
 			const { key } = e;
@@ -596,9 +585,10 @@ function createQueryInput(customConfig) {
 				if (suggestionContainer) suggestionContainer.innerHTML = "";
 			}
 		});
-		// In the results-page variant, picking a suggestion submits it as the
-		// query (loads results + facets) instead of navigating to the page.
-		if (config.submitInPlace && suggestionContainer) suggestionContainer.addEventListener("click", (e) => {
+		// Picking a suggestion submits it as the query rather than opening the hit:
+		// the header redirects to the configured search page (`searchPageUrl`), the
+		// results-page/tabs variants refresh their panel in place.
+		if (suggestionContainer) suggestionContainer.addEventListener("click", (e) => {
 			const item = e.target.closest(".stx-suggestion__item");
 			if (!item) return;
 			e.preventDefault();
@@ -635,6 +625,6 @@ function createQueryInput(customConfig) {
 	};
 }
 //#endregion
-export { html as a, buildSearchRequestBody as b, trapFocus as c, getHitUrl as g, fetchSearchResults as i, defaultConfig as n, normalizeLabels as o, SEARCH_QUERY_PARAM as p, createLazyComponent as r, onUrlChange as s, createQueryInput as t };
+export { html as a, buildSearchRequestBody as b, trapFocus as c, getHitUrl as g, fetchSearchResults as i, defaultConfig as n, normalizeLabels as o, DEFAULT_QUERY_PARAM as p, createLazyComponent as r, onUrlChange as s, createQueryInput as t };
 
 //# sourceMappingURL=common-CzdFOaSu.js.map

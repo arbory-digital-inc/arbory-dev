@@ -9,10 +9,17 @@ function decorate(block, tabSelector, renderers) {
 		replaceElWithError(block, "The <em>Search Tabs</em> block requires <i>searchApiUrl</i>");
 		return;
 	}
+	// URL param carrying the query; shared by the input (writer) and tab panels (readers).
+	const queryParam = config.queryParam || "query";
 	const inputConfig = {
 		searchApiUrl: config.searchApiUrl,
-		searchPageUrl: (query) => `${config.searchPageUrl ?? ""}?stx-search=${encodeURIComponent(query)}`,
+		searchPageUrl: (query) => `${config.searchPageUrl ?? ""}?${queryParam}=${encodeURIComponent(query)}`,
 		minSearchLength: Number(config.minSearchLength) || 3,
+		// Submitting refreshes the active tab's panel in place via the query URL param.
+		submitInPlace: true,
+		queryParam,
+		// Optional preconfigured query: fetched at render, shown on focus while the input is empty.
+		initialQuery: config.initialQuery || void 0,
 		labels: {
 			inputPlaceholder: config.inputPlaceholder,
 			inputLabel: config.inputLabel,
@@ -42,6 +49,10 @@ function decorate(block, tabSelector, renderers) {
 			results: {
 				pageSize: Number(tabConfig.pageSize) || 10,
 				dataSources: [tabConfig.dataSources],
+				method: "POST",
+				queryParam,
+				// Facet nesting depth for this tab (default flat); per-tab, else block-level.
+				facetDepthLevel: Number(tabConfig.facetDepthLevel || config.facetDepthLevel) || void 0,
 				labels: generatePannelLabels(tabConfig)
 			}
 		};

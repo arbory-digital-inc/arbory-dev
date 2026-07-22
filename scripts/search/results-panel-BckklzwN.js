@@ -1,4 +1,4 @@
-import { a as html, b as buildSearchRequestBody, i as fetchSearchResults, o as normalizeLabels, p as SEARCH_QUERY_PARAM, s as onUrlChange } from "./common-CzdFOaSu.js";
+import { a as html, b as buildSearchRequestBody, i as fetchSearchResults, o as normalizeLabels, p as DEFAULT_QUERY_PARAM, s as onUrlChange } from "./common-CzdFOaSu.js";
 //#region src/config.ts
 var config = { debug: false };
 //#endregion
@@ -201,7 +201,7 @@ var restoreFocusForPage = () => {
 	};
 };
 var panelStates = /* @__PURE__ */ new WeakMap();
-var getSearchQuery = () => new URL(window.location.href).searchParams.get(SEARCH_QUERY_PARAM) || "";
+var getSearchQuery = (queryParam = DEFAULT_QUERY_PARAM) => new URL(window.location.href).searchParams.get(queryParam) || "";
 var buildSearchUrl = (results, pageNumber, selectedFilters) => {
 	const dataUrl = new URL(results.dataSources[0], window.location.href);
 	dataUrl.searchParams.set("from", String((pageNumber - 1) * results.pageSize));
@@ -221,7 +221,8 @@ var buildResultsRequestOptions = (results, pageNumber, selectedFilters, query) =
 			from: (pageNumber - 1) * results.pageSize,
 			size: results.pageSize,
 			query,
-			filters
+			filters,
+			facetDepthLevel: results.facetDepthLevel
 		})
 	};
 };
@@ -277,8 +278,14 @@ var updateResultsList = (resultsPanel, data, results, currentPage) => {
 	hideResultsLoading(resultsContainer);
 	announceResults(results.labels.totalResults(data.hits.total.value));
 };
+var updateFacets = (resultsPanel, data, results, panelState) => {
+	const oldFacets = resultsPanel.querySelector(".stx-results-panel__facets-container");
+	const newFacets = createFacets(data, panelState, resultsPanel, results);
+	if (oldFacets) oldFacets.replaceWith(newFacets);
+	else resultsPanel.prepend(newFacets);
+};
 var buildResultsForPage = (resultsPanel, results, pageNumber, options = {}) => {
-	const { preserveFacets = false, resetFilters = false } = options;
+	const { resetFilters = false } = options;
 	const panelState = panelStates.get(resultsPanel);
 	if (!panelState) return;
 	const restorePageFocus = restoreFocusForPage();
@@ -286,20 +293,27 @@ var buildResultsForPage = (resultsPanel, results, pageNumber, options = {}) => {
 	panelState.currentPage = pageNumber;
 	const facetsContainer = resultsPanel.querySelector(".stx-results-panel__facets-container");
 	const resultsContainer = resultsPanel.querySelector(".stx-results-panel__container");
-	if (preserveFacets && facetsContainer && resultsContainer) showResultsLoading(resultsContainer);
+	// Once the panel is rendered, update it in place (dim + swap) so it never
+	// collapses to a centered loader and reflows the whole page. Only a brand-new
+	// query (resetFilters) rebuilds the facets — a facet change keeps them.
+	const hasContent = facetsContainer instanceof HTMLElement && resultsContainer instanceof HTMLElement;
+	if (hasContent) showResultsLoading(resultsContainer);
 	else {
 		resultsPanel.innerHTML = "";
 		resultsPanel.append(results.renderers.loader());
 		panelState.facetsElement = null;
 	}
 	const searchUrl = buildSearchUrl(results, pageNumber, panelState.selectedFilters);
-	const requestOptions = buildResultsRequestOptions(results, pageNumber, panelState.selectedFilters, getSearchQuery());
-	fetchSearchResults(searchUrl, getSearchQuery(), void 0, requestOptions).then((responseData) => {
-		if (preserveFacets && facetsContainer) updateResultsList(resultsPanel, responseData, results, pageNumber);
-		else renderFullResults(resultsPanel, responseData, results, pageNumber, panelState);
+	const query = getSearchQuery(results.queryParam);
+	const requestOptions = buildResultsRequestOptions(results, pageNumber, panelState.selectedFilters, query);
+	fetchSearchResults(searchUrl, query, void 0, requestOptions).then((responseData) => {
+		if (hasContent) {
+			updateResultsList(resultsPanel, responseData, results, pageNumber);
+			if (resetFilters) updateFacets(resultsPanel, responseData, results, panelState);
+		} else renderFullResults(resultsPanel, responseData, results, pageNumber, panelState);
 		restorePageFocus();
 	}).catch((error) => {
-		if (preserveFacets && resultsContainer instanceof HTMLElement) hideResultsLoading(resultsContainer);
+		if (hasContent && resultsContainer instanceof HTMLElement) hideResultsLoading(resultsContainer);
 		console.error(error);
 	});
 };
@@ -501,9 +515,10 @@ var renderFullResults = (resultsPanel, data, results, currentPage, panelState) =
 	announceResults(results.labels.totalResults(data.hits.total.value));
 };
 var addOnSearchParamChangeAction = (resultsPanel, results) => {
-	let prevSearchParam = new URL(window.location.href).searchParams.get(SEARCH_QUERY_PARAM) || "";
+	const queryParam = results.queryParam || DEFAULT_QUERY_PARAM;
+	let prevSearchParam = new URL(window.location.href).searchParams.get(queryParam) || "";
 	const onUrlChagne = () => {
-		const searchQuery = new URLSearchParams(window.location.search).get(SEARCH_QUERY_PARAM) || "";
+		const searchQuery = new URLSearchParams(window.location.search).get(queryParam) || "";
 		if (prevSearchParam !== searchQuery) {
 			buildResultsForPage(resultsPanel, results, 1, { resetFilters: true });
 			prevSearchParam = searchQuery;
