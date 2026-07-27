@@ -1,5 +1,6 @@
-import { t as createResultsPanel } from "../search-results-panel-XEbvRceR.js";
-import { i as replaceElWithError, n as getEDSConfig, r as loadCssFile, t as generatePannelLabels } from "../eds-helper-NkKtY9o8.js";
+import "../common-DNRtji8p.js";
+import { t as createResultsPanel } from "../search-results-panel-DsW7SMWW.js";
+import { a as replaceElWithError, i as readPanelOptions, n as loadCssFile, t as getEDSConfig } from "../eds-helper-jHyHkGKx.js";
 //#region src/exports/eds/decorate-results-panel.ts
 function decorate(block, renderers) {
 	loadCssFile("/scripts/search/streamx-search.css");
@@ -9,19 +10,14 @@ function decorate(block, renderers) {
 		replaceElWithError(block, "The <em>Results panel</em> block requires <i>searchApiUrl</i>");
 		return;
 	}
-	// URL param carrying the query; shared by the input (writer) and panel (reader).
 	const queryParam = config.queryParam || "query";
 	const inputConfig = {
 		searchApiUrl: config.searchApiUrl,
 		searchPageUrl: config.searchPageUrl ? (query) => `${config.searchPageUrl}?${queryParam}=${encodeURIComponent(query)}` : void 0,
 		minSearchLength: Number(config.minSearchLength) || 3,
-		// Typeahead uses the same GET request as the header search; submitting
-		// (Enter / picking a suggestion / search button) refreshes the adjacent
-		// results panel in place via the query URL param (POST fetch below).
-		submitInPlace: true,
 		queryParam,
-		// Optional preconfigured query: fetched at render, shown on focus while the input is empty.
 		initialQuery: config.initialQuery || void 0,
+		submitInPlace: !config.searchPageUrl,
 		labels: {
 			inputPlaceholder: config.inputPlaceholder,
 			inputLabel: config.inputLabel,
@@ -32,14 +28,9 @@ function decorate(block, renderers) {
 	};
 	const resultsRenderers = Object.fromEntries(Object.entries(renderers || {}).filter(([, renderer]) => renderer !== void 0));
 	const resultPanel = createResultsPanel(inputConfig, {
-		pageSize: Number(config.pageSize) || 10,
-		dataSources: config.dataSources ? [config.dataSources] : [],
-		method: "POST",
+		...readPanelOptions(config),
 		queryParam,
-		// Facet nesting depth for this query (default flat / level 0 only).
-		facetDepthLevel: Number(config.facetDepthLevel) || void 0,
-		renderers: resultsRenderers,
-		labels: generatePannelLabels(config)
+		renderers: resultsRenderers
 	});
 	block.append(resultPanel);
 }

@@ -1,4 +1,4 @@
-import { a as html } from "./common-CzdFOaSu.js";
+import { c as html } from "./common-DNRtji8p.js";
 //#region src/eds-helper.ts
 var loadCssFile = (cssFile) => {
 	const styleEl = document.createElement("link");
@@ -43,6 +43,15 @@ var replaceElWithError = (root, error) => {
   `;
 	root.append(errorEl);
 };
+/**
+* Layers two EDS configs: `override` wins key by key, but empty values fall
+* through to `base`, so an empty cell in a tab block cannot blank out a
+* block-level default.
+*/
+var mergeEDSConfigs = (base, override) => ({
+	...base,
+	...Object.fromEntries(Object.entries(override).filter(([, value]) => value))
+});
 var generatePannelLabels = (config) => {
 	const lables = {};
 	if (config.paginationInfo) lables.paginationInfo = (currentPage, pageNumber) => renderEDSLableTemplate(config.paginationInfo, {
@@ -54,7 +63,21 @@ var generatePannelLabels = (config) => {
 	if (config.ariaPaginationNavigation) lables.ariaPaginationNavigation = config.ariaPaginationNavigation;
 	return lables;
 };
+/** Maps authored EDS rows to a results-panel config. Single source of truth. */
+var readPanelOptions = (config) => ({
+	pageSize: Number(config.pageSize) || 10,
+	dataSources: config.dataSources ? [config.dataSources] : [],
+	method: "POST",
+	requestId: config.requestId || void 0,
+	facetDepthLevel: Number(config.facetDepthLevel) || void 0,
+	facetFilterField: config.facetFilterField || void 0,
+	facetFieldPrefix: config.facetFieldPrefix || void 0,
+	facetPathSeparator: config.facetPathSeparator || void 0,
+	facetFieldSize: Number(config.facetFieldSize) || void 0,
+	debugMode: config.debugMode === void 0 ? void 0 : config.debugMode.trim().toLowerCase() === "true",
+	labels: generatePannelLabels(config)
+});
 //#endregion
-export { replaceElWithError as i, getEDSConfig as n, loadCssFile as r, generatePannelLabels as t };
+export { replaceElWithError as a, readPanelOptions as i, loadCssFile as n, mergeEDSConfigs as r, getEDSConfig as t };
 
-//# sourceMappingURL=eds-helper-NkKtY9o8.js.map
+//# sourceMappingURL=eds-helper-jHyHkGKx.js.map

@@ -21,20 +21,36 @@ async function loadInlineSearch() {
     console.error('Could not parse authored nav search config', error);
   }
 
+  // The endpoint comes from the authored `search-config` block; without it the
+  // nav search cannot work, so bail out loudly rather than guess a URL.
+  if (!authored.searchApiUrl) {
+    // eslint-disable-next-line no-console
+    console.error('Nav search is missing "searchApiUrl". Author it in the nav\'s "search-config" block.');
+    return;
+  }
+
   const queryParam = authored.queryParam || 'query';
   const streamxSearchInput = createSearchInput({
     searchOpenElementSelector: '',
-    searchApiUrl: authored.searchApiUrl
-      || 'https://blog-dev.arborydigital.com/search/pages',
+    searchApiUrl: authored.searchApiUrl,
     searchPageUrl: authored.searchPageUrl
       ? (query) => `${authored.searchPageUrl}?${queryParam}=${encodeURIComponent(query)}`
       : undefined,
     // Chars typed before the typeahead GET fires; authorable via `minSearchLength`.
     minSearchLength: Number(authored.minSearchLength) || 2,
     queryParam,
-    // TODO: temporary JS fallback so the header dropdown can be tested without
-    // authoring a `search-config` block. Drop once `initialQuery` is authored.
-    initialQuery: authored.initialQuery || 'AEM as a cloud',
+    initialQuery: authored.initialQuery || undefined,
+    // The nav's own magnifier toggle is the search affordance here, so the
+    // component's built-in search button would be a duplicate icon.
+    showSearchButton: false,
+    // Authorable copy, matching the search blocks' label keys. Undefined values
+    // are dropped by the component, so each falls back to the library default.
+    labels: {
+      inputPlaceholder: authored.inputPlaceholder || undefined,
+      inputLabel: authored.inputLabel || undefined,
+      clearButtonAria: authored.clearButtonAria || undefined,
+      searchButtonAria: authored.searchButtonAria || undefined,
+    },
   }, navSearchInput);
 
   const searchInputEl = streamxSearchInput.querySelector('input');

@@ -1,5 +1,6 @@
-import { t as createSearchTabs } from "../search-tabs-DnOw8MkO.js";
-import { i as replaceElWithError, n as getEDSConfig, r as loadCssFile, t as generatePannelLabels } from "../eds-helper-NkKtY9o8.js";
+import "../common-DNRtji8p.js";
+import { t as createSearchTabs } from "../search-tabs-id6HcUPC.js";
+import { a as replaceElWithError, i as readPanelOptions, n as loadCssFile, r as mergeEDSConfigs, t as getEDSConfig } from "../eds-helper-jHyHkGKx.js";
 //#region src/exports/eds/decorate-search-tabs.ts
 function decorate(block, tabSelector, renderers) {
 	loadCssFile("/scripts/search/streamx-search.css");
@@ -9,17 +10,14 @@ function decorate(block, tabSelector, renderers) {
 		replaceElWithError(block, "The <em>Search Tabs</em> block requires <i>searchApiUrl</i>");
 		return;
 	}
-	// URL param carrying the query; shared by the input (writer) and tab panels (readers).
 	const queryParam = config.queryParam || "query";
 	const inputConfig = {
 		searchApiUrl: config.searchApiUrl,
-		searchPageUrl: (query) => `${config.searchPageUrl ?? ""}?${queryParam}=${encodeURIComponent(query)}`,
+		searchPageUrl: config.searchPageUrl ? (query) => `${config.searchPageUrl}?${queryParam}=${encodeURIComponent(query)}` : void 0,
 		minSearchLength: Number(config.minSearchLength) || 3,
-		// Submitting refreshes the active tab's panel in place via the query URL param.
-		submitInPlace: true,
 		queryParam,
-		// Optional preconfigured query: fetched at render, shown on focus while the input is empty.
 		initialQuery: config.initialQuery || void 0,
+		submitInPlace: !config.searchPageUrl,
 		labels: {
 			inputPlaceholder: config.inputPlaceholder,
 			inputLabel: config.inputLabel,
@@ -30,6 +28,7 @@ function decorate(block, tabSelector, renderers) {
 	};
 	const tabsConfigs = [...document.querySelectorAll(tabSelector)].map((tab) => {
 		const tabConfig = getEDSConfig(tab);
+		const panelOptions = mergeEDSConfigs(config, tabConfig);
 		if (!tabConfig.id) {
 			replaceElWithError(block, "The <em>Search Tab</em> block requires <i>id</i>");
 			return;
@@ -38,7 +37,7 @@ function decorate(block, tabSelector, renderers) {
 			replaceElWithError(block, "The <em>Search Tab</em> block requires <i>displayName</i>");
 			return;
 		}
-		if (!tabConfig.dataSources) {
+		if (!panelOptions.dataSources) {
 			replaceElWithError(block, "The <em>Search Tab</em> block requires <i>dataSources</i>");
 			return;
 		}
@@ -47,13 +46,8 @@ function decorate(block, tabSelector, renderers) {
 			id: tabConfig.id,
 			displayName: tabConfig.displayName,
 			results: {
-				pageSize: Number(tabConfig.pageSize) || 10,
-				dataSources: [tabConfig.dataSources],
-				method: "POST",
-				queryParam,
-				// Facet nesting depth for this tab (default flat); per-tab, else block-level.
-				facetDepthLevel: Number(tabConfig.facetDepthLevel || config.facetDepthLevel) || void 0,
-				labels: generatePannelLabels(tabConfig)
+				...readPanelOptions(panelOptions),
+				queryParam
 			}
 		};
 	});

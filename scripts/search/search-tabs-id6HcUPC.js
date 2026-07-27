@@ -1,17 +1,17 @@
-import { a as html, o as normalizeLabels, r as createLazyComponent, t as createQueryInput } from "./common-CzdFOaSu.js";
-import { n as config, t as createResultsPanel } from "./results-panel-BckklzwN.js";
+import { a as config, c as html, o as createLazyComponent, r as ACTIVE_TAB_PARAM, t as createQueryInput } from "./common-DNRtji8p.js";
+import { t as createResultsPanel } from "./results-panel-CLZpx96R.js";
 //#region src/components/tabs/tabs.ts
-var resolvedTab = (tabsConfig, customRenderers = {}, labels = {}) => {
+var resolvedTab = (tabsConfig, customRenderers = {}) => {
 	return tabsConfig.map((c) => ({
 		...c,
 		results: {
 			pageSize: 10,
 			...c.results,
+			stateKey: c.results?.stateKey ?? String(c.id),
 			renderers: {
 				...customRenderers,
 				...c.results?.renderers
-			},
-			labels: normalizeLabels(labels)
+			}
 		}
 	}));
 };
@@ -54,15 +54,12 @@ var createTabContent = (tabData, isSelected) => {
 };
 function createTabs(tabsConfig, customRenderers) {
 	const tabs = resolvedTab(tabsConfig, customRenderers);
-	// Active tab is persisted in the URL so it survives reloads and is deep-linkable.
-	// The param is only present when a non-default (non-first) tab is active.
-	const SEARCH_TAB_PARAM = "stx-tab";
-	const initialTabParam = new URLSearchParams(window.location.search).get(SEARCH_TAB_PARAM);
+	const initialTabParam = new URLSearchParams(window.location.search).get(ACTIVE_TAB_PARAM);
 	const initialIndex = Math.max(0, tabs.findIndex((tab) => String(tab.id) === initialTabParam));
 	const updateActiveTabParam = (tabId, isDefault) => {
 		const url = new URL(window.location.href);
-		if (isDefault) url.searchParams.delete(SEARCH_TAB_PARAM);
-		else url.searchParams.set(SEARCH_TAB_PARAM, tabId);
+		if (isDefault) url.searchParams.delete(ACTIVE_TAB_PARAM);
+		else url.searchParams.set(ACTIVE_TAB_PARAM, tabId);
 		window.history.replaceState({}, "", url);
 	};
 	const buttonList = tabs.map((el, index) => createTabButton(el, index === initialIndex));
@@ -100,7 +97,7 @@ function createTabs(tabsConfig, customRenderers) {
 		if (!(target instanceof HTMLButtonElement)) return;
 		const currentButtonIndex = buttonList.indexOf(target);
 		const tabCount = buttonList.length;
-		let nextIndex = currentButtonIndex;
+		let nextIndex;
 		switch (e.key) {
 			case "ArrowRight":
 				e.preventDefault();
@@ -146,4 +143,4 @@ var createSearchTabs = (inputConfig, tabsConfig, resultsRenderers, debug) => {
 //#endregion
 export { createSearchTabs as t };
 
-//# sourceMappingURL=search-tabs-DnOw8MkO.js.map
+//# sourceMappingURL=search-tabs-id6HcUPC.js.map

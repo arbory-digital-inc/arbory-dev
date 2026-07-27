@@ -1,2 +1,2 @@
-import { t as createSearchTabs } from "./search-tabs-DnOw8MkO.js";
+import { t as createSearchTabs } from "./search-tabs-id6HcUPC.js";
 export { createSearchTabs };

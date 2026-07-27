@@ -1,14 +1,3 @@
-
-:root {
-  --stx-color-text: #222;
-  --stx-color-muted: #666;
-  --stx-color-background: #fff;
-  --stx-color-surface: #fff;
-  --stx-color-border: #eee;
-  --stx-color-focus: #4d90fe;
-  --stx-shadow-dropdown: rgba(100, 100, 111, 0.2) 0 7px 29px 0;
-}
-
 .stx-query-input,
 .stx-query-input * {
   box-sizing: border-box;
@@ -24,8 +13,14 @@
   align-items: center;
 }
 
+/* The input owns a stacking context so its suggestions dropdown paints above
+   the page content below it. The value is themeable because the default is high
+   enough to out-stack a host's site header - which would put a header search's
+   dropdown *under* a second input further down the page. Lower it when the
+   component sits inside a page that manages its own stacking. */
 .stx-query-input {
   position: relative;
+  z-index: var(--stx-z-query-input, 1000);
 }
 
 .stx-query-input__input-wrapper {
@@ -56,7 +51,7 @@
   border-bottom: 1px solid var(--stx-color-border);
   border-radius: 0;
   background: var(--stx-color-surface);
-  color: var(--stx-color-text);
+  color: var(--stx-color-text-query-input);
   outline: none;
   font: inherit;
 }
@@ -120,7 +115,6 @@
 .stx-query-input__suggestions-wrapper {
   position: absolute;
   top: 100%;
-  z-index: 20;
   width: 100%;
   max-height: 600px;
   overflow-y: auto;
@@ -153,7 +147,7 @@
   margin: 0;
   padding: 8px 12px;
   background: transparent;
-  color: var(--stx-color-text);
+  color: var(--stx-color-text-query-input);
   text-decoration: none;
   font: inherit;
   line-height: 1.4;
@@ -183,8 +177,16 @@
   font-style: normal;
   font-weight: 600;
 }
-
-/* SRP start here */
+:root {
+  --stx-color-text: #222;
+  --stx-color-muted: #666;
+  --stx-color-text-query-input: #222;
+  --stx-color-background: #fff;
+  --stx-color-surface: #fff;
+  --stx-color-border: #eee;
+  --stx-color-focus: #4d90fe;
+  --stx-shadow-dropdown: rgba(100, 100, 111, 0.2) 0 7px 29px 0;
+}
 
 .stx-hidden {
   display: none;
@@ -218,6 +220,11 @@
   flex: 0 0 220px;
 }
 
+/* --------------------------------------------------------------- facets --
+   A facet renders as a collapsible group of checkboxes. Nested aggregations
+   add an expandable subtree per node; a flat facet renders as a plain list
+   with no chevron or indent. */
+
 .stx-results-panel__facet + .stx-results-panel__facet {
   margin-top: 0.75rem;
 }
@@ -239,7 +246,6 @@
 
 .stx-results-panel__facet-toggle:hover,
 .stx-results-panel__facet-toggle:focus,
-.stx-results-panel__facet-toggle:focus-visible,
 .stx-results-panel__facet-toggle[aria-expanded="true"] {
   background-color: transparent;
   border-bottom: 2px solid var(--stx-color-focus);
@@ -265,50 +271,33 @@
   width: 0.4rem;
   height: 0.4rem;
   margin: auto;
-  border-right: 2px solid currentColor;
-  border-bottom: 2px solid currentColor;
+  border-right: 2px solid currentcolor;
+  border-bottom: 2px solid currentcolor;
   transform: rotate(45deg);
   transition: transform 0.1s ease;
 }
 
-.stx-results-panel__facet-toggle[aria-expanded="true"] .stx-results-panel__facet-chevron::before {
+.stx-results-panel__facet-toggle[aria-expanded="true"]
+  .stx-results-panel__facet-chevron::before {
   transform: rotate(225deg);
 }
 
+.stx-results-panel__facet-values,
+.stx-results-panel__facet-node,
+.stx-results-panel__facet-children {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
 .stx-results-panel__facet-values {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
   margin-top: 0.5rem;
   padding-left: 0.25rem;
 }
 
-.stx-results-panel__facet-values[hidden] {
+.stx-results-panel__facet-values[hidden],
+.stx-results-panel__facet-children[hidden] {
   display: none;
-  flex-direction: column;
-  gap: 0.5rem;
-  margin-top: 0.5rem;
-  padding-left: 0.25rem;
-}
-
-.stx-results-panel__facet-option {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  cursor: pointer;
-  font-weight: 400;
-}
-
-.stx-results-panel__facet-option input {
-  margin: 0;
-  width: auto;
-  cursor: pointer;
-}
-
-.stx-results-panel__facet-node {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
 }
 
 .stx-results-panel__facet-row {
@@ -318,8 +307,19 @@
 }
 
 .stx-results-panel__facet-option {
+  display: flex;
   flex: 1;
   min-width: 0;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-weight: 400;
+}
+
+.stx-results-panel__facet-option input {
+  width: auto;
+  margin: 0;
+  cursor: pointer;
 }
 
 .stx-results-panel__facet-label {
@@ -330,16 +330,17 @@
 .stx-results-panel__facet-count {
   flex-shrink: 0;
   margin-left: 0.5rem;
-  color: var(--stx-color-text);
-  opacity: 0.6;
+  color: var(--stx-color-muted);
   font-variant-numeric: tabular-nums;
 }
 
+/* The reset is deliberate: host pages often style every <button>, which would
+   otherwise paint this icon-sized toggle as a filled, rounded button. */
 .stx-results-panel__facet-subtoggle {
   display: inline-flex;
+  flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
   width: 1rem;
   height: 1rem;
   margin: 0;
@@ -372,10 +373,12 @@
   transform: rotate(-45deg);
 }
 
-.stx-results-panel__facet-subtoggle[aria-expanded="true"] .stx-results-panel__facet-chevron::before {
+.stx-results-panel__facet-subtoggle[aria-expanded="true"]
+  .stx-results-panel__facet-chevron::before {
   transform: rotate(45deg);
 }
 
+/* Keeps leaf rows aligned with siblings that do have a chevron. */
 .stx-results-panel__facet-subtoggle-spacer {
   display: inline-block;
   flex-shrink: 0;
@@ -384,16 +387,9 @@
 }
 
 .stx-results-panel__facet-children {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  padding-left: 1rem;
-  border-left: 1px solid var(--stx-color-border, currentColor);
   margin-left: 0.5rem;
-}
-
-.stx-results-panel__facet-children[hidden] {
-  display: none;
+  padding-left: 1rem;
+  border-left: 1px solid var(--stx-color-border);
 }
 
 .stx-results-panel__container {
@@ -402,11 +398,14 @@
   min-width: 0;
 }
 
+/* Results refresh in place: the panel keeps its size and dims, rather than
+   collapsing to a loader and reflowing the page. */
 .stx-results-panel__container--loading {
   pointer-events: none;
 }
 
-.stx-results-panel__container--loading > :not(.stx-results-panel__loading-overlay) {
+.stx-results-panel__container--loading
+  > :not(.stx-results-panel__loading-overlay) {
   opacity: 0.45;
 }
 
@@ -630,3 +629,4 @@
   outline: 2px solid var(--stx-color-focus);
   outline-offset: 2px;
 }
+/*$vite$:1*/
