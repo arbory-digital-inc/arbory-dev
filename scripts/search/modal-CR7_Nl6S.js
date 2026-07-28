@@ -1,4 +1,4 @@
-import { c as html, d as trapFocus, t as createQueryInput } from "./common-DNRtji8p.js";
+import { f as trapFocus, l as html, t as createQueryInput } from "./common-S2Xwo6A-.js";
 //#region src/inline-search/modal/modal.ts
 var createSearchModal = (config) => {
 	const { element: queryInput, inputEl } = createQueryInput(config.input);
@@ -35,4 +35,4 @@ var createSearchModal = (config) => {
 //#endregion
 export { createSearchModal as t };
 
-//# sourceMappingURL=modal-D4dzUfwX.js.map
+//# sourceMappingURL=modal-CR7_Nl6S.js.map

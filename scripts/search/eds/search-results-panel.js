@@ -1,6 +1,5 @@
-import "../common-DNRtji8p.js";
-import { t as createResultsPanel } from "../search-results-panel-DsW7SMWW.js";
-import { a as replaceElWithError, i as readPanelOptions, n as loadCssFile, t as getEDSConfig } from "../eds-helper-jHyHkGKx.js";
+import { t as createResultsPanel } from "../search-results-panel-BVmYr8j3.js";
+import { a as readPanelOptions, i as readInputOptions, n as loadCssFile, o as replaceElWithError, t as getEDSConfig } from "../eds-helper-B2lm9102.js";
 //#region src/exports/eds/decorate-results-panel.ts
 function decorate(block, renderers) {
 	loadCssFile("/scripts/search/streamx-search.css");
@@ -10,26 +9,16 @@ function decorate(block, renderers) {
 		replaceElWithError(block, "The <em>Results panel</em> block requires <i>searchApiUrl</i>");
 		return;
 	}
-	const queryParam = config.queryParam || "query";
+	const inputOptions = readInputOptions(config);
 	const inputConfig = {
 		searchApiUrl: config.searchApiUrl,
-		searchPageUrl: config.searchPageUrl ? (query) => `${config.searchPageUrl}?${queryParam}=${encodeURIComponent(query)}` : void 0,
-		minSearchLength: Number(config.minSearchLength) || 3,
-		queryParam,
-		initialQuery: config.initialQuery || void 0,
-		submitInPlace: !config.searchPageUrl,
-		labels: {
-			inputPlaceholder: config.inputPlaceholder,
-			inputLabel: config.inputLabel,
-			clearButtonAria: config.clearButtonAria,
-			searchButtonAria: config.searchButtonAria
-		},
+		...inputOptions,
 		renderers
 	};
 	const resultsRenderers = Object.fromEntries(Object.entries(renderers || {}).filter(([, renderer]) => renderer !== void 0));
 	const resultPanel = createResultsPanel(inputConfig, {
 		...readPanelOptions(config),
-		queryParam,
+		queryParam: inputOptions.queryParam,
 		renderers: resultsRenderers
 	});
 	block.append(resultPanel);

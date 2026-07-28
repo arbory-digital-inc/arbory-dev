@@ -1,5 +1,5 @@
-import { n as defaultConfig, t as createQueryInput } from "./common-DNRtji8p.js";
-import { t as createSearchModal } from "./modal-D4dzUfwX.js";
+import { n as defaultConfig, t as createQueryInput } from "./common-S2Xwo6A-.js";
+import { t as createSearchModal } from "./modal-CR7_Nl6S.js";
 //#region src/exports/search-inline.ts
 var getTriggerOpenEl = (searchOpenElementSelector) => {
 	if (!searchOpenElementSelector) throw new Error("No trigger selector provided!");

@@ -1,4 +1,4 @@
-import { c as html } from "./common-DNRtji8p.js";
+import { l as html } from "./common-S2Xwo6A-.js";
 //#region src/eds-helper.ts
 var loadCssFile = (cssFile) => {
 	const styleEl = document.createElement("link");
@@ -75,9 +75,35 @@ var readPanelOptions = (config) => ({
 	facetPathSeparator: config.facetPathSeparator || void 0,
 	facetFieldSize: Number(config.facetFieldSize) || void 0,
 	debugMode: config.debugMode === void 0 ? void 0 : config.debugMode.trim().toLowerCase() === "true",
+	namespace: config.namespace || void 0,
 	labels: generatePannelLabels(config)
 });
+/**
+* Maps authored EDS rows to a query-input config. Single source of truth, so
+* both search blocks expose the same input options.
+*
+* `searchApiUrl` is deliberately left to the caller: the decorators validate it
+* first, and that check is what narrows it to a non-empty string.
+*/
+var readInputOptions = (config) => {
+	const queryParam = config.queryParam || "query";
+	const searchPageUrl = config.searchPageUrl;
+	return {
+		queryParam,
+		searchPageUrl: searchPageUrl ? (query) => `${searchPageUrl}?${queryParam}=${encodeURIComponent(query)}` : void 0,
+		minSearchLength: Number(config.minSearchLength) || 3,
+		initialQuery: config.initialQuery || void 0,
+		namespace: config.namespace || void 0,
+		submitInPlace: !searchPageUrl,
+		labels: {
+			inputPlaceholder: config.inputPlaceholder,
+			inputLabel: config.inputLabel,
+			clearButtonAria: config.clearButtonAria,
+			searchButtonAria: config.searchButtonAria
+		}
+	};
+};
 //#endregion
-export { replaceElWithError as a, readPanelOptions as i, loadCssFile as n, mergeEDSConfigs as r, getEDSConfig as t };
+export { readPanelOptions as a, readInputOptions as i, loadCssFile as n, replaceElWithError as o, mergeEDSConfigs as r, getEDSConfig as t };
 
-//# sourceMappingURL=eds-helper-jHyHkGKx.js.map
+//# sourceMappingURL=eds-helper-B2lm9102.js.map

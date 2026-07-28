@@ -444,6 +444,21 @@
   border-bottom: 1px solid var(--stx-color-border);
 }
 
+/* The whole row links to the result. Inheriting colour keeps whatever the
+   custom item renderer styled, rather than forcing default link blue. */
+.stx-results-panel__result-link {
+  display: block;
+  flex: 1;
+  min-width: 0;
+  color: inherit;
+  text-decoration: none;
+}
+
+.stx-results-panel__result-link:hover,
+.stx-results-panel__result-link:focus-visible {
+  text-decoration: underline;
+}
+
 .stx-results-panel__pagination-container {
   margin-top: 1.5rem;
 }

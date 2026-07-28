@@ -1,4 +1,4 @@
-import { a as config, c as html, i as DEFAULT_QUERY_PARAM, l as normalizeLabels, s as fetchSearchResults, u as onUrlChange } from "./common-DNRtji8p.js";
+import { a as config, c as fetchSearchResults, d as onUrlChange, i as DEFAULT_QUERY_PARAM, l as html, o as getHitUrl, p as withNamespaceParam, u as normalizeLabels } from "./common-S2Xwo6A-.js";
 //#region src/search-request.ts
 /**
 * Defaults for the facet field naming convention.
@@ -57,7 +57,7 @@ var joinFacetPath = (parentPath, key, separator = ">") => parentPath ? `${parent
 * of one tree as separate entries would AND them and match nothing, which is
 * why grouping is per tree rather than per aggregation level.
 */
-var buildSearchRequestBody = ({ requestId, from = 0, size = 20, query = "", filters, filterField = DEFAULT_FACET_FILTER_FIELD, facetDepthLevel, facetFieldPrefix, facetFieldSize } = {}) => {
+var buildSearchRequestBody = ({ requestId, from = 0, size = 20, query = "", filters, filterField = DEFAULT_FACET_FILTER_FIELD, facetDepthLevel, facetFieldPrefix, facetFieldSize, namespace } = {}) => {
 	const body = { params: {
 		from,
 		size,
@@ -69,6 +69,7 @@ var buildSearchRequestBody = ({ requestId, from = 0, size = 20, query = "", filt
 	} };
 	if (requestId) body.id = requestId;
 	if (query) body.params.query = query;
+	if (namespace) body.params.namespace = namespace;
 	const filterGroups = filters ? Object.values(filters).filter((values) => values.length > 0) : [];
 	if (filterGroups.length > 0) body.params.filter_query = { fields: filterGroups.map((values, index) => {
 		const entry = {
@@ -282,7 +283,7 @@ var buildSearchUrl = (results, pageNumber) => {
 	const dataUrl = new URL(results.dataSources[0], window.location.href);
 	dataUrl.searchParams.set("from", String((pageNumber - 1) * results.pageSize));
 	dataUrl.searchParams.set("size", String(results.pageSize));
-	return dataUrl.toString();
+	return withNamespaceParam(dataUrl.toString(), results.namespace);
 };
 var serializeFilters = (selectedFilters) => Object.fromEntries([...selectedFilters.entries()].map(([field, values]) => [field, [...values]]));
 var DEFAULT_FACETS_PARAM = "stx-facets";
@@ -335,7 +336,8 @@ var buildResultsRequestOptions = (results, pageNumber, selectedFilters, query) =
 			filterField: results.facetFilterField,
 			facetDepthLevel: results.facetDepthLevel,
 			facetFieldPrefix: results.facetFieldPrefix,
-			facetFieldSize: results.facetFieldSize
+			facetFieldSize: results.facetFieldSize,
+			namespace: results.namespace
 		})
 	};
 };
@@ -354,29 +356,64 @@ var createResultsNumber = (data, results, currentPage) => {
     </div>
   `;
 };
+/**
+* Wraps a result's content in the link to that result, so the whole row is
+* clickable. The target comes from the hit's `_id`, which carries the namespace
+* as an `<namespace>:` prefix - see `getHitUrl`.
+*
+* Left unwrapped when no URL can be derived, or when the custom renderer
+* already produced its own anchor (nesting anchors is invalid HTML).
+*/
+var linkResultContent = (item, content) => {
+	const href = getHitUrl(item);
+	const rendersOwnLink = content instanceof HTMLElement && (content.tagName === "A" || content.querySelector("a") !== null);
+	if (!href || rendersOwnLink) return content;
+	const link = html`
+    <a class="stx-results-panel__result-link"></a>
+  `;
+	link.setAttribute("href", href);
+	link.append(content);
+	return link;
+};
 var createItems = (data, renderers, debugMode) => {
 	const showDebug = debugMode || config.debug;
-	return data.hits.hits?.map((item) => {
+	/** Result types with no renderer, counted so one summary is logged per render. */
+	const unrendered = /* @__PURE__ */ new Map();
+	const items = data.hits.hits?.map((item) => {
 		const { type } = item._source;
+		const rendererName = `item-${type}`;
 		let itemContent;
-		if (renderers[`item-${type}`]) try {
-			itemContent = renderers[`item-${type}`](item);
+		let isDiagnostic = false;
+		if (renderers[rendererName]) try {
+			itemContent = renderers[rendererName](item);
 		} catch (error) {
 			console.error(error);
 			if (!showDebug) return null;
 			itemContent = renderNoItem(item);
+			isDiagnostic = true;
 		}
-		else if (showDebug) itemContent = html`
+		else {
+			unrendered.set(rendererName, (unrendered.get(rendererName) ?? 0) + 1);
+			if (!showDebug) return null;
+			itemContent = html`
           <span class="stx-results-panel__missing-renderer">
             <span>Missing renderer for "item-${item?._source?.type}"</span>
             <span>${JSON.stringify(item)}</span>
           </span>
         `;
-		else return null;
+			isDiagnostic = true;
+		}
 		return html`
-        <li class="stx-results-panel__results-item">${itemContent}</li>
+        <li class="stx-results-panel__results-item">
+          ${isDiagnostic ? itemContent : linkResultContent(item, itemContent)}
+        </li>
       `;
 	}).filter((item) => item !== null);
+	if (unrendered.size > 0) {
+		const summary = [...unrendered.entries()].map(([name, count]) => `${name} (x${count})`).join(", ");
+		console.warn(`[streamx-search] No renderer registered for: ${summary}.`, showDebug ? "Shown in the list as a diagnostic because debugMode is on." : "Those results were left out of the list. Register an `item-<type>` renderer, or set debugMode to show them.");
+	}
+	return items;
 };
 var facetNodeIdSeq = 0;
 var FACET_NODE_SELECTOR = ".stx-results-panel__facet-node";
@@ -798,4 +835,4 @@ var createResultsPanel = (resultsConfig) => {
 //#endregion
 export { createResultsPanel as t };
 
-//# sourceMappingURL=results-panel-CLZpx96R.js.map
+//# sourceMappingURL=results-panel-BOvGqn-R.js.map

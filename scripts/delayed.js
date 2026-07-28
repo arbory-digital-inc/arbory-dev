@@ -36,15 +36,11 @@ async function loadInlineSearch() {
     searchPageUrl: authored.searchPageUrl
       ? (query) => `${authored.searchPageUrl}?${queryParam}=${encodeURIComponent(query)}`
       : undefined,
-    // Chars typed before the typeahead GET fires; authorable via `minSearchLength`.
     minSearchLength: Number(authored.minSearchLength) || 2,
     queryParam,
     initialQuery: authored.initialQuery || undefined,
-    // The nav's own magnifier toggle is the search affordance here, so the
-    // component's built-in search button would be a duplicate icon.
+    namespace: authored.namespace || undefined,
     showSearchButton: false,
-    // Authorable copy, matching the search blocks' label keys. Undefined values
-    // are dropped by the component, so each falls back to the library default.
     labels: {
       inputPlaceholder: authored.inputPlaceholder || undefined,
       inputLabel: authored.inputLabel || undefined,
@@ -56,9 +52,6 @@ async function loadInlineSearch() {
   const searchInputEl = streamxSearchInput.querySelector('input');
   searchInputEl.classList.add('nav-search-input');
 
-  // The nav toggle opens the search and auto-focuses it, but focus alone can't be
-  // relied on (already-focused input fires no focus event, and the toggle click
-  // closes the dropdown as an "outside" click). Show it explicitly on every open.
   const navSearch = streamxSearchInput.closest('.nav-search');
   const navSearchToggle = navSearch?.querySelector('.nav-search-toggle');
   if (navSearch && navSearchToggle) {

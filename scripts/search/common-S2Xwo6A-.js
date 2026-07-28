@@ -201,6 +201,20 @@ var createLazyComponent = (buildFunction) => {
 		build
 	};
 };
+/**
+* Adds the `namespace` query param to a `GET` search URL, so results are
+* limited to one content namespace. A missing namespace is left off entirely,
+* which searches across all of them.
+*
+* `POST` requests carry the namespace in the body instead - see
+* `buildSearchRequestBody`.
+*/
+var withNamespaceParam = (url, namespace) => {
+	if (!namespace) return url;
+	const namespacedUrl = new URL(url, window.location.origin);
+	namespacedUrl.searchParams.set("namespace", namespace);
+	return namespacedUrl.toString();
+};
 var dispatchUrlChangeEvent = () => {
 	window.dispatchEvent(new Event("urlchange"));
 };
@@ -387,7 +401,7 @@ function createQueryInput(customConfig) {
 	const inputTextId = crypto.randomUUID();
 	const suggestionWrapperId = crypto.randomUUID();
 	const { labels, renderers, queryParam } = config;
-	const searchUrl = typeof config.searchApiUrl === "string" ? config.searchApiUrl : config.searchApiUrl();
+	const searchUrl = withNamespaceParam(typeof config.searchApiUrl === "string" ? config.searchApiUrl : config.searchApiUrl(), config.namespace);
 	const queryInputEl = html`
     <div class="stx-query-input">
       <div class="stx-query-input__controls">
@@ -588,6 +602,6 @@ function createQueryInput(customConfig) {
 	};
 }
 //#endregion
-export { config as a, html as c, trapFocus as d, DEFAULT_QUERY_PARAM as i, normalizeLabels as l, defaultConfig as n, createLazyComponent as o, ACTIVE_TAB_PARAM as r, fetchSearchResults as s, createQueryInput as t, onUrlChange as u };
+export { config as a, fetchSearchResults as c, onUrlChange as d, trapFocus as f, DEFAULT_QUERY_PARAM as i, html as l, defaultConfig as n, getHitUrl as o, withNamespaceParam as p, ACTIVE_TAB_PARAM as r, createLazyComponent as s, createQueryInput as t, normalizeLabels as u };
 
-//# sourceMappingURL=common-DNRtji8p.js.map
+//# sourceMappingURL=common-S2Xwo6A-.js.map

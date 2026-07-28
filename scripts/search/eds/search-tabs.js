@@ -1,6 +1,5 @@
-import "../common-DNRtji8p.js";
-import { t as createSearchTabs } from "../search-tabs-id6HcUPC.js";
-import { a as replaceElWithError, i as readPanelOptions, n as loadCssFile, r as mergeEDSConfigs, t as getEDSConfig } from "../eds-helper-jHyHkGKx.js";
+import { t as createSearchTabs } from "../search-tabs-CPnYPIAl.js";
+import { a as readPanelOptions, i as readInputOptions, n as loadCssFile, o as replaceElWithError, r as mergeEDSConfigs, t as getEDSConfig } from "../eds-helper-B2lm9102.js";
 //#region src/exports/eds/decorate-search-tabs.ts
 function decorate(block, tabSelector, renderers) {
 	loadCssFile("/scripts/search/streamx-search.css");
@@ -10,20 +9,10 @@ function decorate(block, tabSelector, renderers) {
 		replaceElWithError(block, "The <em>Search Tabs</em> block requires <i>searchApiUrl</i>");
 		return;
 	}
-	const queryParam = config.queryParam || "query";
+	const inputOptions = readInputOptions(config);
 	const inputConfig = {
 		searchApiUrl: config.searchApiUrl,
-		searchPageUrl: config.searchPageUrl ? (query) => `${config.searchPageUrl}?${queryParam}=${encodeURIComponent(query)}` : void 0,
-		minSearchLength: Number(config.minSearchLength) || 3,
-		queryParam,
-		initialQuery: config.initialQuery || void 0,
-		submitInPlace: !config.searchPageUrl,
-		labels: {
-			inputPlaceholder: config.inputPlaceholder,
-			inputLabel: config.inputLabel,
-			clearButtonAria: config.clearButtonAria,
-			searchButtonAria: config.searchButtonAria
-		},
+		...inputOptions,
 		renderers
 	};
 	const tabsConfigs = [...document.querySelectorAll(tabSelector)].map((tab) => {
@@ -47,7 +36,7 @@ function decorate(block, tabSelector, renderers) {
 			displayName: tabConfig.displayName,
 			results: {
 				...readPanelOptions(panelOptions),
-				queryParam
+				queryParam: inputOptions.queryParam
 			}
 		};
 	});
