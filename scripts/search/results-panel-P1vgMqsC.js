@@ -1,4 +1,4 @@
-import { a as config, c as fetchSearchResults, d as onUrlChange, i as DEFAULT_QUERY_PARAM, l as html, o as getHitUrl, p as withNamespaceParam, u as normalizeLabels } from "./common-S2Xwo6A-.js";
+import { a as config, c as fetchSearchResults, d as onUrlChange, i as DEFAULT_QUERY_PARAM, l as html, p as withNamespaceParam, u as normalizeLabels } from "./common-S2Xwo6A-.js";
 //#region src/search-request.ts
 /**
 * Defaults for the facet field naming convention.
@@ -356,25 +356,6 @@ var createResultsNumber = (data, results, currentPage) => {
     </div>
   `;
 };
-/**
-* Wraps a result's content in the link to that result, so the whole row is
-* clickable. The target comes from the hit's `_id`, which carries the namespace
-* as an `<namespace>:` prefix - see `getHitUrl`.
-*
-* Left unwrapped when no URL can be derived, or when the custom renderer
-* already produced its own anchor (nesting anchors is invalid HTML).
-*/
-var linkResultContent = (item, content) => {
-	const href = getHitUrl(item);
-	const rendersOwnLink = content instanceof HTMLElement && (content.tagName === "A" || content.querySelector("a") !== null);
-	if (!href || rendersOwnLink) return content;
-	const link = html`
-    <a class="stx-results-panel__result-link"></a>
-  `;
-	link.setAttribute("href", href);
-	link.append(content);
-	return link;
-};
 var createItems = (data, renderers, debugMode) => {
 	const showDebug = debugMode || config.debug;
 	/** Result types with no renderer, counted so one summary is logged per render. */
@@ -383,14 +364,12 @@ var createItems = (data, renderers, debugMode) => {
 		const { type } = item._source;
 		const rendererName = `item-${type}`;
 		let itemContent;
-		let isDiagnostic = false;
 		if (renderers[rendererName]) try {
 			itemContent = renderers[rendererName](item);
 		} catch (error) {
 			console.error(error);
 			if (!showDebug) return null;
 			itemContent = renderNoItem(item);
-			isDiagnostic = true;
 		}
 		else {
 			unrendered.set(rendererName, (unrendered.get(rendererName) ?? 0) + 1);
@@ -401,12 +380,9 @@ var createItems = (data, renderers, debugMode) => {
             <span>${JSON.stringify(item)}</span>
           </span>
         `;
-			isDiagnostic = true;
 		}
 		return html`
-        <li class="stx-results-panel__results-item">
-          ${isDiagnostic ? itemContent : linkResultContent(item, itemContent)}
-        </li>
+        <li class="stx-results-panel__results-item">${itemContent}</li>
       `;
 	}).filter((item) => item !== null);
 	if (unrendered.size > 0) {
@@ -835,4 +811,4 @@ var createResultsPanel = (resultsConfig) => {
 //#endregion
 export { createResultsPanel as t };
 
-//# sourceMappingURL=results-panel-BOvGqn-R.js.map
+//# sourceMappingURL=results-panel-P1vgMqsC.js.map
