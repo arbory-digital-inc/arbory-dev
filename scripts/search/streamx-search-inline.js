@@ -1,5 +1,5 @@
-import { n as defaultConfig, t as createQueryInput } from "./common-CzdFOaSu.js";
-import { t as createSearchModal } from "./modal-CTqFzm0O.js";
+import { n as defaultConfig, o as getHitUrl, t as createQueryInput } from "./common-S2Xwo6A-.js";
+import { t as createSearchModal } from "./modal-CR7_Nl6S.js";
 //#region src/exports/search-inline.ts
 var getTriggerOpenEl = (searchOpenElementSelector) => {
 	if (!searchOpenElementSelector) throw new Error("No trigger selector provided!");
@@ -57,6 +57,6 @@ function createSearchInput(customConfig, mountPoint) {
 	return element;
 }
 //#endregion
-export { createSearchInput, mountSearchModal };
+export { createSearchInput, getHitUrl, mountSearchModal };
 
 //# sourceMappingURL=streamx-search-inline.js.map

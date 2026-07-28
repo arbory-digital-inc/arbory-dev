@@ -147,10 +147,36 @@ function debounce(fn, delay) {
 		}, delay);
 	};
 }
-var fetchSearchResults = async (url, query, signal) => {
-	const searchURL = new URL(url, window.location.origin);
-	searchURL.searchParams.set("query", query);
-	const response = await fetch(searchURL.toString(), { signal });
+/**
+* Fetches search results.
+*
+* Two transports are supported: the default `GET` sends the query as a URL
+* param (used for typeahead/highlight lookups), while `POST` sends a prepared
+* body - see {@link buildSearchRequestBody} - and is used when results need
+* facet aggregations or filtering.
+*
+* @param url Endpoint. For `POST` any query string on it is stripped, since
+* everything travels in the body.
+* @param query Search phrase. Only used by the `GET` transport.
+* @param signal Abort signal, so in-flight requests can be superseded.
+* @param requestOptions Transport selection and the `POST` body.
+*/
+var fetchSearchResults = async (url, query, signal, requestOptions = {}) => {
+	let response;
+	if (requestOptions.method === "POST") {
+		const postURL = new URL(url, window.location.origin);
+		postURL.search = "";
+		response = await fetch(postURL.toString(), {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify(requestOptions.body),
+			signal
+		});
+	} else {
+		const searchURL = new URL(url, window.location.origin);
+		searchURL.searchParams.set("query", query);
+		response = await fetch(searchURL.toString(), { signal });
+	}
 	if (!response.ok) throw new Error(`Fetch data error: ${response.status}`);
 	return response.json();
 };
@@ -175,6 +201,20 @@ var createLazyComponent = (buildFunction) => {
 		build
 	};
 };
+/**
+* Adds the `namespace` query param to a `GET` search URL, so results are
+* limited to one content namespace. A missing namespace is left off entirely,
+* which searches across all of them.
+*
+* `POST` requests carry the namespace in the body instead - see
+* `buildSearchRequestBody`.
+*/
+var withNamespaceParam = (url, namespace) => {
+	if (!namespace) return url;
+	const namespacedUrl = new URL(url, window.location.origin);
+	namespacedUrl.searchParams.set("namespace", namespace);
+	return namespacedUrl.toString();
+};
 var dispatchUrlChangeEvent = () => {
 	window.dispatchEvent(new Event("urlchange"));
 };
@@ -190,6 +230,27 @@ var normalizeLabels = (labels) => {
 };
 //#endregion
 //#region src/renderers/renderers.ts
+/**
+* Resolves the destination URL of a hit from its `_id`.
+*
+* The index namespaces `_id` (e.g. `en:/en/blog/post`), so the `${namespace}:`
+* prefix has to be stripped to get a usable URL. Hits without a namespace - or
+* whose `_id` does not carry that exact prefix - are returned unchanged.
+*
+* @example
+* getHitUrl({ _id: "en:/en/blog/post", _source: { namespace: "en" } })
+* // "/en/blog/post"
+*
+* @example
+* getHitUrl({ _id: "/index.html", _source: { namespace: null } })
+* // "/index.html"
+*/
+function getHitUrl(item) {
+	const id = item?._id ?? "";
+	const namespace = item?._source?.namespace;
+	if (namespace && id.startsWith(`${namespace}:`)) return id.slice(namespace.length + 1);
+	return id;
+}
 function suggestionItem(item) {
 	const id = crypto.randomUUID();
 	const data = [];
@@ -197,7 +258,7 @@ function suggestionItem(item) {
 	if (item.highlight?.["payload.content"]) data.push(...item.highlight["payload.content"]);
 	const content = data.map((el) => parseHighlight(el))[0];
 	return html`
-    <a href="${item._id}" id="${id}" class="stx-suggestion__item">
+    <a href="${getHitUrl(item)}" id="${id}" class="stx-suggestion__item">
       <span>${content}</span>
     </a>
   `;
@@ -215,11 +276,30 @@ function searchIcon() {
 	return "🔍";
 }
 //#endregion
+//#region src/config.ts
+var config = { debug: false };
+/**
+* Default URL param carrying the active search query.
+*
+* The query input writes it and the results panel reads it, so both sides must
+* agree. Override per component with the `queryParam` option.
+*/
+var DEFAULT_QUERY_PARAM = "query";
+/**
+* URL param holding the active tab's id.
+*
+* It is written only while a non-default tab is selected, so the URL stays
+* clean on the first tab.
+*/
+var ACTIVE_TAB_PARAM = "stx-tab";
+//#endregion
 //#region src/inline-search/default-config.ts
 var defaultConfig = {
 	input: {
 		minSearchLength: 3,
 		groupByCategory: true,
+		showSearchButton: true,
+		queryParam: DEFAULT_QUERY_PARAM,
 		labels: {
 			inputPlaceholder: "Search",
 			inputLabel: "Search",
@@ -285,6 +365,7 @@ var resolveConfig = (customConfig) => {
 	return {
 		...defaultConfig.input,
 		...customConfig,
+		queryParam: customConfig.queryParam || defaultConfig.input.queryParam,
 		renderers: {
 			...defaultConfig.input.renderers,
 			...customConfig.renderers
@@ -308,11 +389,10 @@ var createDebouncedSearch = (url, callback) => {
 		}
 	}, 300);
 };
-var updateSearchQuery = (query) => {
+var updateSearchQuery = (query, queryParam) => {
 	const url = new URL(window.location.href);
-	const SEARCH_QUERY_PARAM_NAME = "stx-search";
-	url.searchParams.delete(SEARCH_QUERY_PARAM_NAME);
-	url.searchParams.set(SEARCH_QUERY_PARAM_NAME, query);
+	url.searchParams.delete(queryParam);
+	url.searchParams.set(queryParam, query);
 	window.history.pushState({}, "", url);
 	dispatchUrlChangeEvent();
 };
@@ -320,8 +400,8 @@ function createQueryInput(customConfig) {
 	const config = resolveConfig(customConfig);
 	const inputTextId = crypto.randomUUID();
 	const suggestionWrapperId = crypto.randomUUID();
-	const { labels, renderers } = config;
-	let onSearch;
+	const { labels, renderers, queryParam } = config;
+	const searchUrl = withNamespaceParam(typeof config.searchApiUrl === "string" ? config.searchApiUrl : config.searchApiUrl(), config.namespace);
 	const queryInputEl = html`
     <div class="stx-query-input">
       <div class="stx-query-input__controls">
@@ -365,6 +445,57 @@ function createQueryInput(customConfig) {
 	const searchButton = queryInputEl.querySelector(".stx-query-input__search-button");
 	let activeIndex = -1;
 	let suggestionListLenght = 0;
+	/**
+	* Whether the dropdown currently holds `initialQuery` results, so typing can
+	* drop them without clearing (and flickering) live typeahead results.
+	*/
+	let showingInitialSuggestions = false;
+	const closeSuggestions = () => {
+		activeIndex = -1;
+		suggestionListLenght = 0;
+		showingInitialSuggestions = false;
+		if (suggestionContainer) suggestionContainer.innerHTML = "";
+	};
+	/**
+	* Submits the query. With `submitInPlace` the active query is written to the
+	* URL so an adjacent results panel can react; otherwise the user is sent to
+	* `searchPageUrl`.
+	*/
+	const submitQuery = (query) => {
+		if (config.submitInPlace) {
+			updateSearchQuery(query, queryParam);
+			closeSuggestions();
+			return;
+		}
+		if (config.searchPageUrl) {
+			window.location.href = config.searchPageUrl(query).toString();
+			return;
+		}
+		updateSearchQuery(query, queryParam);
+	};
+	let initialSuggestionsPromise = null;
+	/** Fetches the `initialQuery` results once and caches them. */
+	const prefetchInitialSuggestions = () => {
+		if (!config.initialQuery) return null;
+		if (!initialSuggestionsPromise) initialSuggestionsPromise = fetchSearchResults(searchUrl, config.initialQuery).catch((error) => {
+			console.error(error);
+			initialSuggestionsPromise = null;
+			return null;
+		});
+		return initialSuggestionsPromise;
+	};
+	const showInitialSuggestions = async () => {
+		if (!config.initialQuery || !suggestionContainer || inputEl.value) return;
+		const response = await prefetchInitialSuggestions();
+		if (!response || inputEl.value) return;
+		const suggestionEl = createSuggestions(response, config);
+		suggestionListLenght = response.hits.hits?.length || 0;
+		activeIndex = -1;
+		suggestionContainer.innerHTML = "";
+		suggestionContainer.append(suggestionEl.element);
+		showingInitialSuggestions = true;
+	};
+	queryInputEl.showInitialSuggestions = showInitialSuggestions;
 	const updateActiveItem = () => {
 		if (!suggestionContainer) return;
 		suggestionContainer.querySelectorAll(".stx-suggestion__item").forEach((el, index) => {
@@ -383,10 +514,7 @@ function createQueryInput(customConfig) {
 		if (activeIndex === -1) inputEl.removeAttribute("aria-activedescendant");
 	};
 	if (inputEl) {
-		let url = "";
-		if (typeof config.searchApiUrl === "string") url = config.searchApiUrl;
-		else url = config.searchApiUrl();
-		onSearch = createDebouncedSearch(url, (results) => {
+		const onSearch = createDebouncedSearch(searchUrl, (results) => {
 			const suggestionEl = createSuggestions(results, config);
 			suggestionListLenght = results.hits.hits?.length || 0;
 			activeIndex = -1;
@@ -394,25 +522,39 @@ function createQueryInput(customConfig) {
 				suggestionContainer.innerHTML = "";
 				suggestionContainer.append(suggestionEl.element);
 			}
+			showingInitialSuggestions = false;
 		});
-		inputEl.addEventListener("input", async (event) => {
+		if (config.submitInPlace) {
+			const urlQuery = new URLSearchParams(window.location.search).get(queryParam) || "";
+			if (urlQuery) {
+				inputEl.value = urlQuery;
+				clearButton?.classList.remove("stx-hidden");
+			}
+		}
+		prefetchInitialSuggestions();
+		inputEl.addEventListener("focus", () => {
+			showInitialSuggestions();
+		});
+		inputEl.addEventListener("click", () => {
+			showInitialSuggestions();
+		});
+		inputEl.addEventListener("input", (event) => {
 			const { value } = event.target;
 			clearButton.classList.toggle("stx-hidden", !value.length);
-			if (value.length >= config.minSearchLength) onSearch(inputEl.value);
-			if (!value.length && suggestionContainer) {
-				suggestionContainer.innerHTML = "";
-				suggestionListLenght = 0;
+			if (!value.length) {
+				closeSuggestions();
+				showInitialSuggestions();
+				return;
 			}
+			if (showingInitialSuggestions || value.length < config.minSearchLength) closeSuggestions();
+			if (value.length >= config.minSearchLength) onSearch(value);
 		});
 		inputEl.addEventListener("keydown", (e) => {
 			const { key } = e;
 			if (key === "Enter") if (activeIndex > -1 && suggestionContainer) {
 				e.preventDefault();
 				suggestionContainer.querySelectorAll(".stx-suggestion__item")[activeIndex]?.click();
-			} else if (config.searchPageUrl) {
-				const link = config.searchPageUrl(inputEl.value);
-				window.location.href = link.toString();
-			} else updateSearchQuery(inputEl.value);
+			} else submitQuery(inputEl.value);
 			if (!suggestionListLenght) return;
 			const maxIndex = suggestionListLenght;
 			if (key === "ArrowDown") {
@@ -425,31 +567,34 @@ function createQueryInput(customConfig) {
 				if (maxIndex === 0) return;
 				activeIndex = activeIndex > 0 ? activeIndex - 1 : maxIndex;
 				updateActiveItem();
-			} else if (key === "Escape") {
-				activeIndex = -1;
-				if (suggestionContainer) suggestionContainer.innerHTML = "";
-			}
+			} else if (key === "Escape") closeSuggestions();
+		});
+		suggestionContainer?.addEventListener("click", (e) => {
+			const item = e.target.closest(".stx-suggestion__item");
+			if (!item) return;
+			e.preventDefault();
+			const query = item.textContent?.trim() || "";
+			inputEl.value = query;
+			clearButton?.classList.remove("stx-hidden");
+			submitQuery(query);
 		});
 	}
-	if (clearButton && inputEl && suggestionContainer) clearButton.addEventListener("click", () => {
+	if (clearButton && inputEl) clearButton.addEventListener("click", () => {
 		inputEl.value = "";
-		suggestionContainer.innerHTML = "";
-		suggestionListLenght = 0;
+		closeSuggestions();
 		inputEl.focus();
+		showInitialSuggestions();
 	});
-	if (searchButton && config.searchPageUrl) {
-		const { searchPageUrl } = config;
-		searchButton.addEventListener("click", () => {
-			const link = searchPageUrl(inputEl.value);
-			window.location.href = link.toString();
+	if (searchButton) {
+		const hasSubmitTarget = config.submitInPlace || config.searchPageUrl;
+		if (config.showSearchButton && hasSubmitTarget) searchButton.addEventListener("click", () => {
+			submitQuery(inputEl.value);
 		});
-	} else if (searchButton) searchButton.remove();
+		else searchButton.remove();
+	}
 	window.addEventListener("click", (e) => {
 		const target = e.target;
-		if (target !== queryInputEl && !target.closest(".stx-query-input")) {
-			activeIndex = -1;
-			if (suggestionContainer) suggestionContainer.innerHTML = "";
-		}
+		if (target !== queryInputEl && !target.closest(".stx-query-input")) closeSuggestions();
 	});
 	return {
 		element: queryInputEl,
@@ -457,6 +602,6 @@ function createQueryInput(customConfig) {
 	};
 }
 //#endregion
-export { html as a, trapFocus as c, fetchSearchResults as i, defaultConfig as n, normalizeLabels as o, createLazyComponent as r, onUrlChange as s, createQueryInput as t };
+export { config as a, fetchSearchResults as c, onUrlChange as d, trapFocus as f, DEFAULT_QUERY_PARAM as i, html as l, defaultConfig as n, getHitUrl as o, withNamespaceParam as p, ACTIVE_TAB_PARAM as r, createLazyComponent as s, createQueryInput as t, normalizeLabels as u };
 
-//# sourceMappingURL=common-CzdFOaSu.js.map
+//# sourceMappingURL=common-S2Xwo6A-.js.map

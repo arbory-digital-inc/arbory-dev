@@ -21,9 +21,15 @@
   margin-left: 10px;
 }
 
+/* The whole row is a link to the result; keep the renderer's own colours
+   instead of the default link styling. */
 .results-panel-item {
   display: flex;
+  flex: 1;
   flex-direction: column;
+  min-width: 0;
+  color: inherit;
+  text-decoration: none;
 }
 
 .results-panel-item__title {
@@ -32,4 +38,9 @@
 
 .results-panel-item__type {
   color: grey;
+}
+
+.results-panel-item:hover .results-panel-item__title,
+.results-panel-item:focus-visible .results-panel-item__title {
+  text-decoration: underline;
 }

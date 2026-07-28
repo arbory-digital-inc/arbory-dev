@@ -450,8 +450,15 @@ div.border-bottom-glow{
 
 .stx-query-input {
 /* search */
+
+  /* Below the fixed header's z-index (99) so a header search dropdown paints
+     over page content instead of under the results panel's own input. */
+  --stx-z-query-input: 10;
   --stx-color-text: #fff;
+  --stx-color-text-query-input: #fff;
   --stx-color-background: var(--background-color);
+  --stx-color-surface: var(--background-color-2);
+  --stx-color-muted: #b8bcc6;
   --stx-color-border: var(--link-color);
 
   font-size: 1rem;

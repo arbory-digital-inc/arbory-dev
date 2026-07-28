@@ -1,6 +1,6 @@
-import { a as html, t as createQueryInput } from "./common-CzdFOaSu.js";
-import "./modal-CTqFzm0O.js";
-import { t as createResultsPanel$1 } from "./results-panel-BckklzwN.js";
+import { l as html, t as createQueryInput } from "./common-S2Xwo6A-.js";
+import "./modal-CR7_Nl6S.js";
+import { t as createResultsPanel$1 } from "./results-panel-P1vgMqsC.js";
 //#region src/inline-search/index.ts
 function mountQueryInput(customConfig, mountPoint) {
 	const { element } = createQueryInput(customConfig);
@@ -18,4 +18,4 @@ var createResultsPanel = (searchIputConfig, resultPanelConfig) => {
 //#endregion
 export { createResultsPanel as t };
 
-//# sourceMappingURL=search-results-panel-XEbvRceR.js.map
+//# sourceMappingURL=search-results-panel-oPiJHnTQ.js.map

@@ -1,5 +1,5 @@
-import { t as createSearchTabs } from "../search-tabs-DnOw8MkO.js";
-import { i as replaceElWithError, n as getEDSConfig, r as loadCssFile, t as generatePannelLabels } from "../eds-helper-NkKtY9o8.js";
+import { t as createSearchTabs } from "../search-tabs-B5JZuCO1.js";
+import { a as readPanelOptions, i as readInputOptions, n as loadCssFile, o as replaceElWithError, r as mergeEDSConfigs, t as getEDSConfig } from "../eds-helper-B2lm9102.js";
 //#region src/exports/eds/decorate-search-tabs.ts
 function decorate(block, tabSelector, renderers) {
 	loadCssFile("/scripts/search/streamx-search.css");
@@ -9,20 +9,15 @@ function decorate(block, tabSelector, renderers) {
 		replaceElWithError(block, "The <em>Search Tabs</em> block requires <i>searchApiUrl</i>");
 		return;
 	}
+	const inputOptions = readInputOptions(config);
 	const inputConfig = {
 		searchApiUrl: config.searchApiUrl,
-		searchPageUrl: (query) => `${config.searchPageUrl ?? ""}?stx-search=${encodeURIComponent(query)}`,
-		minSearchLength: Number(config.minSearchLength) || 3,
-		labels: {
-			inputPlaceholder: config.inputPlaceholder,
-			inputLabel: config.inputLabel,
-			clearButtonAria: config.clearButtonAria,
-			searchButtonAria: config.searchButtonAria
-		},
+		...inputOptions,
 		renderers
 	};
 	const tabsConfigs = [...document.querySelectorAll(tabSelector)].map((tab) => {
 		const tabConfig = getEDSConfig(tab);
+		const panelOptions = mergeEDSConfigs(config, tabConfig);
 		if (!tabConfig.id) {
 			replaceElWithError(block, "The <em>Search Tab</em> block requires <i>id</i>");
 			return;
@@ -31,7 +26,7 @@ function decorate(block, tabSelector, renderers) {
 			replaceElWithError(block, "The <em>Search Tab</em> block requires <i>displayName</i>");
 			return;
 		}
-		if (!tabConfig.dataSources) {
+		if (!panelOptions.dataSources) {
 			replaceElWithError(block, "The <em>Search Tab</em> block requires <i>dataSources</i>");
 			return;
 		}
@@ -40,9 +35,8 @@ function decorate(block, tabSelector, renderers) {
 			id: tabConfig.id,
 			displayName: tabConfig.displayName,
 			results: {
-				pageSize: Number(tabConfig.pageSize) || 10,
-				dataSources: [tabConfig.dataSources],
-				labels: generatePannelLabels(tabConfig)
+				...readPanelOptions(panelOptions),
+				queryParam: inputOptions.queryParam
 			}
 		};
 	});

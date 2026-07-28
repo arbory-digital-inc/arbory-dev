@@ -1,17 +1,17 @@
-import { a as html, o as normalizeLabels, r as createLazyComponent, t as createQueryInput } from "./common-CzdFOaSu.js";
-import { n as config, t as createResultsPanel } from "./results-panel-BckklzwN.js";
+import { a as config, l as html, r as ACTIVE_TAB_PARAM, s as createLazyComponent, t as createQueryInput } from "./common-S2Xwo6A-.js";
+import { t as createResultsPanel } from "./results-panel-P1vgMqsC.js";
 //#region src/components/tabs/tabs.ts
-var resolvedTab = (tabsConfig, customRenderers = {}, labels = {}) => {
+var resolvedTab = (tabsConfig, customRenderers = {}) => {
 	return tabsConfig.map((c) => ({
 		...c,
 		results: {
 			pageSize: 10,
 			...c.results,
+			stateKey: c.results?.stateKey ?? String(c.id),
 			renderers: {
 				...customRenderers,
 				...c.results?.renderers
-			},
-			labels: normalizeLabels(labels)
+			}
 		}
 	}));
 };
@@ -54,11 +54,19 @@ var createTabContent = (tabData, isSelected) => {
 };
 function createTabs(tabsConfig, customRenderers) {
 	const tabs = resolvedTab(tabsConfig, customRenderers);
-	const buttonList = tabs.map((el, index) => createTabButton(el, !index));
+	const initialTabParam = new URLSearchParams(window.location.search).get(ACTIVE_TAB_PARAM);
+	const initialIndex = Math.max(0, tabs.findIndex((tab) => String(tab.id) === initialTabParam));
+	const updateActiveTabParam = (tabId, isDefault) => {
+		const url = new URL(window.location.href);
+		if (isDefault) url.searchParams.delete(ACTIVE_TAB_PARAM);
+		else url.searchParams.set(ACTIVE_TAB_PARAM, tabId);
+		window.history.replaceState({}, "", url);
+	};
+	const buttonList = tabs.map((el, index) => createTabButton(el, index === initialIndex));
 	const tabsLazyMounts = [];
 	const contentList = [];
 	tabs.forEach((el, index) => {
-		const { element, build } = createTabContent(el, !index);
+		const { element, build } = createTabContent(el, index === initialIndex);
 		tabsLazyMounts.push(build);
 		contentList.push(element);
 	});
@@ -69,8 +77,9 @@ function createTabs(tabsConfig, customRenderers) {
     </div>
   `;
 	const activateTab = (selectedTabButton) => {
+		const selectedIndex = buttonList.indexOf(selectedTabButton);
 		buttonList.forEach((button, index) => {
-			const isSelected = button === selectedTabButton;
+			const isSelected = index === selectedIndex;
 			const contentElId = button.getAttribute("aria-controls");
 			const contentEl = tabsEl.querySelector(`#${contentElId}`);
 			button.setAttribute("aria-selected", String(isSelected));
@@ -80,14 +89,15 @@ function createTabs(tabsConfig, customRenderers) {
 				if (isSelected) tabsLazyMounts[index]();
 			}
 		});
+		if (selectedIndex >= 0) updateActiveTabParam(String(tabs[selectedIndex].id), selectedIndex === 0);
 	};
-	tabsLazyMounts[0]();
+	tabsLazyMounts[initialIndex]();
 	const onKeyDown = (e) => {
 		const { target } = e;
 		if (!(target instanceof HTMLButtonElement)) return;
 		const currentButtonIndex = buttonList.indexOf(target);
 		const tabCount = buttonList.length;
-		let nextIndex = currentButtonIndex;
+		let nextIndex;
 		switch (e.key) {
 			case "ArrowRight":
 				e.preventDefault();
@@ -133,4 +143,4 @@ var createSearchTabs = (inputConfig, tabsConfig, resultsRenderers, debug) => {
 //#endregion
 export { createSearchTabs as t };
 
-//# sourceMappingURL=search-tabs-DnOw8MkO.js.map
+//# sourceMappingURL=search-tabs-B5JZuCO1.js.map

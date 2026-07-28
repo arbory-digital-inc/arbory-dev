@@ -1,5 +1,5 @@
-import { t as createResultsPanel } from "../search-results-panel-XEbvRceR.js";
-import { i as replaceElWithError, n as getEDSConfig, r as loadCssFile, t as generatePannelLabels } from "../eds-helper-NkKtY9o8.js";
+import { t as createResultsPanel } from "../search-results-panel-oPiJHnTQ.js";
+import { a as readPanelOptions, i as readInputOptions, n as loadCssFile, o as replaceElWithError, t as getEDSConfig } from "../eds-helper-B2lm9102.js";
 //#region src/exports/eds/decorate-results-panel.ts
 function decorate(block, renderers) {
 	loadCssFile("/scripts/search/streamx-search.css");
@@ -9,24 +9,17 @@ function decorate(block, renderers) {
 		replaceElWithError(block, "The <em>Results panel</em> block requires <i>searchApiUrl</i>");
 		return;
 	}
+	const inputOptions = readInputOptions(config);
 	const inputConfig = {
 		searchApiUrl: config.searchApiUrl,
-		searchPageUrl: config.searchPageUrl ? (query) => `${config.searchPageUrl}?stx-search=${encodeURIComponent(query)}` : void 0,
-		minSearchLength: Number(config.minSearchLength) || 3,
-		labels: {
-			inputPlaceholder: config.inputPlaceholder,
-			inputLabel: config.inputLabel,
-			clearButtonAria: config.clearButtonAria,
-			searchButtonAria: config.searchButtonAria
-		},
+		...inputOptions,
 		renderers
 	};
 	const resultsRenderers = Object.fromEntries(Object.entries(renderers || {}).filter(([, renderer]) => renderer !== void 0));
 	const resultPanel = createResultsPanel(inputConfig, {
-		pageSize: Number(config.pageSize) || 10,
-		dataSources: config.dataSources ? [config.dataSources] : [],
-		renderers: resultsRenderers,
-		labels: generatePannelLabels(config)
+		...readPanelOptions(config),
+		queryParam: inputOptions.queryParam,
+		renderers: resultsRenderers
 	});
 	block.append(resultPanel);
 }
