@@ -72,6 +72,4 @@ sampleRUM('cwv');
 loadInlineSearch();
 
 // add more delayed functionality here
-/* Add in ALI ARMS RUM CODE */
 
-/* END ALI ARMS RUM CODE */
