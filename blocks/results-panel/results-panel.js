@@ -48,7 +48,7 @@ export const clearIcon = () => icon('<path d="M18 6 6 18M6 6l12 12" />');
 
 /** Renderers shared by the standalone panel and the tabbed search. */
 export const searchRenderers = {
-  'item-page/eds': renderItem,
+  'item-page/eds-page': renderItem,
   searchIcon,
   clearIcon,
 };
