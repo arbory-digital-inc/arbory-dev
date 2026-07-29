@@ -810,13 +810,27 @@
    toggle that shows one tab at a time. Indenting the header by the facet
    column's footprint gives the same layout with no DOM changes.
 
-   Keyed off the active panel actually having facets - a tab whose response
-   carries no aggregations renders none, and the header should then span the
-   full width rather than indent past nothing. */
+   The indent is unconditional, and panels without facets reserve the column
+   rather than reclaiming it. The library drops the facets container outright
+   when a response carries no aggregations, so keying the indent off its
+   presence slid the entire layout sideways whenever a tab switch, a new query
+   or a filter changed what came back. Holding the column costs some width on
+   facet-less tabs and buys a layout that never moves. */
 
-.stx-search-tabs:has(.stx-tabs__content:not([hidden]) .stx-results-panel__facets-container) .stx-query-input,
-.stx-search-tabs:has(.stx-tabs__content:not([hidden]) .stx-results-panel__facets-container) .stx-tabs__buttons {
+.stx-search-tabs .stx-query-input,
+.stx-search-tabs .stx-tabs__buttons {
   margin-left: var(--stx-facet-indent);
+}
+
+/* Stands in for the absent container so the results keep their left edge. */
+.search-tabs .stx-results-panel:not(:has(.stx-results-panel__facets-container)) {
+  padding-left: var(--stx-facet-indent);
+}
+
+/* Not a results panel at all, so it needs the same reservation to land on the
+   shared edge instead of starting at the panel's own. */
+.search-tabs .search-tabs-content-tab {
+  padding-left: var(--stx-facet-indent);
 }
 
 /* The library ships no media queries, so the facet column would otherwise hold
@@ -831,8 +845,124 @@
     width: 100%;
   }
 
-  .stx-search-tabs:has(.stx-tabs__content:not([hidden]) .stx-results-panel__facets-container) .stx-query-input,
-  .stx-search-tabs:has(.stx-tabs__content:not([hidden]) .stx-results-panel__facets-container) .stx-tabs__buttons {
+  .stx-search-tabs .stx-query-input,
+  .stx-search-tabs .stx-tabs__buttons {
     margin-left: 0;
   }
+
+  /* Stacked, so there is no column left to hold. */
+  .search-tabs .stx-results-panel:not(:has(.stx-results-panel__facets-container)),
+  .search-tabs .search-tabs-content-tab {
+    padding-left: 0;
+  }
+}
+
+/* ----------------------------------------------------------- content tab --
+   A tab holding an authored fragment rather than a results panel (see
+   injectContentTab in search-tabs.js). Kept deliberately thin: the fragment
+   arrives already decorated and inherits the page's own typography. */
+
+/* The fragment brings the page's .section wrappers with it, and their padding
+   would read as a stray indent inside a panel already sitting on the shared
+   left edge. */
+.search-tabs .search-tabs-content-tab .section {
+  padding: 0;
+}
+
+/* No measure on the wrapper: the entry rows span the panel so their rule and
+   chevron reach its full width. The measure moves onto the answer body, which
+   is the part that is actually prose. */
+
+/* Same split the result rows use - full-strength for the question, muted for
+   the body - so the tab reads as part of the search UI. */
+.search-tabs .search-tabs-content-tab h2 {
+  color: var(--stx-color-text);
+}
+
+.search-tabs .search-tabs-content-tab p {
+  color: var(--stx-color-muted);
+}
+
+.search-tabs .search-tabs-content-tab a {
+  color: var(--link-color);
+  text-decoration: underline;
+}
+
+/* Entries collapsed to their question until opened (buildAccordion). The
+   chevron is rebuilt from the facet toggle's geometry rather than shared with
+   it - that one is a pseudo-element on a span the library owns. */
+
+.search-tabs .search-tabs-entry {
+  border-bottom: 1px solid var(--stx-color-border);
+}
+
+.search-tabs .search-tabs-entry-question {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+
+  /* Suppresses the default disclosure triangle; the ::after chevron below
+     replaces it. Safari needs the pseudo-element form as well. */
+  padding: 1rem 0;
+  list-style: none;
+  cursor: pointer;
+}
+
+.search-tabs .search-tabs-entry-question::-webkit-details-marker {
+  display: none;
+}
+
+/* The authored h2 sits inside the summary, so it drops the page's heading scale
+   and takes the panel's own. The hover transition belongs here rather than on
+   the summary: the summary never changes colour itself, so declaring it there
+   left the hover snapping. */
+.search-tabs .search-tabs-entry-question h2 {
+  margin: 0;
+  font-size: 1.0625rem;
+  line-height: 1.4;
+  transition: color var(--stx-ease);
+}
+
+.search-tabs .search-tabs-entry-question:hover h2 {
+  color: var(--link-color);
+}
+
+.search-tabs .search-tabs-entry-question::after {
+  content: "";
+  flex-shrink: 0;
+  width: 0.4rem;
+  height: 0.4rem;
+
+  /* Nudged onto the question's first baseline; the box is square, so its own
+     height is what centres it against the cap. */
+  margin-top: 0.35rem;
+
+  /* Holds the chevron off the panel's right edge. Sized against the rotated
+     box, whose corner overhangs the border box by a couple of pixels. */
+  margin-right: 0.625rem;
+  border-right: 2px solid currentcolor;
+  border-bottom: 2px solid currentcolor;
+  color: var(--stx-color-muted);
+  transform: rotate(45deg);
+  transition: transform var(--stx-ease);
+}
+
+.search-tabs .search-tabs-entry[open] .search-tabs-entry-question::after {
+  transform: rotate(225deg);
+}
+
+.search-tabs .search-tabs-entry-question:focus-visible {
+  outline: 2px solid var(--stx-color-focus);
+  outline-offset: 2px;
+}
+
+.search-tabs .search-tabs-entry-answer {
+  max-width: 70ch;
+}
+
+/* The answer's own paragraphs carry the spacing, so the first one does not add
+   a second gap under the question. */
+.search-tabs .search-tabs-entry-answer > :first-child {
+  margin-top: 0;
 }
