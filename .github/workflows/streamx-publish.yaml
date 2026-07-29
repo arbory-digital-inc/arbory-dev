@@ -56,6 +56,6 @@ jobs:
           streamx-ingestion-url: ${{ vars.STREAMX_INGESTION_URL }}
           streamx-ingestion-token: ${{ secrets.STREAMX_INGESTION_GH_TOKEN }}
           event-type: 'com.streamx.blueprints.page.published.v1'
-          event-data: '{"type": "page/eds", "facets": {"probeEventData_level0": ["EDprobe"], "probeEventData_hierarchy": ["EDprobe", "EDprobe>Leaf"]}}'
+          event-data: '{"type": "page/eds-page"}'
           external-resource-url: ${{ steps.vars.outputs.eds_page_url }}
           subject: ${{ steps.vars.outputs.streamx_subject }}
