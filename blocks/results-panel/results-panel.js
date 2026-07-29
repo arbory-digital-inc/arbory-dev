@@ -12,13 +12,18 @@ import { getHitUrl } from '../../scripts/search/streamx-search-results-panel.js'
  * @returns {HTMLElement} The rendered result
  */
 export function renderItem(item) {
+  const url = getHitUrl(item);
+
   const link = document.createElement('a');
   link.className = 'results-panel-item';
-  link.href = getHitUrl(item);
+  link.href = url;
 
+  // A hit whose payload never got enriched has no title. Falling back to the
+  // URL keeps the row clickable - throwing here would make the library drop it
+  // from the list while it still counted toward the reported total.
   const title = document.createElement('span');
   title.className = 'results-panel-item__title';
-  title.textContent = item._source.payload.title;
+  title.textContent = item._source.payload?.title || url;
 
   const type = document.createElement('span');
   type.className = 'results-panel-item__type';
@@ -46,8 +51,21 @@ export const searchIcon = () => icon('<circle cx="11" cy="11" r="7" /><path d="m
 
 export const clearIcon = () => icon('<path d="M18 6 6 18M6 6l12 12" />');
 
-/** Renderers shared by the standalone panel and the tabbed search. */
+/*
+ * Renderers shared by the standalone panel and the tabbed search.
+ *
+ * The library looks up `item-${_source.type}` per hit and, with no match, drops
+ * the row (or shows a "Missing renderer" diagnostic when debugMode is on). The
+ * index currently holds two page types, so both are mapped to the same renderer:
+ *
+ *   page/eds       - what .github/workflows/streamx-publish.yaml ingests today,
+ *                    so every newly published page arrives under this type.
+ *   page/eds-page  - legacy hits from an earlier ingestion path. No workflow in
+ *                    this repo emits it, but they are still in the index, so the
+ *                    mapping stays until they are reingested or purged.
+ */
 export const searchRenderers = {
+  'item-page/eds': renderItem,
   'item-page/eds-page': renderItem,
   searchIcon,
   clearIcon,
