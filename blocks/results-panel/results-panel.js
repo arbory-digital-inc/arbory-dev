@@ -150,8 +150,11 @@ function enhanceFacetGroup(group) {
     const matching = nodes.filter((node) => !node.hidden);
     if (!expanded) matching.slice(FACET_VISIBLE_LIMIT).forEach((node) => { node.hidden = true; });
 
-    const over = matching.length - FACET_VISIBLE_LIMIT;
-    more.hidden = over <= 0;
+    // Clamped, not just tested: styles.css puts `display: inline-block` on every
+    // button, so a stylesheet that has not undone it for [hidden] would leave a
+    // "Show -3 more" on screen instead of hiding the control.
+    const over = Math.max(0, matching.length - FACET_VISIBLE_LIMIT);
+    more.hidden = over === 0;
     more.textContent = expanded ? 'Show less' : `Show ${over} more`;
     more.setAttribute('aria-expanded', String(expanded));
   };

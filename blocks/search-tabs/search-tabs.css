@@ -623,11 +623,13 @@
 }
 
 /* Reads as a link but behaves as a button - see enhanceFacetGroup for why it is
-   not an anchor. `display` is left alone so [hidden] keeps working. */
+   not an anchor. */
 .search-tabs .results-panel-facet-more {
   align-self: flex-start;
   margin: 0.25rem 0 0;
-  padding: 0;
+
+  /* Padding rather than more margin, so the extra room is inside the hit area. */
+  padding: 0.375rem 0 0;
   border: 0;
   background: none;
   color: var(--stx-color-muted);
@@ -648,6 +650,13 @@
 .search-tabs .results-panel-facet-more:focus-visible {
   outline: 2px solid var(--stx-color-focus);
   outline-offset: 2px;
+}
+
+/* styles.css sets `display: inline-block` on every button, which outranks the
+   UA rule for [hidden] - without this the control stays on screen when there is
+   nothing left to reveal. */
+.search-tabs .results-panel-facet-more[hidden] {
+  display: none;
 }
 
 .search-tabs .stx-results-panel__facet-values {
