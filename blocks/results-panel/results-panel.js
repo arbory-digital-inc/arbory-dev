@@ -25,11 +25,24 @@ export function renderItem(item) {
   title.className = 'results-panel-item__title';
   title.textContent = item._source.payload?.title || url;
 
-  const type = document.createElement('span');
-  type.className = 'results-panel-item__type';
-  type.textContent = item._source.type;
+  link.append(title);
 
-  link.append(title, type);
+  /*
+   * The authored Category, from `payload.facets.categories_level0` - plural, and
+   * unrelated to the `facetFieldPrefix` the panel requests aggregations under.
+   *
+   * `_source.type` used to sit here, which meant every row was labelled
+   * "page/eds": that field selects the renderer, it is not a label. Rows with no
+   * category get no pill rather than a fallback, since anything shown there
+   * instead would be the same kind of noise.
+   */
+  const categories = item._source.payload?.facets?.categories_level0;
+  if (categories?.length) {
+    const category = document.createElement('span');
+    category.className = 'results-panel-item__category';
+    category.textContent = categories.join(', ');
+    link.append(category);
+  }
 
   return link;
 }

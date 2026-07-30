@@ -36,7 +36,7 @@
   font-size: 1.5rem;
 }
 
-.results-panel-item__type {
+.results-panel-item__category {
   color: grey;
 }
 
@@ -67,19 +67,25 @@
   font-size: 13px;
 }
 
-/* Reads as a link, behaves as a button. */
+/* Reads as a link, behaves as a button. styles.css styles every button as a
+   filled pill, so the radius and the overflow clipping come off with it. */
 .results-panel-facet-more {
   align-self: flex-start;
   margin: 0.25rem 0 0;
   padding: 0.375rem 0 0;
   border: 0;
+  border-radius: 0;
+  overflow: visible;
   background: none;
   color: var(--stx-color-muted);
   font-size: 12px;
   cursor: pointer;
 }
 
-.results-panel-facet-more:hover {
+/* `:focus` too - styles.css repaints the filled background on both. */
+.results-panel-facet-more:hover,
+.results-panel-facet-more:focus {
+  background: none;
   color: var(--stx-color-text);
   text-decoration: underline;
 }

@@ -97,6 +97,7 @@
 .search-tabs .stx-results-panel__facet-subtoggle,
 .search-tabs .stx-query-input__search-button,
 .search-tabs .stx-query-input__clear-button,
+.search-tabs .results-panel-facet-more,
 .search-tabs .stx-results-panel__pagination-list button {
   margin: 0;
   overflow: visible;
@@ -415,22 +416,29 @@
   color: var(--stx-color-muted);
 }
 
+/* Wider than the 2px this sat at while the rows were separator-delimited: with a
+   border on each card, too little space reads as one doubled rule rather than as
+   two edges. */
 .search-tabs .stx-results-panel__results-list {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 0.5rem;
 }
 
-/* The row separator gives way to a hover surface - with rows this tall the
-   rules read as clutter, and the hover already delimits them. */
+/* The library's bottom-rule separator gives way to a bordered card per result.
+   `border` rather than `border-bottom: 0` - setting all four edges is what drops
+   the library's rule, so it no longer needs zeroing separately. */
 .search-tabs .stx-results-panel__results-item {
   padding: 0;
-  border-bottom: 0;
+  border: 1px solid var(--stx-color-border);
   border-radius: var(--border-radius);
-  transition: background-color var(--stx-ease);
+  transition: background-color var(--stx-ease), border-color var(--stx-ease);
 }
 
+/* The existing hover surface, plus the edge lifting with it so the whole card
+   responds rather than just its fill. */
 .search-tabs .stx-results-panel__results-item:hover {
+  border-color: rgb(255 255 255 / 24%);
   background: rgb(255 255 255 / 4%);
 }
 
@@ -455,7 +463,7 @@
   transition: color var(--stx-ease);
 }
 
-.search-tabs .results-panel-item__type {
+.search-tabs .results-panel-item__category {
   align-self: flex-start;
   padding: 2px 9px;
   border: 1px solid var(--stx-color-border);
@@ -642,7 +650,11 @@
   transition: color var(--stx-ease);
 }
 
-.search-tabs .results-panel-facet-more:hover {
+/* `:focus` as well as `:hover`: styles.css repaints the filled background on
+   both, and the base rule above only clears the resting state. */
+.search-tabs .results-panel-facet-more:hover,
+.search-tabs .results-panel-facet-more:focus {
+  background: none;
   color: var(--stx-color-text);
   text-decoration: underline;
 }
