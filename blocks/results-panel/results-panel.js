@@ -71,6 +71,140 @@ export const searchRenderers = {
   clearIcon,
 };
 
+/** Top-level values a facet shows before "show more" takes over. */
+const FACET_VISIBLE_LIMIT = 5;
+
+const NODE_SELECTOR = ':scope > .stx-results-panel__facet-node';
+const CHILD_NODE_SELECTOR = ':scope > .stx-results-panel__facet-children > .stx-results-panel__facet-node';
+
+/**
+ * Adds a filter field and a truncated value list to one facet group.
+ *
+ * The library renders every bucket the response carried, uncapped and
+ * unfiltered, so a facet at `facetFieldSize: 20` fills the whole column. Both
+ * controls are added from here because the bundle is copy-in-only.
+ *
+ * Skipped entirely for groups at or under the limit - a filter field above four
+ * checkboxes is clutter, not help.
+ *
+ * @param {Element} group One `.stx-results-panel__facet`
+ */
+function enhanceFacetGroup(group) {
+  const values = group.querySelector('.stx-results-panel__facet-values');
+  const nodes = values ? [...values.querySelectorAll(NODE_SELECTOR)] : [];
+  if (nodes.length <= FACET_VISIBLE_LIMIT) return;
+
+  const groupName = group.querySelector('.stx-results-panel__facet-name')?.textContent?.trim();
+
+  const search = document.createElement('input');
+  search.type = 'search';
+  search.className = 'results-panel-facet-search';
+  search.placeholder = 'Filter';
+  search.setAttribute('aria-label', groupName ? `Filter ${groupName}` : 'Filter values');
+
+  // A button rather than an anchor: it acts on this page and goes nowhere, so a
+  // link would be the wrong affordance and the wrong keyboard contract.
+  const more = document.createElement('button');
+  more.type = 'button';
+  more.className = 'results-panel-facet-more';
+
+  let expanded = false;
+
+  const labelOf = (node) => node
+    .querySelector(':scope > .stx-results-panel__facet-row .stx-results-panel__facet-label')
+    ?.textContent?.trim()?.toLowerCase() || '';
+
+  /*
+   * Matches a subtree and reports whether anything in it hit, so a parent can
+   * stay visible for the sake of a matching descendant.
+   *
+   * `inherited` carries a matched ancestor downwards: once a parent matches, its
+   * whole subtree stays browsable rather than being filtered out from under it.
+   */
+  const filterNode = (node, query, inherited) => {
+    const self = !query || labelOf(node).includes(query);
+    const children = [...node.querySelectorAll(CHILD_NODE_SELECTOR)];
+    const childMatch = children
+      .map((child) => filterNode(child, query, inherited || self))
+      .some(Boolean);
+
+    node.hidden = !(self || childMatch || inherited);
+
+    // A hit two levels down is worthless while its parent is still collapsed.
+    if (query && childMatch) {
+      const panel = node.querySelector(':scope > .stx-results-panel__facet-children');
+      const toggle = node.querySelector(':scope > .stx-results-panel__facet-row .stx-results-panel__facet-subtoggle');
+      if (panel) panel.hidden = false;
+      if (toggle) toggle.setAttribute('aria-expanded', 'true');
+    }
+
+    return self || childMatch;
+  };
+
+  const apply = () => {
+    const query = search.value.trim().toLowerCase();
+    nodes.forEach((node) => filterNode(node, query, false));
+
+    // The cap applies to whatever survived the filter, so searching inside a
+    // long facet does not immediately bury its own matches.
+    const matching = nodes.filter((node) => !node.hidden);
+    if (!expanded) matching.slice(FACET_VISIBLE_LIMIT).forEach((node) => { node.hidden = true; });
+
+    const over = matching.length - FACET_VISIBLE_LIMIT;
+    more.hidden = over <= 0;
+    more.textContent = expanded ? 'Show less' : `Show ${over} more`;
+    more.setAttribute('aria-expanded', String(expanded));
+  };
+
+  // Re-collapsing on every keystroke keeps "show more" meaning the same thing
+  // for each new query.
+  search.addEventListener('input', () => {
+    expanded = false;
+    apply();
+  });
+
+  more.addEventListener('click', () => {
+    expanded = !expanded;
+    apply();
+  });
+
+  values.prepend(search);
+  values.append(more);
+  apply();
+}
+
+/**
+ * Keeps the facet controls attached across re-renders.
+ *
+ * `updateFacets` replaces the entire facets container on every response, so a
+ * one-shot pass would be thrown away by the next query, filter or page change.
+ * Only *added* nodes are inspected, so the controls added above never retrigger
+ * this, and the marker makes a second pass over the same container a no-op.
+ *
+ * @param {Element} root Element containing one or more results panels
+ */
+export function observeFacets(root) {
+  const enhance = (container) => {
+    if (container.dataset.facetsEnhanced) return;
+    container.dataset.facetsEnhanced = 'true';
+    container.querySelectorAll('.stx-results-panel__facet').forEach(enhanceFacetGroup);
+  };
+
+  const enhanceWithin = (node) => {
+    if (!(node instanceof HTMLElement)) return;
+    if (node.classList.contains('stx-results-panel__facets-container')) enhance(node);
+    else node.querySelectorAll('.stx-results-panel__facets-container').forEach(enhance);
+  };
+
+  root.querySelectorAll('.stx-results-panel__facets-container').forEach(enhance);
+
+  const observer = new MutationObserver((records) => {
+    records.forEach((record) => record.addedNodes.forEach(enhanceWithin));
+  });
+  observer.observe(root, { childList: true, subtree: true });
+}
+
 export default function decorate(block) {
   decorateResultsPanel(block, searchRenderers);
+  observeFacets(block);
 }

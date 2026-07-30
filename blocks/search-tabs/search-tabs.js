@@ -1,5 +1,5 @@
 import decorateSearchTabs from '../../scripts/search/eds/search-tabs.js';
-import { searchRenderers } from '../results-panel/results-panel.js';
+import { searchRenderers, observeFacets } from '../results-panel/results-panel.js';
 import { loadFragment } from '../fragment/fragment.js';
 
 /* URL param the library persists the active tab under. Duplicated rather than
@@ -288,4 +288,7 @@ export default function decorate(block) {
     });
   }
   slideTabIndicator(block);
+  // Each tab builds its own results panel on activation, so this watches the
+  // whole block rather than any one panel.
+  observeFacets(block);
 }
