@@ -96,3 +96,52 @@
 .results-panel-facet-more[hidden] {
   display: none;
 }
+
+/* Selected facet values, mirrored beside the result count. */
+.results-panel .stx-results-panel__results-number {
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.results-panel-selected {
+  display: flex;
+  order: -1;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.375rem;
+  margin-right: auto;
+}
+
+.results-panel-selected[hidden] {
+  display: none;
+}
+
+/* A pill, so it keeps a radius - what comes off is styles.css's fill, margin
+   and ellipsis. */
+.results-panel-selected-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  margin: 0;
+  padding: 2px 8px 2px 10px;
+  overflow: visible;
+  border: 1px solid var(--stx-color-border);
+  border-radius: 999px;
+  background: var(--stx-color-surface);
+  color: var(--stx-color-text);
+  font-size: 12px;
+  text-overflow: clip;
+  cursor: pointer;
+}
+
+.results-panel-selected-badge:hover,
+.results-panel-selected-badge:focus {
+  border-color: var(--stx-color-focus);
+  background: var(--stx-color-surface);
+}
+
+.results-panel-selected-badge__remove {
+  color: var(--stx-color-muted);
+  font-size: 14px;
+  line-height: 1;
+}

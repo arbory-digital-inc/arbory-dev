@@ -89,6 +89,33 @@ const FACET_VISIBLE_LIMIT = 5;
 
 const NODE_SELECTOR = ':scope > .stx-results-panel__facet-node';
 const CHILD_NODE_SELECTOR = ':scope > .stx-results-panel__facet-children > .stx-results-panel__facet-node';
+const ROW_LABEL_SELECTOR = ':scope > .stx-results-panel__facet-row .stx-results-panel__facet-label';
+const FACETS_CONTAINER_CLASS = 'stx-results-panel__facets-container';
+const RESULTS_META_CLASS = 'stx-results-panel__results-number';
+
+/** A facet node's own bucket label, ignoring any nested below it. */
+const facetLabelOf = (node) => node.querySelector(ROW_LABEL_SELECTOR)?.textContent?.trim() || '';
+
+/**
+ * Labels from the root of a facet tree down to the given node.
+ *
+ * Read from the DOM rather than by splitting the checkbox value, which is a
+ * separator-joined path whose separator is authored (`facetPathSeparator`) and
+ * so is not knowable from here.
+ *
+ * @param {Element} input A facet checkbox
+ * @returns {string[]} Ancestor labels, outermost first
+ */
+function facetAncestry(input) {
+  const labels = [];
+  let node = input.closest('.stx-results-panel__facet-node');
+  while (node) {
+    const label = facetLabelOf(node);
+    if (label) labels.unshift(label);
+    node = node.parentElement?.closest('.stx-results-panel__facet-node') || null;
+  }
+  return labels;
+}
 
 /**
  * Adds a filter field and a truncated value list to one facet group.
@@ -123,9 +150,7 @@ function enhanceFacetGroup(group) {
 
   let expanded = false;
 
-  const labelOf = (node) => node
-    .querySelector(':scope > .stx-results-panel__facet-row .stx-results-panel__facet-label')
-    ?.textContent?.trim()?.toLowerCase() || '';
+  const labelOf = (node) => facetLabelOf(node).toLowerCase();
 
   /*
    * Matches a subtree and reports whether anything in it hit, so a parent can
@@ -190,34 +215,114 @@ function enhanceFacetGroup(group) {
 }
 
 /**
- * Keeps the facet controls attached across re-renders.
+ * Mirrors the current facet selection into removable badges beside the count.
+ *
+ * The selection is read off the checkboxes rather than tracked here: the library
+ * keeps it in a private `panelState`, but `refreshFacetStates` writes it back to
+ * every input, so `:checked` is that state. It also rolls a fully selected
+ * branch up to its parent, which the badges inherit for free - one "Tablets"
+ * chip rather than every model under it.
+ *
+ * Removal replays a real click, so the library's own change handler clears the
+ * selection, rewrites the URL and re-runs the search exactly as the checkbox
+ * would have.
+ *
+ * @param {Element} panel One `.stx-results-panel`
+ */
+function renderSelectedBadges(panel) {
+  const meta = panel?.querySelector(`.${RESULTS_META_CLASS}`);
+  if (!meta) return;
+
+  let list = meta.querySelector('.results-panel-selected');
+  if (!list) {
+    list = document.createElement('div');
+    list.className = 'results-panel-selected';
+    meta.append(list);
+  }
+
+  const facets = panel.querySelector(`.${FACETS_CONTAINER_CLASS}`);
+  const selected = facets
+    ? [...facets.querySelectorAll('.stx-results-panel__facet-option input:checked')]
+    : [];
+
+  list.replaceChildren();
+  list.hidden = selected.length === 0;
+
+  selected.forEach((input) => {
+    const path = facetAncestry(input);
+    const leaf = path[path.length - 1] || input.value;
+
+    const badge = document.createElement('button');
+    badge.type = 'button';
+    badge.className = 'results-panel-selected-badge';
+    badge.setAttribute('aria-label', `Remove filter ${path.join(' › ') || leaf}`);
+    // Only the ancestry a nested value carries; a top-level one adds nothing.
+    if (path.length > 1) badge.title = path.join(' › ');
+
+    const text = document.createElement('span');
+    text.textContent = leaf;
+
+    // Decorative: the button's aria-label already says what activating it does.
+    const remove = document.createElement('span');
+    remove.className = 'results-panel-selected-badge__remove';
+    remove.setAttribute('aria-hidden', 'true');
+    remove.textContent = '×';
+
+    badge.append(text, remove);
+    badge.addEventListener('click', () => input.click());
+    list.append(badge);
+  });
+}
+
+/**
+ * Keeps the facet controls and the selection badges attached across re-renders.
  *
  * `updateFacets` replaces the entire facets container on every response, so a
  * one-shot pass would be thrown away by the next query, filter or page change.
- * Only *added* nodes are inspected, so the controls added above never retrigger
- * this, and the marker makes a second pass over the same container a no-op.
+ * The results header is the opposite - `updateResultsMeta` rewrites its text in
+ * place - so the badge list is built once there and refilled.
+ *
+ * Only *added* nodes are inspected, and neither the controls nor the badges are
+ * one of the two watched classes, so nothing inserted here retriggers this.
  *
  * @param {Element} root Element containing one or more results panels
  */
 export function observeFacets(root) {
   const enhance = (container) => {
-    if (container.dataset.facetsEnhanced) return;
-    container.dataset.facetsEnhanced = 'true';
-    container.querySelectorAll('.stx-results-panel__facet').forEach(enhanceFacetGroup);
+    if (!container.dataset.facetsEnhanced) {
+      container.dataset.facetsEnhanced = 'true';
+      container.querySelectorAll('.stx-results-panel__facet').forEach(enhanceFacetGroup);
+    }
+    renderSelectedBadges(container.closest('.stx-results-panel'));
   };
 
-  const enhanceWithin = (node) => {
-    if (!(node instanceof HTMLElement)) return;
-    if (node.classList.contains('stx-results-panel__facets-container')) enhance(node);
-    else node.querySelectorAll('.stx-results-panel__facets-container').forEach(enhance);
+  const collect = (node, className) => {
+    if (!(node instanceof HTMLElement)) return [];
+    return node.classList.contains(className) ? [node] : [...node.querySelectorAll(`.${className}`)];
   };
 
-  root.querySelectorAll('.stx-results-panel__facets-container').forEach(enhance);
+  const handleAdded = (node) => {
+    collect(node, FACETS_CONTAINER_CLASS).forEach(enhance);
+    // The header can arrive after the facets on first render, so a selection
+    // restored from the URL still gets its badges.
+    collect(node, RESULTS_META_CLASS)
+      .forEach((meta) => renderSelectedBadges(meta.closest('.stx-results-panel')));
+  };
+
+  root.querySelectorAll(`.${FACETS_CONTAINER_CLASS}`).forEach(enhance);
 
   const observer = new MutationObserver((records) => {
-    records.forEach((record) => record.addedNodes.forEach(enhanceWithin));
+    records.forEach((record) => record.addedNodes.forEach(handleAdded));
   });
   observer.observe(root, { childList: true, subtree: true });
+
+  // Delegated, so the badges update on the click rather than waiting for the
+  // response that replaces the facets. The library's own listener sits on the
+  // input and has already run by the time this fires.
+  root.addEventListener('change', (event) => {
+    if (!event.target.closest?.('.stx-results-panel__facet-option')) return;
+    renderSelectedBadges(event.target.closest('.stx-results-panel'));
+  });
 }
 
 export default function decorate(block) {
