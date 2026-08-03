@@ -30,5 +30,5 @@ export function renderItem(item) {
 }
 
 export default function decorate(block) {
-  decorateResultsPanel(block, { 'item-page/eds-page': renderItem });
+  decorateResultsPanel(block, { 'item-page/eds': renderItem });
 }

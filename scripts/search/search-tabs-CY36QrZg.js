@@ -1,5 +1,5 @@
 import { a as config, l as html, r as ACTIVE_TAB_PARAM, s as createLazyComponent, t as createQueryInput } from "./common-S2Xwo6A-.js";
-import { t as createResultsPanel } from "./results-panel-P1vgMqsC.js";
+import { t as createResultsPanel } from "./results-panel-gs4k6BcT.js";
 //#region src/components/tabs/tabs.ts
 var resolvedTab = (tabsConfig, customRenderers = {}) => {
 	return tabsConfig.map((c) => ({
@@ -143,4 +143,4 @@ var createSearchTabs = (inputConfig, tabsConfig, resultsRenderers, debug) => {
 //#endregion
 export { createSearchTabs as t };
 
-//# sourceMappingURL=search-tabs-B5JZuCO1.js.map
+//# sourceMappingURL=search-tabs-CY36QrZg.js.map

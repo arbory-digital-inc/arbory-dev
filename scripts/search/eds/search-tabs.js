@@ -1,5 +1,5 @@
-import { t as createSearchTabs } from "../search-tabs-B5JZuCO1.js";
-import { a as readPanelOptions, i as readInputOptions, n as loadCssFile, o as replaceElWithError, r as mergeEDSConfigs, t as getEDSConfig } from "../eds-helper-B2lm9102.js";
+import { t as createSearchTabs } from "../search-tabs-CY36QrZg.js";
+import { a as readPanelOptions, i as readInputOptions, n as loadCssFile, o as replaceElWithError, r as mergeEDSConfigs, t as getEDSConfig } from "../eds-helper-ChIwXtx4.js";
 //#region src/exports/eds/decorate-search-tabs.ts
 function decorate(block, tabSelector, renderers) {
 	loadCssFile("/scripts/search/streamx-search.css");

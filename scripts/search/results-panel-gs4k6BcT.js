@@ -1,41 +1,60 @@
 import { a as config, c as fetchSearchResults, d as onUrlChange, i as DEFAULT_QUERY_PARAM, l as html, p as withNamespaceParam, u as normalizeLabels } from "./common-S2Xwo6A-.js";
 //#region src/search-request.ts
 /**
-* Defaults for the facet field naming convention.
+* The facet field naming convention.
 *
-* They match the layout StreamX indexes use out of the box, but every one of
-* them is overridable per query so the components stay index-agnostic.
+* A facet is configured by its **root** name alone (`category`, `tags`, ...).
+* The surrounding names are fixed by the index layout: each nesting level is
+* aggregated on `<root>_level<n>`, and selections are filtered against
+* `<root>_hierarchy`, which stores the full ancestor paths.
 */
-var DEFAULT_FACET_FIELD_PREFIX = "category_level";
-var DEFAULT_FACET_FILTER_FIELD = "category_hierarchy";
+var DEFAULT_FACET_FIELDS = ["category"];
+var FACET_LEVEL_SUFFIX = "_level";
+var FACET_HIERARCHY_SUFFIX = "_hierarchy";
 /**
-* Builds the facet aggregations requested for a query, `depth` levels deep:
-* `${fieldPrefix}0` nesting down to `${fieldPrefix}${depth - 1}`.
+* Maps an aggregation field back to the field its selections filter against,
+* so every facet tree filters on its own hierarchy instead of a shared one.
+*
+* @example
+* facetFilterFieldFor("tags_level0") // "tags_hierarchy"
+* facetFilterFieldFor("category_level2") // "category_hierarchy"
+*/
+var facetFilterFieldFor = (treeField) => {
+	return `${treeField.replace(new RegExp(`${FACET_LEVEL_SUFFIX}\\d+$`), "")}${FACET_HIERARCHY_SUFFIX}`;
+};
+/**
+* Builds the facet aggregations requested for a query: one tree per configured
+* root, each nesting `depth` levels from `<root>_level0`.
 *
 * A missing or invalid depth falls back to a single flat level.
 *
 * @example
-* buildFacetFields({ depth: 1 })
+* buildFacetFields({ fields: ["category"] })
 * // { fields: [{ name: "category_level0", size: 20, last: true }] }
 *
 * @example
-* buildFacetFields({ depth: 2 })
+* buildFacetFields({ fields: ["category"], depth: 2 })
 * // { fields: [{ name: "category_level0", size: 20,
 * //             children: [{ name: "category_level1", size: 20, last: true }],
 * //             last: true }] }
+*
+* @example
+* buildFacetFields({ fields: ["category", "tags"] })
+* // { fields: [{ name: "category_level0", ... }, { name: "tags_level0", ... }] }
 */
-var buildFacetFields = ({ depth, fieldPrefix = DEFAULT_FACET_FIELD_PREFIX, fieldSize = 20 } = {}) => {
+var buildFacetFields = ({ depth, fields = DEFAULT_FACET_FIELDS, fieldSize = 20 } = {}) => {
 	const levels = Math.max(1, Math.trunc(Number(depth)) || 1);
-	const buildLevel = (index) => {
+	const roots = fields.length > 0 ? fields : DEFAULT_FACET_FIELDS;
+	const buildLevel = (root, index) => {
 		const field = {
-			name: `${fieldPrefix}${index}`,
+			name: `${root}${FACET_LEVEL_SUFFIX}${index}`,
 			size: fieldSize
 		};
-		if (index < levels - 1) field.children = [buildLevel(index + 1)];
+		if (index < levels - 1) field.children = [buildLevel(root, index + 1)];
 		field.last = true;
 		return field;
 	};
-	return { fields: [buildLevel(0)] };
+	return { fields: roots.map((root) => buildLevel(root, 0)) };
 };
 /**
 * Joins a facet ancestor path.
@@ -50,30 +69,31 @@ var joinFacetPath = (parentPath, key, separator = ">") => parentPath ? `${parent
 *
 * Selected filters become `params.filter_query.fields`: one entry per facet
 * tree - values within a tree are OR-ed, separate trees are AND-ed - with
-* `last: true` on the final entry.
+* `last: true` on the final entry. Each entry filters against that tree's own
+* `<root>_hierarchy` field, so two trees that share a value stay distinct.
 *
 * Values are full hierarchical paths (`"Electronics>Tablet"`), so a nested
 * selection never needs its ancestors sent alongside it. Sending two branches
 * of one tree as separate entries would AND them and match nothing, which is
 * why grouping is per tree rather than per aggregation level.
 */
-var buildSearchRequestBody = ({ requestId, from = 0, size = 20, query = "", filters, filterField = DEFAULT_FACET_FILTER_FIELD, facetDepthLevel, facetFieldPrefix, facetFieldSize, namespace } = {}) => {
+var buildSearchRequestBody = ({ requestId, from = 0, size = 20, query = "", filters, facetDepthLevel, facetFields, facetFieldSize, namespace } = {}) => {
 	const body = { params: {
 		from,
 		size,
 		facets: buildFacetFields({
 			depth: facetDepthLevel,
-			fieldPrefix: facetFieldPrefix,
+			fields: facetFields,
 			fieldSize: facetFieldSize
 		})
 	} };
 	if (requestId) body.id = requestId;
 	if (query) body.params.query = query;
 	if (namespace) body.params.namespace = namespace;
-	const filterGroups = filters ? Object.values(filters).filter((values) => values.length > 0) : [];
-	if (filterGroups.length > 0) body.params.filter_query = { fields: filterGroups.map((values, index) => {
+	const filterGroups = filters ? Object.entries(filters).filter(([, values]) => values.length > 0) : [];
+	if (filterGroups.length > 0) body.params.filter_query = { fields: filterGroups.map(([treeField, values], index) => {
 		const entry = {
-			name: filterField,
+			name: facetFilterFieldFor(treeField),
 			values
 		};
 		if (index === filterGroups.length - 1) entry.last = true;
@@ -205,8 +225,7 @@ var defaultConfig = {
 	method: "GET",
 	queryParam: DEFAULT_QUERY_PARAM,
 	facetDepthLevel: 1,
-	facetFilterField: DEFAULT_FACET_FILTER_FIELD,
-	facetFieldPrefix: DEFAULT_FACET_FIELD_PREFIX,
+	facetFields: DEFAULT_FACET_FIELDS,
 	facetPathSeparator: ">",
 	facetFieldSize: 20,
 	debugMode: false,
@@ -333,9 +352,8 @@ var buildResultsRequestOptions = (results, pageNumber, selectedFilters, query) =
 			size: results.pageSize,
 			query,
 			filters: serializeFilters(selectedFilters),
-			filterField: results.facetFilterField,
 			facetDepthLevel: results.facetDepthLevel,
-			facetFieldPrefix: results.facetFieldPrefix,
+			facetFields: results.facetFields,
 			facetFieldSize: results.facetFieldSize,
 			namespace: results.namespace
 		})
@@ -811,4 +829,4 @@ var createResultsPanel = (resultsConfig) => {
 //#endregion
 export { createResultsPanel as t };
 
-//# sourceMappingURL=results-panel-P1vgMqsC.js.map
+//# sourceMappingURL=results-panel-gs4k6BcT.js.map

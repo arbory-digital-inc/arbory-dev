@@ -63,6 +63,15 @@ var generatePannelLabels = (config) => {
 	if (config.ariaPaginationNavigation) lables.ariaPaginationNavigation = config.ariaPaginationNavigation;
 	return lables;
 };
+/**
+* Parses the authored `facetFields` row - a comma-separated list of facet roots
+* - into the array the panel expects. Blank entries are dropped, and an empty
+* row falls back to the component default.
+*/
+var parseFacetFields = (value) => {
+	const roots = (value ?? "").split(",").map((root) => root.trim()).filter(Boolean);
+	return roots.length > 0 ? roots : void 0;
+};
 /** Maps authored EDS rows to a results-panel config. Single source of truth. */
 var readPanelOptions = (config) => ({
 	pageSize: Number(config.pageSize) || 10,
@@ -70,8 +79,7 @@ var readPanelOptions = (config) => ({
 	method: "POST",
 	requestId: config.requestId || void 0,
 	facetDepthLevel: Number(config.facetDepthLevel) || void 0,
-	facetFilterField: config.facetFilterField || void 0,
-	facetFieldPrefix: config.facetFieldPrefix || void 0,
+	facetFields: parseFacetFields(config.facetFields),
 	facetPathSeparator: config.facetPathSeparator || void 0,
 	facetFieldSize: Number(config.facetFieldSize) || void 0,
 	debugMode: config.debugMode === void 0 ? void 0 : config.debugMode.trim().toLowerCase() === "true",
@@ -106,4 +114,4 @@ var readInputOptions = (config) => {
 //#endregion
 export { readPanelOptions as a, readInputOptions as i, loadCssFile as n, replaceElWithError as o, mergeEDSConfigs as r, getEDSConfig as t };
 
-//# sourceMappingURL=eds-helper-B2lm9102.js.map
+//# sourceMappingURL=eds-helper-ChIwXtx4.js.map

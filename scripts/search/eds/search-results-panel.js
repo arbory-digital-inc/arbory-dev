@@ -1,5 +1,5 @@
-import { t as createResultsPanel } from "../search-results-panel-oPiJHnTQ.js";
-import { a as readPanelOptions, i as readInputOptions, n as loadCssFile, o as replaceElWithError, t as getEDSConfig } from "../eds-helper-B2lm9102.js";
+import { t as createResultsPanel } from "../search-results-panel-BY8xM5v9.js";
+import { a as readPanelOptions, i as readInputOptions, n as loadCssFile, o as replaceElWithError, t as getEDSConfig } from "../eds-helper-ChIwXtx4.js";
 //#region src/exports/eds/decorate-results-panel.ts
 function decorate(block, renderers) {
 	loadCssFile("/scripts/search/streamx-search.css");
