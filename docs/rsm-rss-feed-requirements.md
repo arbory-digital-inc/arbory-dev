@@ -1,15 +1,16 @@
 # RSM Syndication Feeds — Requirements for StreamX
 
-**Version:** 0.3 (draft for StreamX review)
+**Version:** 0.4 (draft for StreamX review)
 **Date:** 2026-08-07
 **Owner:** Arbory Digital / RSM IT-CMG
 **Audience:** StreamX engineering
 
-> **Changes from v0.2:** DA source is now readable, which resolved four open questions and
-> **overturned one major v0.2 conclusion** — the corpus is not half-migrated, it is being
-> deliberately reduced (§2.2). Author names have a source (§7.4). The `tags` defect is
-> confirmed as index-side only, with source-level proof (§7.3). The authoritative DA
-> metadata model is documented in §8.1.
+> **Changes from v0.3:** a tag crosswalk **does** exist — the AEMaaCS `tagsservlet` — which
+> overturns v0.3's "no crosswalk" finding and reduces §9 from a build-from-scratch project
+> to a scope extension (§2.1). The site's `query.yaml` is now readable, which pins the root
+> cause of both index defects to specific lines of config (§7.3). Reframed throughout to
+> foreground **XML shape fidelity** as the core requirement; feed size and index size are
+> no longer treated as constraints.
 
 ---
 
@@ -28,16 +29,35 @@ Those feeds must continue to be served after the migration, generated instead by
 | CorporateSight | `https://rsmus.com/content/feeds/corporatesight.rss` | CorporateSight |
 | FamilySight | `https://rsmus.com/feeds/familyoffice.xml` | FamilySight |
 
-### 1.1 How to read this document
+**All three feeds draw exclusively from the US site.** The DA org also hosts `rsm-ca` for
+the Canadian site, which has a structurally identical EDS index but is **out of scope**
+unless RSM asks for a Canadian feed (**O-12**).
+
+### 1.1 The core requirement, stated plainly
+
+These are live integrations with downstream portals that RSM does not control. The primary
+requirement is therefore **not** performance, freshness or elegance — it is that
+
+> **the XML shape of each new feed matches the current feed closely enough that no
+> downstream consumer has to change anything.**
+
+Element names, nesting, attribute names, value formats, optionality and namespace behaviour
+all form part of that contract. §4–§6 specify it element by element. §10 lists the places
+where the current output is defective and a change may be warranted — each needs consumer
+sign-off, because "wrong but expected" beats "correct but breaking".
+
+Everything else in this document exists to serve that requirement.
+
+### 1.2 How to read this document
 
 - **MUST** — required for portal compatibility. Changing it requires consumer sign-off.
 - **SHOULD** — strongly preferred; deviate with a documented reason.
 - **MAY** — StreamX's discretion. We have deliberately left the *how* open.
 
-We are specifying **what the feeds must contain**, not how StreamX builds them. Choice of
-source, caching strategy, generation trigger and storage are StreamX's to design.
+We specify **what the feeds must contain**, not how StreamX builds them. Source of data,
+caching, generation trigger, storage and rebuild strategy are StreamX's to design.
 
-### 1.2 Evidence base
+### 1.3 Evidence base
 
 Everything here is derived from data read directly on **2026-08-07**. Nothing is inferred.
 
@@ -45,47 +65,63 @@ Everything here is derived from data read directly on **2026-08-07**. Nothing is
 | --- | --- |
 | All three live AEM 6.5 feeds | Field inventories, counts, formats, ordering, selection rules (§4–§6) |
 | `…aem.page/en/query-index.json` | 4,459 rows × 18 columns — the EDS index (§7) |
-| Published EDS pages | The `<meta>` model behind the index |
+| `admin.hlx.page/config/rsm-it-cmg/sites/rsm-us/content/query.yaml` | The live index configuration (§7.3, §11) |
+| `…adobeaemcloud.com/services/tagsservlet` | The tag taxonomy and crosswalk — 269 nodes (§9) |
 | DA source (`admin.da.live`) | Authoring model, `bios.json`, `redirects.json`, site config (§8.1) |
+| Published EDS pages | The `<meta>` model behind the index |
 | Live rsmus.com AEM 6.5 pages | The legacy metadata model, for comparison |
 
 **4,095 documents appear in both the Global feed and the EDS index.** Every accuracy
-figure in §8 is measured across that paired set.
-
-Still not available: the site's `helix-query.yaml` (not in DA; lives in the GitHub repo,
-which we could not reach). It would confirm *how* index columns are configured — we now
-know what they contain and, from §7.3, enough to say what needs changing.
+figure in §8 and §9 is measured across that paired set.
 
 ---
 
 ## 2. Executive summary
 
-Three things that need decisions from RSM, not from StreamX.
+### 2.1 The tag crosswalk exists — and covers two-thirds of the problem
 
-### 2.1 The tag taxonomy was redesigned, not relabelled — the main risk
-
-The feeds' `<category>` values are AEM tag IDs (`rsm-sites/content-type/article`). EDS
-carries **display labels in a different structure** (`RSM Display | Content type /
-Article`), with the three AEM namespaces (`rsm-sites`, `rsm-filters`, `rsm-internal`)
-**flattened into one**.
-
-Mechanical transformation reproduces **83%** of current category values (18,679 of
-22,444 across the paired documents). The remaining 17% fail because the hierarchy moved:
+The feeds emit AEM tag IDs (`rsm-sites/content-type/article`); EDS carries display labels
+(`RSM Display | Content type / Article`). v0.3 reported that no mapping existed and one
+would have to be built. **That was wrong.** RSM runs a `tagsservlet` on AEMaaCS which holds
+the taxonomy and maps labels to tag paths:
 
 ```
-AEM 6.5 : rsm-sites/service/managed-technology-services/managed-application-services
-EDS     : RSM Display | Service / Business applications / Managed application services
+https://publish-p194552-e2014559.adobeaemcloud.com/services/tagsservlet
 ```
 
-**We searched DA and found no crosswalk** — not in `/data`, `/docs/library`, `/config`, or
-the org-level configuration. If RSM wants the feeds to keep emitting legacy tag IDs, that
-table has to be built from scratch. See §9 and **O-1**.
+It is a **public, unauthenticated JSON endpoint** — directly consumable by StreamX, no
+credentials, no export step, no table for anyone to hand-maintain. Each node carries a
+`jcr:title` (the display label) and a `path` (`/content/cq:tags/rsm-sites/content-type/article`),
+which is exactly the tag ID the feeds emit.
 
-### 2.2 The corpus is being deliberately reduced — this corrects v0.2
+Measured against the paired documents:
 
-v0.2 reported the migration as "47% complete" and treated the gap as unfinished work.
-**Reading `redirects.json` shows that is wrong.** Of the 8,741 documents in the Global
-feed:
+| Approach | Feed categories reproduced |
+| --- | --- |
+| Servlet crosswalk alone | 15,812 / 22,444 (**70%**) |
+| Servlet + slug fallback for the uncovered namespaces | 20,257 / 22,444 (**90%**) |
+| **Servlet, restricted to `rsm-sites` — what it actually covers** | **15,812 / 15,821 (99.94%)** |
+
+**Where it is authoritative it is essentially perfect** — 9 failures in 15,821. The gap is
+purely one of scope: the servlet exposes only the `rsm-sites` namespace (6 groups, 269
+nodes). It returns the identical payload regardless of query parameters, so there is no way
+to ask it for more.
+
+Uncovered, and therefore the whole of the remaining problem:
+
+| AEM namespace | EDS groups | Feed categories |
+| --- | --- | --- |
+| `rsm-filters` | Organization · Role · Ownership · Country · World region · Location | 3,975 |
+| `rsm-internal` | Purpose · Editor · Audience · Framework programs · ENG · Industry conversations | 2,586 |
+
+**The ask is now small and specific: extend the servlet to expose `rsm-filters` and
+`rsm-internal`.** That converts the tag problem from a project into a configuration change
+(**O-1**). A slug-derivation fallback gets to 90% in the meantime, and the residue is
+mostly tags dropped during migration (§9.3) rather than mapping failures.
+
+### 2.2 The corpus is being deliberately reduced
+
+Of the 8,741 documents in the Global feed:
 
 | Outcome | Count | Detail |
 | --- | --- | --- |
@@ -93,7 +129,7 @@ feed:
 | **Deliberately retired** | **3,716** (43%) | Redirected to just **194 destinations**; 94% collapse to an ancestor section hub |
 | **No destination at all** | **930** (11%) | 721 `/people` · 153 `/insights` · 36 `/offers` · 20 other |
 
-The retirement is systematic, not accidental — 38 hub pages absorb 3,489 documents:
+The retirement is systematic — 38 hub pages absorb 3,489 documents:
 
 | Redirect destination | Documents absorbed |
 | --- | --- |
@@ -107,30 +143,32 @@ Only 136 redirects are true 1:1 replacements.
 
 **Consequences:**
 
-- The feeds will legitimately shrink from ~8,700 to ~4,100 entries plus new content. That
-  is the plan, not a defect — acceptance criteria must be written against the *migrated*
-  corpus (§13.2), or every test will report a false 50% loss.
-- **The portals must be told.** A consumer doing a full re-sync will see half its
-  catalogue disappear. That is a communications task, not an engineering one.
-- The 930 with no destination are a genuine gap — mostly `/people` profiles. See **O-2**.
+- The feeds will legitimately shrink to roughly half their current entry count. That is the
+  plan, not a defect — completeness must be tested against the *migrated* corpus (§13.2),
+  or every test reports a false 50% loss.
+- **The portals must be told.** A consumer doing a full re-sync will see half its catalogue
+  disappear. That is a communications task, not an engineering one.
+- The 930 with no destination are a genuine gap, mostly `/people` profiles. **O-2**.
 
-### 2.3 Two index defects block feed generation; a third is now solved
+### 2.3 Two index defects, each now traced to one line of config
 
-1. **The `tags` column has no delimiter.** 3,547 of 4,414 tagged rows concatenate their
-   tags into one unsplittable string; **zero** rows use a comma. We confirmed at source
-   that DA stores each tag as a **separate `<p>` element**, and that the sibling
-   `card-tags` column *is* comma-delimited from identical markup — so this is a one-line
-   `helix-query.yaml` fix, not an authoring problem. §7.3, **O-3**.
-2. **`cardImage` points at AEM Cloud.** 3,833 of 3,839 values are absolute URLs on
-   `publish-p194552-e2014559.adobeaemcloud.com`. The DAM genuinely lives in AEMaaCS
-   (confirmed: site config `aem.repositoryId` = `author-p194552-e2014559.adobeaemcloud.com`),
-   so this is not a mistake — but the feeds need public `rsmus.com` asset URLs. **O-4**.
-3. ~~Author display names are absent.~~ **Solved** — `/data/bios.json` resolves 90% of
-   contributor slugs to names, 97% by occurrence. §7.4.
+Both are RSM-side fixes in `query.yaml`, and reading the live config makes each of them a
+one-line change:
+
+1. **`tags` arrives with no delimiter** — 3,547 of 4,414 tagged rows. The config uses
+   `value:` (singular) with a comment stating the expectation that the DA picker emits *one*
+   pipe-delimited string. **It does not** — pages emit N separate
+   `<meta property="article:tag">` elements, which `value:` concatenates with no separator.
+   Switching to `values:` fixes it. §7.3, **O-3**.
+2. **`cardImage` keeps the AEMaaCS host** — 3,833 of 3,839 rows. The sibling `image`
+   property already strips it with `match(attribute(el, "content"), "https:\/\/[^/]+(/.*)")`;
+   `cardImage` uses a bare `attribute()`. Apply the same `match()`. §7.3, **O-4**.
+
+Author display names, flagged as missing in v0.2, are resolved by `/data/bios.json` (§7.4).
 
 ---
 
-## 3. Format requirements
+## 3. Format and output contract
 
 ### 3.1 Formats
 
@@ -140,11 +178,33 @@ Only 136 redirects are true 1:1 replacements.
 | `familyoffice.xml` | **Atom 1.0** (RFC 4287) | MUST remain Atom |
 | `corporatesight.rss` | **RSS 2.0** | MUST remain RSS 2.0 |
 
-Not interchangeable — the portals parse them as-is. Do not harmonise onto one format.
+Not interchangeable — the portals parse them as-is. **Do not harmonise the three onto one
+format**, and do not "modernise" one to match another. The two Atom feeds differ from each
+other in which elements they emit (§6.2), and that asymmetry is part of the contract.
+
 StreamX **MAY** additionally expose JSON Feed 1.1 at a parallel URL; it must not replace
 the XML.
 
-### 3.2 Transport and encoding
+### 3.2 Shape fidelity — what "match the current feed" means
+
+For each feed, the following **MUST** be preserved exactly unless §10 says otherwise and a
+consumer has signed off:
+
+- **Element names and nesting**, including the non-standard ones (`cardtype`, `cardimage`,
+  `cardBgColor`, `cardEyeBrow`) and their current namespace behaviour (§4.2, D-8).
+- **Attribute names and their spelling**, including lowercase run-together forms such as
+  `desktopimage`, `popbackgroundpathdesktop`, `usemessagecontainer` (§4.3).
+- **Value formats** — date/time serialisation, absolute vs root-relative URLs, `type="html"`
+  on Atom `title`/`summary`, `isPermaLink="false"` on RSS `guid`.
+- **Optionality and emptiness behaviour** — where the current feed emits an empty element
+  rather than omitting it, that is observable and must be a deliberate decision, not an
+  accident of a new implementation.
+- **Cardinality**, including the places the current feeds exceed their own spec (up to 15
+  `<author>` elements per RSS item).
+
+A field-level diff harness against the current feeds is the acceptance test (§13).
+
+### 3.3 Transport and encoding
 
 - **MUST** serve `Content-Type: text/xml; charset=utf-8` (matches today).
 - **MUST** be UTF-8.
@@ -152,39 +212,31 @@ the XML.
   - `/feeds/us.xml`
   - `/content/feeds/corporatesight.rss` ← note `/content/` prefix, unlike the other two
   - `/feeds/familyoffice.xml`
-- **SHOULD** support conditional GET (`ETag`, `Last-Modified`) and gzip.
-- **SHOULD** set a `Cache-Control` max-age agreed with RSM (suggest 300–900 s).
+- **MUST** XML-escape all text content.
 
-### 3.3 Size and freshness
+### 3.4 Completeness and ordering
 
-| Feed | Entries today | Size today | Expected post-migration (§2.2) |
-| --- | --- | --- | --- |
-| Global (`us.xml`) | 8,741 | 15.3 MB | ~4,100 + new content |
-| CorporateSight | 1,601 | 1.97 MB | ~800 + new content |
-| FamilySight | 83 | 95 KB | ~29 + new content |
+Entry counts, for reference when testing completeness (§13.2) — not as a size constraint:
 
-- Feeds are **unpaginated and uncapped** today. **MUST** preserve this — a portal doing a
-  full sync silently loses content if a cap appears. Pagination (RFC 5005) **MAY** be
-  added additively; the unpaginated document must remain complete.
-- **SHOULD** regenerate on publish. Lag of up to ~5 minutes is acceptable.
-- **MUST NOT** require a full-corpus rebuild per publish if avoidable.
+| Feed | Entries today | Expected post-migration (§2.2) |
+| --- | --- | --- |
+| Global (`us.xml`) | 8,741 | ~4,100 + new content |
+| CorporateSight | 1,601 | ~800 + new content |
+| FamilySight | 83 | ~29 + new content |
 
-### 3.4 Ordering
+- Feeds are **unpaginated and uncapped** today, and **MUST** remain so — a portal doing a
+  full sync silently loses content if a cap appears. Pagination (RFC 5005) **MAY** be added
+  additively; the unpaginated document must remain complete.
+- **SHOULD** regenerate on publish, consistent with the existing search pipeline. Lag of a
+  few minutes is acceptable; the portals poll, they do not stream.
 
-| Feed | Current order |
-| --- | --- |
-| CorporateSight | **`pubDate` descending** (verified strictly sorted); items without `pubDate` last |
-| Global | Not chronologically sorted |
-| FamilySight | Not chronologically sorted |
+**Ordering:**
 
-CorporateSight **MUST** remain `pubDate` descending. Global and FamilySight **SHOULD**
-become publication-date descending — an improvement on the current arbitrary order, but
-flag it in case a consumer depends on stable ordering.
-
-### 3.5 Escaping
-
-**MUST** XML-escape all text. Preserve `type="html"` on `title` and `summary` in the Atom
-feeds.
+| Feed | Current order | Requirement |
+| --- | --- | --- |
+| CorporateSight | `pubDate` descending (verified strictly sorted); items without `pubDate` last | **MUST** preserve |
+| Global | Not chronologically sorted | SHOULD become date-descending, with sign-off |
+| FamilySight | Not chronologically sorted | SHOULD become date-descending, with sign-off |
 
 ---
 
@@ -239,7 +291,7 @@ Counts out of 8,741 entries.
 
 > `cardtype`, `cardimage`, `cardBgColor` and `cardEyeBrow` are emitted **in the Atom
 > namespace**, because the feed declares Atom as default and these are unprefixed. Invalid
-> Atom — see §10, D-8.
+> Atom, and part of the current contract — see §10, D-8.
 
 ### 4.3 `link[@rel="enclosure"]` variants
 
@@ -256,8 +308,8 @@ Counts out of 8,741 entries.
 
 The `sm-banner` / `md-banner` enclosures carry **16 attributes** describing an AEM 6.5 hero
 component. **The DA authoring model has no corresponding fields** (§8.1) and nothing in the
-index or page metadata maps to them. If the portals need this data it must be authored
-from scratch. See **O-5**.
+index or page metadata maps to them. If the portals need this data it must be authored from
+scratch. **O-5**.
 
 ---
 
@@ -351,7 +403,7 @@ Counts out of 83 entries.
 | `cardimage` | 83 | 1 | Root-relative DAM path |
 
 **Not emitted here** (unlike Global): `cardBgColor`, `cardEyeBrow`, and all
-`link[@rel="enclosure"]` elements.
+`link[@rel="enclosure"]` elements. This asymmetry is part of the contract (§3.2).
 
 ### 6.3 Identifier schemes differ per feed
 
@@ -364,12 +416,12 @@ Counts out of 83 entries.
 Verified: of 1,544 documents in both Global and CorporateSight, **zero** share an ID; of
 8 documents in both CorporateSight and FamilySight, **7** share an identical UUID.
 
-**Identifiers MUST be stable for the lifetime of a document.** Portals deduplicate on
-them; a changed GUID re-surfaces content as new.
+**Identifiers MUST be stable for the lifetime of a document.** Portals deduplicate on them;
+a changed GUID re-surfaces content as new.
 
-`jcr:uuid` does not exist in EDS or DA — we confirmed neither the index nor the DA
-authoring model carries a UUID field. A deterministic replacement is required, e.g. UUIDv5
-over the document path with a fixed namespace. See **O-6**.
+`jcr:uuid` does not exist in EDS or DA — neither the index nor the DA authoring model
+carries a UUID field. A deterministic replacement is required, e.g. UUIDv5 over the
+document path with a fixed namespace. **O-6**.
 
 ### 6.4 Feed membership / selection rules
 
@@ -382,8 +434,9 @@ over the document path with a fixed namespace. See **O-6**.
 **FamilySight — verified end to end.** All 83 entries carry
 `rsm-sites/service/family-office-services`, the only tag common to all. In EDS, exactly
 **29** documents carry `RSM Display | Service / Family office services`, and those are
-**exactly** the 29 FamilySight documents that migrated — a clean 1:1. The rule translates
-without loss, making FamilySight the right pilot (§13).
+**exactly** the 29 FamilySight documents that migrated — a clean 1:1. The tag is also in the
+`rsm-sites` namespace, so the servlet crosswalk resolves it authoritatively (§9). This
+makes FamilySight the right pilot (§13.3).
 
 **Global** spans `/insights` 5,930 · `/people` 1,229 · `/events` 481 · `/services` 328 ·
 `/newsroom` 262 · `/technologies` 208 · `/about` 66 · `/careers` 56 · `/industries` 42 ·
@@ -406,44 +459,43 @@ A signature, not a rule — no tag is on 100% of items. Most likely an AEM query
 OR-set of tags, or a curated list.
 
 > ⚠️ **Compounded by §2.2.** CorporateSight's largest single redirect destination is
-> `/insights/tax-alerts`, which absorbed **946 retired documents** — and tax alerts are
-> 49% of the feed. A large fraction of CorporateSight's catalogue has been retired
-> outright. Separately, the `rsm-filters/organization/*` and `rsm-filters/ownership/*`
-> tags that most distinguish it are among the most frequently dropped in migration
-> (§9.2). Even with the authoritative rule in hand it may not be *executable* against EDS
-> content. See **O-7**.
+> `/insights/tax-alerts`, which absorbed **946 retired documents** — and tax alerts are 49%
+> of the feed. A large fraction of its catalogue has been retired outright. Separately,
+> three of the six tags that most distinguish it sit in `rsm-filters` / `rsm-internal`,
+> which the servlet does not yet cover (§2.1). **O-7**.
 
 Additional verified facts:
 
-- 55 of 1,601 CorporateSight items and 5 of 83 FamilySight entries are **not** in the
-  Global feed — Global is **not** a strict superset.
+- 55 of 1,601 CorporateSight items and 5 of 83 FamilySight entries are **not** in the Global
+  feed — Global is **not** a strict superset.
 - CorporateSight spans 2011–2026. There is **no date-window filter**; do not add one.
 
 ---
 
-## 7. What EDS and DA actually provide
+## 7. What EDS and DA provide
 
 ### 7.1 The EDS index
 
-`https://main--rsm-us--rsm-it-cmg.aem.page/en/query-index.json` — 4,459 rows, 18 columns,
-5.1 MB, complete in one request (`total` = `limit` = 4,459).
+`https://main--rsm-us--rsm-it-cmg.aem.page/en/query-index.json` — 4,459 rows, 18 columns.
+Built by the `rsmus-en` index in `query.yaml`, which includes `/**` and excludes
+`/drafts/**`, `/docs/**`, `/private/**`, `/fragments/**`.
 
-> The index is served under `/en/` but its `path` values are **not** `/en/`-prefixed —
-> they are site-root paths (`/insights/…`), and pages resolve there. `/en/…` returns 404.
+> The index is served under `/en/` but its `path` values are **not** `/en/`-prefixed — they
+> are site-root paths (`/insights/…`), and pages resolve there. `/en/…` returns 404.
 
 | Column | Non-empty | DA metadata field | Notes |
 | --- | --- | --- | --- |
 | `path` | 4,459 (100%) | — | Site-root, extensionless |
-| `title` | 4,459 (100%) | `Title` | |
+| `title` | 4,459 (100%) | `Title` | via `og:title` |
 | `tags` | 4,414 (99%) | `Tags` | ⚠️ **no delimiter** — §7.3 |
 | `description` | 4,313 (97%) | `Description` | |
 | `cardLabel` | 3,941 (88%) | `Card Label` | `Read more` 2,856 · `Learn more` 865 · `Watch` 167 · `Register` 51 |
-| `cardImage` | 3,839 (86%) | `Card Image` | ⚠️ AEM Cloud host — §7.3 |
-| `image` | 3,644 (82%) | `Image` | Root-relative. **Social rendition, not card** |
+| `cardImage` | 3,839 (86%) | `Card Image` | ⚠️ AEMaaCS host — §7.3 |
+| `image` | 3,644 (82%) | `Image` | Root-relative (host stripped in config). **Social rendition, not card** |
 | `card-resource` | 3,507 (79%) | `Card Resource` | Content-type tag — the eyebrow source |
 | `date` | 2,994 (67%) | `Date` | ISO `YYYY-MM-DD`. 1 malformed (`2024-01`) |
 | `page-title` | 2,965 (66%) | `Page Title` | |
-| `card-tags` | 2,965 (66%) | `Card Tags` | ✅ correctly comma-delimited |
+| `card-tags` | 2,965 (66%) | `Card Tags` | Comma-delimited in most rows |
 | `cardTitle` | 2,520 (57%) | `Card Title` | |
 | `contributor` | 1,815 (41%) | `Contributor` | Comma-separated **slugs** |
 | `navigation-title` | 1,101 (25%) | `Navigation Title` | |
@@ -460,57 +512,72 @@ Additional verified facts:
 | `id` / `guid` | No UUID anywhere. Must be synthesised (§6.3) |
 | `cardtype` (`featuredCard` etc.) | No equivalent. Constant `featuredCard` covers 98% of current values |
 | `sm-banner` / `md-banner` + 16 attributes | **No equivalent in the index, the page, or the DA authoring model** |
-| AEM tag IDs | Only display labels (§9) |
 
-### 7.3 Index defects — and where they actually originate
+### 7.3 Index defects, with root cause
 
-**Defect E-1 — `tags` has no delimiter. Confirmed index-side.** 3,547 of 4,414 tagged rows
-concatenate tags with no separator:
+**Defect E-1 — `tags` has no delimiter.** 3,547 of 4,414 tagged rows concatenate tags with
+no separator:
 
 ```
 RSM Display | Service / Business taxRSM Display | Service / Managed servicesRSM Display | …
 ```
 
-We traced this to source. In the DA document the tags are stored as **separate `<p>`
-elements**, correctly:
+The live config explains why:
 
-```html
-<p>RSM Display | Service / Business tax</p>
-<p>RSM Display | Service / Managed services</p>
-<p>RSM Display | Service / Risk consulting</p>
+```yaml
+      # CHANGED: single pipe-delimited tag string from the DA picker plugin.
+      # One meta -> one string. Split on "|" in your cardlist block JS.
+      tags:
+        select: head > meta[property="article:tag"]
+        value: |
+          attribute(el, "content")
 ```
 
-The page renders them as separate `<meta property="article:tag">` elements, also
-correctly. And the `Card Tags` field — **identical markup in the same document** — comes
-out of the index properly comma-delimited. So this is a per-field `helix-query.yaml`
-misconfiguration (`value:` where `values:` is needed), fixable in one line, with no
-authoring change.
+The comment records an assumption — one `<meta>` holding one pipe-delimited string — that
+**the rendered pages do not satisfy.** They emit N separate `<meta property="article:tag">`
+elements, one per tag, and `value:` (singular) against a multi-match selector concatenates
+them without a separator.
+
+The assumption is also self-defeating: the labels themselves contain a pipe
+(`RSM Display | Service / Business tax`), so "split on `|`" would split *inside* every tag.
+
+**Fix:** `values:` instead of `value:`. Source data and page markup are already correct — DA
+stores each tag as its own `<p>`, and the page renders each as its own `<meta>`.
 
 Splitting on the literal `RSM Display | ` currently works but is fragile — 2 rows already
 use variant prefixes (`RSM Display :`, `RSM|Display`) that break it. **StreamX MUST NOT be
-asked to rely on that.** Fix the index. **O-3**.
+asked to rely on that.** **O-3**.
 
-**Defect E-2 — `cardImage` uses the AEM Cloud host.** 3,833 of 3,839 values are absolute
-URLs on `publish-p194552-e2014559.adobeaemcloud.com`; 4 are on `rsmus.com`, 1 is
-root-relative. The DAM genuinely lives in AEMaaCS — the DA site config records
-`aem.repositoryId` = `author-p194552-e2014559.adobeaemcloud.com` — so this is architecture,
-not error. But feeds need public `rsmus.com` asset URLs. Host rewriting can happen at feed
-generation, but RSM must confirm the public asset host at cutover. **O-4**.
+**Defect E-2 — `cardImage` keeps the AEMaaCS host.** 3,833 of 3,839 values are absolute URLs
+on `publish-p194552-e2014559.adobeaemcloud.com`. The config shows the inconsistency
+directly — `image` strips the host, `cardImage` does not:
 
-**Defect E-3 — taxonomy hygiene.** 428 distinct tags. 1 row uses `RSM Display :` instead of
-`|`, 1 uses `RSM|Display`, one value is a mangled concatenation of three tags. Group names
-are inconsistent (`Service` vs `Services`, a stray `Type`). One `date` is `2024-01` rather
-than ISO.
+```yaml
+      image:
+        select: head > meta[property="og:image"]
+        value: |
+          match(attribute(el, "content"), "https:\/\/[^/]+(/.*)")     # host stripped
+      cardImage:
+        select: head > meta[name="card-image"]
+        value: |
+          attribute(el, "content")                                    # host kept
+```
 
-### 7.4 Author names — solved by `/data/bios.json`
+The DAM genuinely lives in AEMaaCS (DA site config records `aem.repositoryId` =
+`author-p194552-e2014559.adobeaemcloud.com`), so the asset host is real — but the feeds need
+public `rsmus.com` URLs. Applying the same `match()` to `cardImage` makes it consistent with
+`image` and with what the Atom feeds expect (root-relative). **O-4**.
+
+**Defect E-3 — taxonomy hygiene.** 428 distinct labels in use against 269 servlet nodes.
+1 row uses `RSM Display :` instead of `|`, 1 uses `RSM|Display`, one value is a mangled
+concatenation of three tags. Group names are inconsistent (`Service` vs `Services`, a stray
+`Type`). One `date` is `2024-01` rather than ISO.
+
+### 7.4 Author names — `/data/bios.json`
 
 DA holds a **1,413-row bios sheet** at `/data/bios.json`, keyed on `Unique ID`, which is
-exactly the contributor slug used in page metadata. Columns: `Unique ID`, `First Name`,
-`Last Name`, `Job Title`, `Secondary Job Title`, `Image`, `Short Description`, `Areas of
-Focus Tags`, `Country`, `Company`, `Department`, `Phone Number`, `Social Media Links`,
-`Bio Page Path`.
-
-Measured against the 733 distinct contributor slugs in the index:
+exactly the contributor slug used in page metadata. Columns include `First Name`,
+`Last Name`, `Job Title`, `Bio Page Path`.
 
 | Metric | Result |
 | --- | --- |
@@ -521,11 +588,10 @@ Measured against the 733 distinct contributor slugs in the index:
 | Those bio paths that exist in the EDS index | **264 / 270** |
 
 The 12% name mismatches are almost entirely **double-space artifacts in the AEM feed**
-(`Casey  Chapman` vs `Casey Chapman`) — the bios value is the cleaner one. For comparison,
-the `/people`-page method described in v0.2 resolved only 253/733 (35%).
+(`Casey  Chapman` vs `Casey Chapman`) — the bios value is the cleaner one.
 
 **`bios.json` is the source for `contributor/name` and `author`.** Bio links remain
-partially unresolved at 37% — see **O-8**.
+partially unresolved at 37% — **O-8**.
 
 ---
 
@@ -534,10 +600,9 @@ partially unresolved at 37% — see **O-8**.
 Measured across the **4,095 documents present in both the Global feed and the EDS index**.
 "Accuracy" = the proportion where the EDS value exactly reproduces the current feed value.
 
-### 8.1 The authoritative DA authoring model
+### 8.1 The DA authoring model
 
-Every syndicatable page carries a `metadata` block with these 21 fields. This is where
-everything ultimately comes from:
+Every syndicatable page carries a `metadata` block with these 21 fields:
 
 ```
 Page Title · Navigation Title · Title · Subtitle · Date · Contributor · Description
@@ -546,29 +611,38 @@ Card Resource · Social Share · Robots · Canonical URL · Authoring Comment
 On-Off Time · Color
 ```
 
-Note what is **absent**: no card-type field, no hero/banner fields, no UUID, no
-modification timestamp. `Robots` and `Canonical URL` exist and may bear on feed inclusion
-(**O-9**); `On-Off Time` is an embargo/expiry field that is currently unused but which
-feeds **SHOULD** respect if it starts being populated.
+Note what is **absent**: no card-type field, no hero/banner fields, no UUID, no modification
+timestamp. `Robots` and `Canonical URL` may bear on feed inclusion (**O-9**); `On-Off Time`
+is an embargo/expiry field, currently unused, which feeds **SHOULD** respect if populated.
 
 ### 8.2 Atom feeds (Global, FamilySight)
 
 | Feed element | Source | Coverage | Accuracy | Verdict |
 | --- | --- | --- | --- | --- |
 | `entry/title` | index `title` | 100% | **90%** | ✅ Use `title`. Not `page-title` (24%) or `cardTitle` (17%) |
-| `entry/link/@href` | index `path` | 100% | — | ✅ Prefix with canonical host; see §8.4 |
+| `entry/link/@href` | index `path` | 100% | — | ✅ Prefix with canonical host; §8.4 |
 | `entry/summary` | index `description` | 97% | **77%** | ✅ Best available. 23% differ — post-migration edits |
-| `entry/category/@term` | index `tags` | 99% | **83%** | ⚠️ Needs a crosswalk — §9 |
+| `entry/category/@term` | index `tags` + **tagsservlet** | 99% | **70% / 99.94% on `rsm-sites`** | ⚠️ §9 |
 | `entry/published` | index `date` | 67% | **98%** | ✅ Reliable where present |
 | `entry/updated` | — | — | — | ❌ Derive from HTTP `Last-Modified` |
 | `entry/id` | — | — | — | ❌ Must be synthesised (§6.3) |
 | `entry/contributor/name` | **`bios.json`** via index `contributor` | **97%** by occurrence | **88%** | ✅ §7.4 |
 | `entry/contributor/link` | `bios.json` → `Bio Page Path` | **37%** | — | ⚠️ **O-8** |
-| `entry/cardimage` | index `cardImage` | 86% | **100%** | ✅ DAM path identical in 3,524/3,530. Rewrite host |
+| `entry/cardimage` | index `cardImage` | 86% | **100%** | ✅ DAM path identical in 3,524/3,530. Strip host (E-2) |
 | `entry/cardBgColor` | index `color` | 23% | **100%** | ✅ `blue`→`rsmBlue`, `green`→`rsmGreen`, `gray`→`rsmGray`, absent→`noColor` |
 | `entry/cardEyeBrow` | index `card-resource` | 79% | **79%** | ⚠️ Only 6% of feed entries have one today |
 | `entry/cardtype` | — | — | — | ❌ No source. Constant `featuredCard` covers 98% |
-| `sm-banner` / `md-banner` | — | — | — | ❌ **No source anywhere. See O-5** |
+| `sm-banner` / `md-banner` | — | — | — | ❌ **No source anywhere. O-5** |
+
+**On `card-resource` as the eyebrow source**, the config carries a useful note:
+
+```yaml
+      # Content-type eyebrow printed on the card ("ARTICLE" / "CASE STUDY").
+      # Legacy reads cardResource directly; deriving it from cq:tags diverges on
+      # 325 pages and is the ONLY content-type signal on 163 of them.
+```
+
+So `card-resource` is authoritative and **MUST NOT** be re-derived from the tag list.
 
 **On `published` / `date`.** Of 2,746 paired documents where both are present, 2,691 (98%)
 agree exactly. All 55 disagreements are **off-by-one-day**, caused by the AEM feed emitting
@@ -576,8 +650,7 @@ spurious timezone offsets (`+05:30`, `+07:00`) against a midnight timestamp. EDS
 the more trustworthy value.
 
 Coverage is perfectly correlated: **zero** documents have a feed `published` but no index
-`date`, and **zero** the reverse. The migration carried dates faithfully; the ~33% with no
-date never had one. Pre-existing gap — close at source (**O-10**).
+`date`, and **zero** the reverse. The ~33% with no date never had one. **O-10**.
 
 ### 8.3 RSS feed (CorporateSight)
 
@@ -589,8 +662,8 @@ date never had one. Pre-existing gap — close at source (**O-10**).
 | `item/guid` | — | Synthesise; `isPermaLink="false"` (§6.3) |
 | `item/pubDate` | index `date` | Convert ISO → RFC 822 |
 | `item/author` | `bios.json` via `contributor` | Flat display names (§7.4) |
-| `item/category` | index `tags` | Crosswalk required (§9) |
-| `item/enclosure/@url` | index `cardImage` | **Absolute** URL; rewrite host (E-2) |
+| `item/category` | index `tags` + tagsservlet | §9 |
+| `item/enclosure/@url` | index `cardImage` | **Absolute** URL — note this differs from Atom |
 
 ### 8.4 URL mapping — `.html` is not handled anywhere
 
@@ -602,81 +675,82 @@ AEM 6.5 : https://rsmus.com/insights/…/compensation-…-productivity.html
 EDS     : https://eds-prd.rsmus.com/insights/…/compensation-…-productivity
 ```
 
-DA's `redirects.json` holds **4,788 redirects — and not one of them handles `.html`.**
-Every `Source` and every `Destination` is already extensionless. The map exists to
-consolidate retired content (§2.2), not to preserve legacy URL form.
+DA's `redirects.json` holds **4,788 redirects — and not one handles `.html`.** Every
+`Source` and `Destination` is already extensionless. The map exists to consolidate retired
+content (§2.2), not to preserve legacy URL form.
 
-So **`.html` URL preservation is currently unaddressed**. Unless RSM adds a rewrite rule,
-every stored link in every consuming portal breaks at cutover. The feed **MUST** emit
-whatever the canonical public URL is at cutover, but RSM must decide what that is. **O-11**.
+So **`.html` preservation is currently unaddressed**. Unless RSM adds a rewrite rule, every
+stored link in every consuming portal breaks at cutover. **O-11**.
 
 ---
 
-## 9. The tag crosswalk
+## 9. Tags — using the crosswalk
 
-The single largest piece of work, and the one most likely to be underestimated.
+### 9.1 How the mapping works
 
-### 9.1 The two taxonomies
+`tagsservlet` returns a tree of nodes, each with a `jcr:title` and a `path`. Concatenating
+the titles down the tree gives exactly the EDS label (minus its constant `RSM Display | `
+prefix); the `path` gives the tag ID the feeds emit:
 
-| | AEM 6.5 (what the feeds emit) | EDS (what exists now) |
+| EDS label (index `tags`) | Servlet node path | Feed `<category>` |
 | --- | --- | --- |
-| Form | Tag ID | Display label |
-| Example | `rsm-sites/content-type/article` | `RSM Display \| Content type / Article` |
-| Namespaces | 3 (`rsm-sites`, `rsm-filters`, `rsm-internal`) | 1, flattened |
-| Distinct values | — | 428 |
+| `RSM Display \| Content type / Article` | `/content/cq:tags/rsm-sites/content-type/article` | `rsm-sites/content-type/article` |
+| `RSM Display \| Service / Family office services` | `/content/cq:tags/rsm-sites/service/family-office-services` | `rsm-sites/service/family-office-services` |
+| `RSM Display \| Site / US` | `/content/cq:tags/rsm-sites/site/us` | `rsm-sites/site/us` |
 
-The namespace→group correspondence is clean and one-to-one, derived empirically from the
-paired documents:
+Note that `RSM Display` is a **constant prefix**, not a namespace marker — labels from all
+three AEM namespaces carry it, so the namespace is not recoverable from the label alone.
+That is precisely what the servlet supplies.
 
-| AEM namespace | EDS groups |
+Implementation is a single lookup table built at startup and refreshed periodically; the
+payload is 36 KB.
+
+### 9.2 Coverage — measured
+
+| Scope | Result |
 | --- | --- |
-| `rsm-sites` | Service · Content type · Topic · Industry · Technology · Site |
-| `rsm-filters` | Organization · Role · Ownership · World region · Country · Location |
-| `rsm-internal` | Purpose · Editor · Audience · Framework programs · ENG |
+| Servlet nodes | 269, `rsm-sites` only (6 groups: Site, Content type, Service, Industry, Technology, Topic) |
+| Distinct EDS labels resolved | 255 / 428 |
+| EDS tag occurrences resolved | 17,378 / 24,326 (71%) |
+| **Feed categories reproduced — `rsm-sites`** | **15,812 / 15,821 (99.94%)** |
+| Feed categories reproduced — overall | 15,812 / 22,444 (70%) |
+| Overall with slug-derivation fallback | 20,257 / 22,444 (90%) |
 
-**Because the namespace is not recoverable from a display label alone, a group→namespace
-lookup is mandatory** to emit `rsm-sites/…` vs `rsm-filters/…` vs `rsm-internal/…`.
+The servlet ignores query parameters (`?namespace=`, `?path=`, `?root=` all return the
+identical 36 KB `rsm-sites` payload), so the other namespaces cannot be requested today.
 
-### 9.2 What mechanical transformation achieves, and where it fails
+### 9.3 What remains, and what to ask for
 
-Naive normalisation (strip the prefix, lowercase, hyphenate, map group → namespace)
-reproduces **18,679 of 22,444 category values (83%)**. The 3,765 failures:
+Uncovered by the servlet:
 
-| Cause | Count | Example |
+| AEM namespace | EDS groups | Feed categories |
 | --- | --- | --- |
-| **Tag absent from the migrated document** | ~2,900 | `rsm-filters/organization/s-corp-us` (540), `rsm-filters/ownership/public` (179), `rsm-internal/audience/client-prospect` (145) |
-| **Hierarchy restructured** | ~280 | `rsm-sites/service/managed-technology-services/managed-application-services` → `RSM Display \| Service / Business applications / Managed application services` |
-| **Moved to a different group** | 283 | `rsm-filters/country/us` → `RSM Display \| Site / US` |
-| **Vocabulary renamed** | — | `webcast-recorded` → `Recorded webinar`; `webcast-on-demand` → `On-demand webinar`; `service` → `RSM Service`; `rsm-stories` → `Stories` |
-| **Legacy junk, correctly dropped** | ~55 | `default/corporate_tax_services`, `primary/tag5`, `resource-type/article` |
+| `rsm-filters` | Organization · Role · Ownership · Country · World region · Location | 3,975 |
+| `rsm-internal` | Purpose · Editor · Audience · Framework programs · ENG · Industry conversations | 2,586 |
 
-The first row is the important one: **most failures are missing data, not mapping
-difficulty.** No crosswalk fixes a tag that was never applied.
+**Recommendation, in priority order:**
 
-### 9.3 No crosswalk exists — it has to be built
+1. **Ask RSM to extend `tagsservlet` to expose `rsm-filters` and `rsm-internal`** (**O-1**).
+   This is the whole fix. It is a scope change to an endpoint that already exists, already
+   holds the taxonomy, and is already public.
+2. **Until then, fall back to slug derivation** for those two namespaces — lowercase the
+   label, hyphenate, prefix the namespace implied by the group. That reaches 90% overall.
+3. **Accept the residue.** After both, ~10% remains unreproduced: 1,110 `rsm-internal` +
+   1,006 `rsm-filters` occurrences that are **absent from the migrated document entirely**
+   — tags dropped during migration, not mapping failures — plus 62 legacy junk values
+   (`default/corporate_tax_services`, `primary/tag5`, `resource-type/article`) that are
+   correctly gone.
 
-We searched DA for one: `/data` (holds only `bios.json`, `marketo-config.json`,
-`search-terms.json`), `/docs/library` (icons only), `/config` and `/metadata` (empty), and
-the org- and site-level configuration. **There is no tag mapping table anywhere.**
-
-Three viable strategies. This is a **consumer-facing decision**:
-
-| Option | What it means | Cost |
-| --- | --- | --- |
-| **A. Crosswalk to legacy IDs** | Build and maintain a 428-row label→ID table; feeds keep emitting `rsm-sites/…` | Highest fidelity, zero portal change. Someone owns the table forever |
-| **B. Emit the new labels** | Feeds emit `RSM Display \| Content type / Article` | Cheapest; **breaks every portal's category logic** |
-| **C. Hybrid** | Crosswalk only the groups portals actually filter on; drop the rest | Needs to know what portals use — **O-12** |
-
-We recommend **A**, with the table owned by RSM (not StreamX) and supplied as a versioned
-data file — but answer **O-12** first. If the portals only filter on content-type and
-service, option C is dramatically cheaper.
+No crosswalk fixes a tag that was never applied. If the portals depend on
+`rsm-filters/organization/*` for filtering, that is a **content** problem (§2.2, **O-2**),
+not a mapping one.
 
 ---
 
 ## 10. Defects in the current feeds
 
-Default is **preserve bug-for-bug** unless the consuming portal team signs off — these
-feeds have live consumers that may parse defensively around them.
+Default is **preserve bug-for-bug** unless the consuming portal team signs off — these feeds
+have live consumers that may parse defensively around them (§3.2).
 
 | # | Defect | Feeds | Spec violated | Recommendation |
 | --- | --- | --- | --- | --- |
@@ -701,21 +775,29 @@ it fixed versus preserved.
 
 ## 11. Recommended architecture
 
-**Build the feeds from a published EDS index, not by crawling documents or rendered HTML.**
-StreamX does not need DA write access, and needs DA read access only for `bios.json`.
+**Build the feeds from a published EDS index.** StreamX needs no DA write access, and DA
+read access only for `bios.json`.
 
-Rationale: index rows are already one-per-document and normalised; it avoids fetching
-thousands of HTML pages per rebuild; feed and site data cannot drift; and it sidesteps the
-authentication problem the search connector already hit (documented in the `arbory-dev`
-POC — unauthenticated origins were required because the connector cannot present a token).
+The two external inputs are both already available to StreamX without credentials or export
+steps:
 
-**`/en/query-index.json` as it stands is not sufficient.** It lacks `updated`, a stable ID
-and `cardtype`; its `tags` column is unusable (E-1); its `cardImage` host needs rewriting
+| Input | Access |
+| --- | --- |
+| `tagsservlet` — label → tag ID (§9) | Public, unauthenticated, 36 KB |
+| `bios.json` — slug → author name (§7.4) | DA read, 747 KB, changes rarely |
+
+Both should be cached and refreshed periodically rather than fetched per document.
+
+**The current `rsmus-en` index is not sufficient** — it lacks `updated`, a stable ID and
+`cardtype`; its `tags` column is unusable (E-1); its `cardImage` keeps the AEMaaCS host
 (E-2).
 
-**Recommendation: define dedicated feed indices in `helix-query.yaml`** — one per feed, or
-one shared. This keeps feed membership (§6.4) an `include`/`exclude` concern and keeps
-feed-only fields out of the site index.
+**Recommendation: add dedicated feed indices to `query.yaml`** rather than changing
+`rsmus-en`, which the site itself depends on. This keeps feed membership (§6.4) an
+`include`/`exclude` concern and avoids destabilising the live site index. The two defect
+fixes should still be made in `rsmus-en` for the site's own benefit.
+
+Deltas from the current `rsmus-en` config:
 
 ```yaml
 indices:
@@ -728,73 +810,62 @@ indices:
       - /technologies/**
       - /people/**
       # …see §6.4 for the full section list
+    exclude:
+      - /drafts/**
+      - /docs/**
+      - /private/**
+      - /fragments/**
     target: /feeds/global-index.json
     properties:
-      title:
-        select: head > meta[property="og:title"]
-        value: attribute(el, "content")
-      description:
-        select: head > meta[name="description"]
-        value: attribute(el, "content")
-      # FIX E-1: `values:` emits a properly delimited multi-value field.
-      # The source markup is already correct - see §7.3.
+      # FIX E-1: `values:` (plural). Pages already emit one <meta> per tag;
+      # `value:` concatenates them with no separator.
       tags:
         select: head > meta[property="article:tag"]
-        values: attribute(el, "content")
-      publicationDate:
-        select: head > meta[name="date"]
-        value: dateValue(attribute(el, 'content'), 'YYYY-MM-DD')
-      # MISSING TODAY: needed for <updated>
-      lastModified:
-        select: none
-        value: parseTimestamp(headers['last-modified'], 'ddd, DD MMM YYYY hh:mm:ss GMT')
-      contributor:
-        select: head > meta[name="contributor"]
-        value: attribute(el, "content")
-      # FIX E-2: strip the AEM Cloud host, keep the DAM path
+        values: |
+          attribute(el, "content")
+
+      # FIX E-2: same host-stripping `image` already uses.
       cardImage:
         select: head > meta[name="card-image"]
-        value: match(attribute(el, "content"), "https?:\/\/[^/]+(/.*)")
-      cardResource:
-        select: head > meta[name="card-resource"]
-        value: attribute(el, "content")
+        value: |
+          match(attribute(el, "content"), "https:\/\/[^/]+(/.*)")
+
+      # NEW: required for Atom <updated>; no DA field carries it.
+      lastModified:
+        select: none
+        value: |
+          parseTimestamp(headers['last-modified'], 'ddd, DD MMM YYYY hh:mm:ss GMT')
+
+      # …remaining properties as per the current rsmus-en index
 ```
 
-Author names come from **`/data/bios.json`** (§7.4), joined on the `contributor` slug.
-StreamX **SHOULD** cache it and refresh on change; it is 747 KB and changes rarely. No
-separate people index is needed.
-
-This is a sketch, not a specification. StreamX **MAY** propose a different source — e.g.
-consuming the published-page events it already receives and maintaining its own
-materialised feed store — if that fits its architecture better. We care about the output
-contract.
+StreamX **MAY** propose a different source — e.g. consuming the published-page events it
+already receives and maintaining its own materialised feed store — if that fits its
+architecture better. We care about the output contract (§3.2), not the pipeline.
 
 **Constraints:** a feed **MUST NOT** contain an unpublished document, and an unpublish
 **MUST** remove it from all feeds — mirroring `unpublish-from-streamx.yaml`. Feeds
-**SHOULD** honour `On-Off Time` and `Robots` if those fields become populated (**O-9**).
+**SHOULD** honour `On-Off Time` and `Robots` if those become populated (**O-9**).
 
 ---
 
 ## 12. Open questions for RSM
 
-Ordered by how much they block.
-
 | # | Question | Blocks |
 | --- | --- | --- |
-| **O-1** | Tag strategy: crosswalk to legacy IDs (A), emit new labels (B), or hybrid (C)? No crosswalk exists — who builds and owns it? | §9 — all three feeds |
-| **O-2** | Content reduction (§2.2) — is the 3,716-document retirement final, and have the portals been told they will lose ~half their catalogue? What is the plan for the 930 with no destination (721 of them `/people`)? | All three feeds |
-| **O-3** | Will the `tags` delimiter defect (E-1) be fixed in `helix-query.yaml`? One-line change; source data is already correct | All three feeds |
-| **O-4** | What is the public asset host at cutover? `cardImage` currently resolves to AEMaaCS | Image fields |
+| **O-1** | Extend `tagsservlet` to expose `rsm-filters` and `rsm-internal`? Covers the remaining 30% of feed categories (§9.3) | Category fidelity, all three feeds |
+| **O-2** | Content reduction (§2.2) — is the 3,716-document retirement final, and have the portals been told they will lose ~half their catalogue? What about the 930 with no destination (721 `/people`)? | All three feeds |
+| **O-3** | Fix E-1 — `values:` instead of `value:` for `tags` in `query.yaml` | All three feeds |
+| **O-4** | Fix E-2 — apply `image`'s host-stripping `match()` to `cardImage`. And what is the public asset host at cutover? | Image fields |
 | **O-5** | Do myRSM/PartnerSight consume `sm-banner`/`md-banner`? **No source data exists in EDS or DA** — if needed, it must be authored from scratch | Global feed |
 | **O-6** | GUID strategy: preserve AEM `jcr:uuid` via a migration map, or mint deterministic IDs and accept a one-off portal re-sync? | All three feeds |
-| **O-7** | Authoritative CorporateSight selection rule — please export the AEM 6.5 feed/query config. Note both its filter tags and much of its catalogue are affected by §2.2 / §9.2 | CorporateSight |
+| **O-7** | Authoritative CorporateSight selection rule — please export the AEM 6.5 feed/query config | CorporateSight |
 | **O-8** | Bio links resolve for only 37% of contributors. Backfill `Bio Page Path` in `bios.json`, or omit `contributor/link` where unknown? | `contributor/link` |
-| **O-9** | Should feeds honour `Robots`, `Canonical URL` and `On-Off Time` from the DA metadata block? All three exist; `On-Off Time` is currently unused | Feed inclusion logic |
+| **O-9** | Should feeds honour `Robots`, `Canonical URL` and `On-Off Time` from the DA metadata block? | Feed inclusion logic |
 | **O-10** | Will the ~33% of documents with no publication date be backfilled? | Ordering, `published`/`pubDate` |
-| **O-11** | Will public URLs keep `.html`? **`redirects.json` does not handle it** — 4,788 redirects, all extensionless→extensionless. And will the host be `rsmus.com` or `eds-prd.rsmus.com`? | All three feeds |
-| **O-12** | Which tag groups do the portals actually filter on? Determines whether O-1 option C is viable | §9 scope |
-| **O-13** | Additional feeds — the org also hosts `rsm-ca` (Canada). Is a Canadian feed wanted? | Scope |
-| **O-14** | Who signs off on the §10 defect fixes for each portal? | Cutover |
+| **O-11** | Will public URLs keep `.html`? **`redirects.json` does not handle it.** And will the host be `rsmus.com` or `eds-prd.rsmus.com`? | All three feeds |
+| **O-12** | Is a Canadian feed wanted from `rsm-ca`? All current feeds are US-only | Scope |
+| **O-13** | Who signs off on the §10 defect fixes for each portal? | Cutover |
 
 ---
 
@@ -802,27 +873,26 @@ Ordered by how much they block.
 
 ### 13.1 A feed is accepted when
 
-1. **Well-formed and valid.** Parses as XML; validates as Atom 1.0 / RSS 2.0 modulo the
-   §10 items explicitly agreed as "preserve".
-2. **Complete against the migrated corpus** — see §13.2.
-3. **Field-faithful.** For a 50-document stratified sample, every field in §4–§6 matches
-   the AEM 6.5 output except where §10 or an open question says otherwise. The comparison
-   harness used to produce §8 can be reused.
+1. **Shape-faithful.** For a 50-document stratified sample, every element, attribute and
+   value format in §4–§6 matches the current feed, except where §10 or an open question says
+   otherwise. This is the primary test (§3.2).
+2. **Well-formed and valid.** Parses as XML; validates as Atom 1.0 / RSS 2.0 modulo the §10
+   items explicitly agreed as "preserve".
+3. **Complete against the migrated corpus** — §13.2.
 4. **Correctly scoped.** Membership matches §6.4 / O-7.
 5. **Stable identifiers.** Two consecutive generations with no content change produce
    identical GUIDs. Editing a document does not change its GUID.
 6. **Correctly ordered.** CorporateSight strictly `pubDate` descending.
 7. **Responsive.** A publish appears within the agreed window; an unpublish removes the
    document from every feed.
-8. **Performant.** Global feed served in full, gzipped, within an agreed TTFB budget.
-9. **Portal-verified.** Each consuming portal confirms successful ingestion from a staging
-   URL before cutover.
+8. **Portal-verified.** Each consuming portal confirms successful ingestion from a staging
+   URL before cutover. This is the test that matters most.
 
 ### 13.2 Completeness must be measured against the migrated corpus
 
-Because of §2.2, a naive "does the new feed contain everything the old feed did?" test will
-report ~50% loss and be useless. Test instead that **every document in the current feed is
-in exactly one of these buckets**, and that the buckets are the expected size:
+Because of §2.2, a naive "does the new feed contain everything the old feed did?" test
+reports ~50% loss and is useless. Test instead that **every document in the current feed
+falls into exactly one bucket**, and that the buckets are the expected size:
 
 | Bucket | Expected | Test |
 | --- | --- | --- |
@@ -830,30 +900,40 @@ in exactly one of these buckets**, and that the buckets are the expected size:
 | Deliberately retired | ~3,716 | Absent from the feed; present in `redirects.json` with a live destination |
 | No destination | ~930 | Absent from both — **flagged for RSM review, not silently dropped** |
 
-Every document must fall into one bucket. Anything that does not is a real defect.
+Anything falling into no bucket is a real defect.
 
 ### 13.3 Suggested delivery sequence
 
 | Phase | Content |
 | --- | --- |
-| 0 | RSM resolves O-1 … O-4. Index defect E-1 fixed; crosswalk strategy chosen; asset host confirmed |
-| 1 | RSM resolves O-5 … O-11. Feed indices defined in `helix-query.yaml` (§11) |
-| 2 | **FamilySight first** — 83 entries, simplest schema, and its selection rule is the only one **verified to survive migration** (§6.4). Proves the pipeline end to end |
+| 0 | RSM resolves O-1 … O-4: servlet extended, E-1/E-2 fixed, asset host confirmed |
+| 1 | RSM resolves O-5 … O-11. Feed indices added to `query.yaml` (§11) |
+| 2 | **FamilySight first** — 83 entries, simplest schema, unambiguous selection rule that is verified to survive migration, and its selector tag is inside the servlet's covered namespace. Proves the pipeline end to end |
 | 3 | **CorporateSight** — once O-7 is answered and the §2.2 impact on its catalogue is understood |
 | 4 | **Global** — largest and most complex; scope depends on O-5 |
-| 5 | Parallel run: new and old feeds served simultaneously, bucket-diff per §13.2, portal verification |
+| 5 | Parallel run: new and old feeds served simultaneously, field-level diff per §13.1 and bucket-diff per §13.2, portal verification |
 | 6 | Cutover |
 
 ---
 
 ## Appendix A — Reference material
 
-- AEM 6.5 feeds as inspected 2026-08-07 (archived alongside this document).
-- EDS index: `https://main--rsm-us--rsm-it-cmg.aem.page/en/query-index.json` (auth required).
-- DA source: `https://admin.da.live/source/rsm-it-cmg/rsm-us/…` (auth required).
-  Key files: `data/bios.json` (1,413 author records), `redirects.json` (4,788 redirects).
-- DA org sites: `rsm-us`, `rsm-ca`, `rsm-da`, `rsm-da-tools`, `rsm-review`, `rsm-seahawks`.
+| Resource | URL | Auth |
+| --- | --- | --- |
+| Tag taxonomy / crosswalk | `https://publish-p194552-e2014559.adobeaemcloud.com/services/tagsservlet` | **None — public** |
+| EDS index (US) | `https://main--rsm-us--rsm-it-cmg.aem.page/en/query-index.json` | Site token |
+| Index config (US) | `https://admin.hlx.page/config/rsm-it-cmg/sites/rsm-us/content/query.yaml` | `x-auth-token` |
+| Index config (Canada) | `https://admin.hlx.page/config/rsm-it-cmg/sites/rsm-ca/content/query.yaml` | `x-auth-token` |
+| DA source | `https://admin.da.live/source/rsm-it-cmg/rsm-us/…` | DA token |
+| — author bios | `…/rsm-us/data/bios.json` — 1,413 records | DA token |
+| — redirects | `…/rsm-us/redirects.json` — 4,788 entries | DA token |
+
+DA org sites: **`rsm-us`** (US — the source for all three current feeds), **`rsm-ca`**
+(Canada), plus `rsm-da`, `rsm-da-tools`, `rsm-review`, `rsm-seahawks`.
+
+Also referenced:
+
 - StreamX EDS publish pipeline POC: `arbory-digital-inc/arbory-dev` —
   `.github/workflows/streamx-publish.yaml`, `unpublish-from-streamx.yaml`, and the
   "Search: tags, categories and facets" section of `README.md`.
-- EDS index conventions: `sas-institute-corp/sas-da/helix-query.yaml`.
+- AEM 6.5 feeds as inspected 2026-08-07.
