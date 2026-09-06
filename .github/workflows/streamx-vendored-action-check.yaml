@@ -1,0 +1,39 @@
+# Guard the path-vendored copy of the StreamX connector action.
+#
+# This is the job a consuming repo needs when it holds its own copy of the
+# action rather than referencing one cross-repo. Two things can go wrong with a
+# copy, and neither announces itself:
+#
+#   1. Someone edits it and reintroduces a third-party `uses:`. That does not
+#      fail here — it fails wherever an actions allow-list is enforced, which
+#      may be a different org and a different week.
+#   2. It silently falls behind the source of truth. A `github-actions`
+#      Dependabot ecosystem will do this on its own, by bumping the
+#      `actions/setup-java` and `actions/cache` pins inside the vendored file.
+#
+# The first is caught here. The second needs the source repo's
+# sync-connector-action.sh --check, which cannot run from inside this repo
+# because the source lives elsewhere — so it is the source repo's job, and this
+# workflow deliberately does not pretend to cover it.
+name: Vendored StreamX action check
+
+on:
+  pull_request:
+    paths:
+      - '.github/actions/connector-github/**'
+  push:
+    paths:
+      - '.github/actions/connector-github/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  allowlist-safety:
+    name: Allow-list safety
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Assert the vendored action references no third-party actions
+        run: bash .github/actions/connector-github/check-allowlist-safety.sh
