@@ -1,0 +1,137 @@
+# Diagnostic workflow for "the connector says success but nothing is indexed".
+#
+# The publish path reports success at the point the ingestion API ACCEPTS a
+# CloudEvent. When the index then does not change, the question is which side of
+# that boundary the message is lost on, and the normal logs cannot answer it —
+# they stop at "sent successfully".
+#
+# Two jobs, which together split the problem in half:
+#
+#   probe-ingestion  Read-only. Asks the REST Ingestion Service about the channel
+#                    with the same credentials the connector uses. If this passes,
+#                    the token is valid, the channel exists, and the service is
+#                    reachable — so a lost message is lost INSIDE the mesh.
+#
+#   publish-debug    Runs the connector with debug-enabled, which sets
+#                    -Dquarkus.profile=debug and surfaces the actual request and
+#                    response instead of one success line.
+#
+# Delete this file once the incident is closed. It is a probe, not a fixture.
+name: StreamX debug probe
+
+on:
+  workflow_dispatch:
+    inputs:
+      page_path:
+        description: 'Page path to re-publish, e.g. /en/blog/aem-edge-delivery-architecture'
+        required: false
+        default: '/en/blog/aem-edge-delivery-architecture'
+        type: string
+      subject:
+        description: 'CloudEvent subject for that page'
+        required: false
+        default: 'en:/en/blog/aem-edge-delivery-architecture'
+        type: string
+      channel:
+        description: 'Ingestion channel to probe'
+        required: false
+        default: 'pages'
+        type: string
+      run_publish:
+        description: 'Also send a real CloudEvent with debug logging'
+        required: false
+        default: true
+        type: boolean
+
+permissions:
+  contents: read
+
+jobs:
+  probe-ingestion:
+    name: Probe the ingestion service (read-only)
+    runs-on: ubuntu-latest
+    steps:
+      # The token never leaves the runner and is never echoed. Only status codes
+      # and response bodies are printed, and the body of a schema response
+      # carries no secrets.
+      - name: Ask the ingestion service about the channel
+        env:
+          INGESTION_URL: ${{ vars.STREAMX_INGESTION_URL }}
+          TOKEN: ${{ secrets.STREAMX_INGESTION_GH_TOKEN }}
+          CHANNEL: ${{ inputs.channel }}
+        run: |
+          set -uo pipefail
+          echo "ingestion base: ${INGESTION_URL}"
+          if [ -z "${TOKEN}" ]; then
+            echo "::error::STREAMX_INGESTION_GH_TOKEN is empty in this repo."
+            exit 1
+          fi
+
+          probe() {
+            local method="$1" path="$2" auth="$3"
+            local url="${INGESTION_URL%/}${path}"
+            local args=(-sS -o /tmp/body.txt -w '%{http_code}' --max-time 30 -X "$method")
+            [ "$auth" = auth ] && args+=(-H "Authorization: Bearer ${TOKEN}")
+            local code
+            code="$(curl "${args[@]}" "$url" 2>/tmp/err.txt)" || code="000 ($(cat /tmp/err.txt))"
+            printf '  %-6s %-46s %-10s -> %s\n' "$method" "$path" "$auth" "$code"
+            if [ -s /tmp/body.txt ]; then
+              sed 's/^/        /' /tmp/body.txt | head -12
+            fi
+          }
+
+          echo
+          echo "=== health (no auth needed) ==="
+          probe GET  "/q/health" noauth
+
+          echo
+          echo "=== channel schema — the read-only question that matters ==="
+          echo "    200 here means: token valid, channel exists, service reachable."
+          echo "    Anything else points at the ingestion side rather than the mesh."
+          probe GET  "/ingestion/v1/channels/${CHANNEL}/schema" auth
+          probe GET  "/ingestion/v1/channels/${CHANNEL}/schema" noauth
+
+          echo
+          echo "=== the channel the mesh actually declares (sources.github -> inbox.pages) ==="
+          probe GET  "/ingestion/v1/channels/inbox.${CHANNEL}/schema" auth
+
+          echo
+          echo "=== channel listing, if the service exposes one ==="
+          probe GET  "/ingestion/v1/channels" auth
+
+  publish-debug:
+    name: Publish one page with debug logging
+    if: ${{ inputs.run_publish }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Show what is being sent where
+        run: |
+          echo "ingestion url : ${{ vars.STREAMX_INGESTION_URL }}"
+          echo "page url      : ${{ vars.EDS_DOMAIN_URL }}${{ inputs.page_path }}"
+          echo "subject       : ${{ inputs.subject }}"
+
+      - name: Run publish to StreamX with debug enabled
+        uses: arbory-digital-inc/arbory-streamx/.github/actions/connector-github@v1
+        env:
+          STREAMX_CONNECTION_SOCKET_TIMEOUT: 30000
+          STREAMX_CONNECTION_TIMEOUT: 3000
+        with:
+          source-provider: ExternalSourceProvider
+          streamx-ingestion-url: ${{ vars.STREAMX_INGESTION_URL }}
+          streamx-ingestion-token: ${{ secrets.STREAMX_INGESTION_GH_TOKEN }}
+          event-type: 'com.streamx.blueprints.page.published.v1'
+          event-data: '{"type": "page/eds"}'
+          external-resource-url: ${{ vars.EDS_DOMAIN_URL }}${{ inputs.page_path }}
+          subject: ${{ inputs.subject }}
+          debug-enabled: 'true'
+
+      - name: Did it reach the index?
+        if: always()
+        continue-on-error: true
+        uses: arbory-digital-inc/arbory-streamx/.github/actions/verify-indexed@v1
+        with:
+          delivery-url: ${{ vars.STREAMX_DELIVERY_URL }}
+          subject: ${{ inputs.subject }}
+          query: 'streamx'
+          timeout-seconds: '120'
+          poll-interval-seconds: '15'
