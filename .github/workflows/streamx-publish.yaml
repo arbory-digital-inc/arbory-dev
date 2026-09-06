@@ -45,6 +45,7 @@ jobs:
 
 
       - name: Run publish to StreamX
+        id: publish
         if: ${{ !(endsWith(steps.vars.outputs.streamx_subject, '/nav') ||
           endsWith(steps.vars.outputs.streamx_subject, '/footer')) }}
       # Internalized action. The upstream original
@@ -66,3 +67,21 @@ jobs:
           event-data: '{"type": "page/eds"}'
           external-resource-url: ${{ steps.vars.outputs.eds_page_url }}
           subject: ${{ steps.vars.outputs.streamx_subject }}
+
+      # The step above reports success when the ingestion API ACCEPTS the event.
+      # Indexing and edge replication happen afterwards, asynchronously, and
+      # nothing in this workflow would notice if they stopped — a broken pipeline
+      # and a working one produce the same green run. So the result is checked
+      # from outside, against the endpoint a reader's browser actually queries.
+      #
+      # This is an existence check: it proves the document is in the index. It
+      # does not prove THIS publish's text is in it, because a re-publish of an
+      # already-indexed page passes instantly. Proving freshness needs a term
+      # that only appears in the new content — that is what the canary is for.
+      - name: Confirm the page reached the search index
+        if: steps.publish.outcome == 'success'
+        uses: arbory-digital-inc/arbory-streamx/.github/actions/verify-indexed@v1
+        with:
+          delivery-url: ${{ vars.STREAMX_DELIVERY_URL }}
+          subject: ${{ steps.vars.outputs.streamx_subject }}
+          timeout-seconds: '300'
