@@ -1,0 +1,103 @@
+# Prove the internalized StreamX connector action works, under the same actions
+# allow-list a customer org enforces.
+#
+# WHY THIS EXISTS
+# ---------------
+# A customer's GitHub org restricts actions to "enterprise-owned, GitHub-authored,
+# or Marketplace-verified", so their workflows cannot call
+# streamx-hub/streamx-common-github-actions/.github/actions/connector-github@v1
+# at all. arbory-streamx now carries an internalized copy of that action with no
+# third-party `uses:` in it. This workflow is the rehearsal for moving a customer
+# repo onto that copy.
+#
+# It is a rehearsal, not a simulation: while it runs, this repository's own
+# actions permissions are set to `selected` with only GitHub-authored actions
+# allowed — the same shape as the customer's policy — so an external reference
+# genuinely fails here too. streamx-policy-control.yaml is the job that proves
+# the restriction is live; if THAT run is refused and the jobs below succeed,
+# the internalization works for the reason we think it does.
+#
+# Both consumption modes are exercised, because the customer may only be able to
+# have one of them:
+#   cross-repo     — the action stays in one place; the caller points at it
+#   path-vendored  — the action is copied into the calling repo
+#
+# The two jobs publish the SAME subject as the reference run
+# https://github.com/arbory-digital-inc/arbory-dev/actions/runs/33327673272
+# (`en:/en/blog/arbory-adobe-partner`). Re-publishing a page that is already
+# indexed is an upsert, so a green run here changes nothing in the index — and
+# the log is directly comparable, line for line, against the reference run made
+# through the external action.
+name: StreamX connector (internalized) test
+
+on:
+  push:
+    branches:
+      - test-internalized-connector
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  # The page the reference run published. Real, already indexed, so a re-publish
+  # is a no-op in effect while still exercising the whole path.
+  TEST_SUBJECT: 'en:/en/blog/arbory-adobe-partner'
+  TEST_PAGE_PATH: '/en/blog/arbory-adobe-partner'
+
+jobs:
+  # Mode 1: the action lives in another repo we own and is referenced by ref.
+  # This is the shape a customer should prefer — one copy, one place to bump.
+  cross-repo:
+    name: Cross-repo reference
+    runs-on: ubuntu-latest
+    steps:
+      - name: Publish via the internalized action in arbory-streamx
+        uses: arbory-digital-inc/arbory-streamx/.github/actions/connector-github@internalize-connector-action
+        env:
+          STREAMX_CONNECTION_SOCKET_TIMEOUT: 30000
+          STREAMX_CONNECTION_TIMEOUT: 3000
+        with:
+          source-provider: ExternalSourceProvider
+          streamx-ingestion-url: ${{ vars.STREAMX_INGESTION_URL }}
+          streamx-ingestion-token: ${{ secrets.STREAMX_INGESTION_GH_TOKEN }}
+          event-type: 'com.streamx.blueprints.page.published.v1'
+          event-data: '{"type": "page/eds"}'
+          external-resource-url: ${{ vars.EDS_DOMAIN_URL }}${{ env.TEST_PAGE_PATH }}
+          subject: ${{ env.TEST_SUBJECT }}
+
+  # Mode 2: the action is copied into this repo. Runs second so the two are not
+  # publishing the same subject at the same moment.
+  path-vendored:
+    name: Path-vendored reference
+    needs: cross-repo
+    runs-on: ubuntu-latest
+    steps:
+      # A local action that has not been checked out does not exist. Only the
+      # action directory is needed, so the checkout is sparse — worth doing on a
+      # customer's content repo, where a full checkout is not free.
+      - name: Check out the vendored action
+        uses: actions/checkout@v7
+        with:
+          sparse-checkout: .github/actions/connector-github
+
+      - name: Confirm the vendored copy is present
+        run: |
+          set -euo pipefail
+          ls -la .github/actions/connector-github/
+          cat .github/actions/connector-github/VENDORED-FROM.txt
+
+      - name: Publish via the local vendored copy
+        uses: ./.github/actions/connector-github
+        env:
+          STREAMX_CONNECTION_SOCKET_TIMEOUT: 30000
+          STREAMX_CONNECTION_TIMEOUT: 3000
+        with:
+          source-provider: ExternalSourceProvider
+          streamx-ingestion-url: ${{ vars.STREAMX_INGESTION_URL }}
+          streamx-ingestion-token: ${{ secrets.STREAMX_INGESTION_GH_TOKEN }}
+          event-type: 'com.streamx.blueprints.page.published.v1'
+          event-data: '{"type": "page/eds"}'
+          external-resource-url: ${{ vars.EDS_DOMAIN_URL }}${{ env.TEST_PAGE_PATH }}
+          subject: ${{ env.TEST_SUBJECT }}

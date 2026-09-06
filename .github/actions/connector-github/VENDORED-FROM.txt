@@ -1,0 +1,15 @@
+This directory is a vendored copy. Do not edit it here.
+
+Source repo:   git@github-arbory:arbory-digital-inc/arbory-streamx.git
+Source path:   .github/actions/connector-github
+Source commit: bcabd8e4ee2b1cd94271f0f9705fe4f244169b8a
+Synced by:     scripts/vendor/sync-connector-action.sh
+Synced at:     2026-09-06T18:28:34Z
+
+Edit the source, then re-run the sync script. To detect drift in CI:
+    sync-connector-action.sh <this-repo-root> --check
+
+sha256:
+  c2b41afe8605068c35ba552baf4b1a766760afa1855500fdedd4d0c4f680190d  action.yml
+  b718c795f719acd1918c7408c3eadcb8af34961b0789e9dfe5e0556d61b1af7a  install-jbang.sh
+  fd00e8e69258c5253baae403b114fb0a3a4bf57d59f13455a46c63a6ed8fed87  README.md

@@ -1,0 +1,48 @@
+# The control for streamx-internalized-test.yaml. THIS RUN IS MEANT TO FAIL.
+#
+# While the internalization is being rehearsed, this repository's actions
+# permissions are set to `selected` with only GitHub-authored actions allowed —
+# the same shape as the customer org's policy. This workflow references the
+# external upstream action, so it should be refused with exactly the error the
+# customer hit:
+#
+#   The action streamx-hub/streamx-common-github-actions/.github/actions/
+#   connector-github@v1 is not allowed in <org>/<repo> because all actions must
+#   be from a repository owned by your enterprise, created by GitHub, or
+#   verified in the GitHub Marketplace.
+#
+# A green run here means the restriction is NOT in force, which makes the test
+# alongside it meaningless — it would only have proved the internalized action
+# works, not that it works where the external one cannot. So: red is the pass.
+#
+# It is a separate file on purpose. A refusal can take down a whole workflow
+# run, and it must not be able to take the real test with it.
+#
+# Kept in the repo after the rehearsal so the check can be repeated; it does
+# nothing unless the restrictive policy is applied again.
+name: StreamX connector policy control (expected to fail)
+
+on:
+  push:
+    branches:
+      - test-internalized-connector
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  external-action-must-be-refused:
+    name: External action reference (must be refused)
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      # No `with:` — this must never get far enough to send anything. The point
+      # is whether GitHub lets the reference resolve at all.
+      - name: Reference the upstream external action
+        continue-on-error: true
+        uses: streamx-hub/streamx-common-github-actions/.github/actions/connector-github@v1
+        with:
+          streamx-ingestion-url: 'https://example.invalid'
+          event-type: 'com.streamx.blueprints.page.published.v1'
+          subject: 'policy-control/never-sent'
