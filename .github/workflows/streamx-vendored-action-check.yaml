@@ -15,15 +15,17 @@
 # sync-connector-action.sh --check, which cannot run from inside this repo
 # because the source lives elsewhere — so it is the source repo's job, and this
 # workflow deliberately does not pretend to cover it.
-name: Vendored StreamX action check
+name: Vendored StreamX actions check
 
 on:
   pull_request:
     paths:
       - '.github/actions/connector-github/**'
+      - '.github/actions/verify-indexed/**'
   push:
     paths:
       - '.github/actions/connector-github/**'
+      - '.github/actions/verify-indexed/**'
   workflow_dispatch:
 
 permissions:
@@ -35,5 +37,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - name: Assert the vendored action references no third-party actions
-        run: bash .github/actions/connector-github/check-allowlist-safety.sh
+      # Both vendored actions, named explicitly: the script defaults to the
+      # directory it sits in, which would silently check only one of them.
+      - name: Assert the vendored actions reference no third-party actions
+        run: |
+          bash .github/actions/connector-github/check-allowlist-safety.sh \
+            .github/actions/connector-github \
+            .github/actions/verify-indexed

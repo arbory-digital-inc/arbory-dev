@@ -1,0 +1,69 @@
+# Ask whether a page is in the StreamX search index, on demand.
+#
+# The publish and unpublish workflows check themselves automatically. This is the
+# manual counterpart: for confirming a specific page after a bulk publish, for
+# checking something a reader says they cannot find, and for proving a content
+# UPDATE landed rather than merely that the document exists.
+#
+# That last one is the distinction worth understanding before using this. Leaving
+# `query` empty asks "is this document indexed at all", which a re-publish
+# satisfies instantly. Supplying a term that appears ONLY in the new text asks
+# "did this edit reach the index" — the question people usually mean.
+name: Is it in StreamX?
+
+on:
+  workflow_dispatch:
+    inputs:
+      subject:
+        description: 'CloudEvent subject / document id, e.g. en:/en/blog/my-page'
+        required: true
+        type: string
+      query:
+        description: 'Optional search term. Leave empty to check existence; set it to a word only in the NEW content to prove an update landed.'
+        required: false
+        type: string
+      expect:
+        description: 'Whether the document should be there'
+        required: false
+        default: present
+        type: choice
+        options: [present, absent]
+      timeout-seconds:
+        description: 'How long to keep polling'
+        required: false
+        default: '120'
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: Check the index
+    runs-on: ubuntu-latest
+    steps:
+      - name: Query the StreamX index
+        id: check
+        uses: arbory-digital-inc/arbory-streamx/.github/actions/verify-indexed@v1
+        with:
+          delivery-url: ${{ vars.STREAMX_DELIVERY_URL }}
+          subject: ${{ inputs.subject }}
+          query: ${{ inputs.query }}
+          expect: ${{ inputs.expect }}
+          timeout-seconds: ${{ inputs.timeout-seconds }}
+
+      - name: Summary
+        if: always()
+        run: |
+          {
+            echo "### StreamX index check"
+            echo
+            echo "| | |"
+            echo "| --- | --- |"
+            echo "| subject | \`${{ inputs.subject }}\` |"
+            echo "| query | ${{ inputs.query == '' && '_(existence check — content-independent)_' || format('`{0}`', inputs.query) }} |"
+            echo "| expected | ${{ inputs.expect }} |"
+            echo "| found | ${{ steps.check.outputs.found || 'n/a' }} |"
+            echo "| documents matched | ${{ steps.check.outputs.total-hits || 'n/a' }} |"
+            echo "| time to satisfy | ${{ steps.check.outputs.elapsed-seconds || 'n/a' }}s |"
+          } >> "$GITHUB_STEP_SUMMARY"

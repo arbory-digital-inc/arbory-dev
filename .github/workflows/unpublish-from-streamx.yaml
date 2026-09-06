@@ -44,6 +44,7 @@ jobs:
       # no longer defines, plus STREAMX_INGESTION_EDS_TOKEN, which fails auth -
       # so unpublished pages were never removed from the search index.
       - name: Run unpublish from StreamX
+        id: unpublish
       # Internalized action. The upstream original
       # (streamx-hub/streamx-common-github-actions/.github/actions/connector-github@v1)
       # is refused outright in an org whose actions allow-list is limited to
@@ -60,3 +61,22 @@ jobs:
           streamx-ingestion-token: ${{ secrets.STREAMX_INGESTION_GH_TOKEN }}
           event-type: 'com.streamx.blueprints.page.unpublished.v1'
           subject: ${{ steps.vars.outputs.streamx_subject }}
+
+      # The mirror of the publish check, and the more valuable of the two. An
+      # unpublish whose subject does not match the one the publish built targets
+      # a document that does not exist: the connector reports success, the job
+      # goes green, and the page stays searchable forever. That has already
+      # happened once in this repo's history — see the note above about the
+      # namespace prefix. Nothing but an outside check catches it.
+      #
+      # No query here on purpose: a document missing from a query's results may
+      # simply not match it, so only the content-independent existence check is
+      # evidence of removal.
+      - name: Confirm the page left the search index
+        if: steps.unpublish.outcome == 'success'
+        uses: arbory-digital-inc/arbory-streamx/.github/actions/verify-indexed@v1
+        with:
+          delivery-url: ${{ vars.STREAMX_DELIVERY_URL }}
+          subject: ${{ steps.vars.outputs.streamx_subject }}
+          expect: absent
+          timeout-seconds: '300'
