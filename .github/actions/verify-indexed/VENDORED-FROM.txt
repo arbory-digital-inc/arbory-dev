@@ -2,15 +2,15 @@ This directory is a vendored copy. Do not edit it here.
 
 Source repo:   git@github-arbory:arbory-digital-inc/arbory-streamx.git
 Source path:   .github/actions/verify-indexed
-Source commit: 84e710d1dd5e149237cb769b2ad0637a86c0724e
+Source commit: cd0ab386e5dc10fa09fa9425968837e341523e55
 Synced by:     scripts/vendor/sync-vendored-action.sh
-Synced at:     2026-09-06T19:17:59Z
+Synced at:     2026-09-06T19:35:19Z
 
 Edit the source, then re-run the sync script. To detect drift in CI:
     sync-vendored-action.sh <this-repo-root> --check
 
 sha256:
-  4bbca5646f54be908fdfba76459d0f5a38055329fb6b8d807ee32b089e7dc9f1  action.yml
-  95c272dc54a344ad141f5277b01f13afec7b3c59b3b58db9371dd2f5ea1cf9e5  README.md
-  b9bddb1ed2514f9f1bc2b5182fe69cb67eeb75a8cb6ca1542b47b9ad824effcb  verify-indexed.sh
+  15e3a48c26a98abe58995216a9af5c66ee0cfadc00fa6be2049a258bb7c56abc  action.yml
+  52b1240fd63c0535a8730ec3845a8b44f7d76aa765e8978314b691e910241c30  README.md
+  6613572e580d219c3c64286144ab165d836d9a4283ad18269fbb9b6ba5fc81d2  verify-indexed.sh
   24eba31380f9d5ad2724993007348f2220a217af1382007d2bb818cc7fd7d1c5  check-allowlist-safety.sh

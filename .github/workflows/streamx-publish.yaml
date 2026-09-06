@@ -44,6 +44,23 @@ jobs:
           echo "CloudEvent subject: ${streamx_subject}"
 
 
+      # Read the document's freshness stamp BEFORE publishing, so the check
+      # afterwards can require it to have changed. Without a baseline the check
+      # can only ask "is this page in the index", which any previously-published
+      # page satisfies instantly — it would go green even while StreamX is
+      # accepting events and applying none of them.
+      #
+      # This never fails the job: no baseline just means the check downgrades to
+      # existence and says so.
+      - name: Read the current index state
+        id: baseline
+        continue-on-error: true
+        uses: arbory-digital-inc/arbory-streamx/.github/actions/verify-indexed@v1
+        with:
+          delivery-url: ${{ vars.STREAMX_DELIVERY_URL }}
+          subject: ${{ steps.vars.outputs.streamx_subject }}
+          mode: read
+
       - name: Run publish to StreamX
         id: publish
         if: ${{ !(endsWith(steps.vars.outputs.streamx_subject, '/nav') ||
@@ -74,14 +91,20 @@ jobs:
       # and a working one produce the same green run. So the result is checked
       # from outside, against the endpoint a reader's browser actually queries.
       #
-      # This is an existence check: it proves the document is in the index. It
-      # does not prove THIS publish's text is in it, because a re-publish of an
-      # already-indexed page passes instantly. Proving freshness needs a term
-      # that only appears in the new content — that is what the canary is for.
+      # Passing the pre-publish stamp turns this from "is the page in the index"
+      # into "was the page re-indexed by THIS publish" — the difference between a
+      # check that passes whatever happens and one that catches StreamX accepting
+      # events without applying them.
+      #
+      # The stamp is only visible once the search template projects
+      # payload.ingested (V1.0.0.7.6 in arbory-streamx, which needs a mesh
+      # deploy). Until then the action warns and falls back to an existence
+      # check, which is weaker but still catches a page that never indexed at all.
       - name: Confirm the page reached the search index
         if: steps.publish.outcome == 'success'
         uses: arbory-digital-inc/arbory-streamx/.github/actions/verify-indexed@v1
         with:
           delivery-url: ${{ vars.STREAMX_DELIVERY_URL }}
           subject: ${{ steps.vars.outputs.streamx_subject }}
+          previous-ingested: ${{ steps.baseline.outputs.ingested }}
           timeout-seconds: '300'

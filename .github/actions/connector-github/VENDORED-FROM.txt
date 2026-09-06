@@ -2,9 +2,9 @@ This directory is a vendored copy. Do not edit it here.
 
 Source repo:   git@github-arbory:arbory-digital-inc/arbory-streamx.git
 Source path:   .github/actions/connector-github
-Source commit: 84e710d1dd5e149237cb769b2ad0637a86c0724e
+Source commit: cd0ab386e5dc10fa09fa9425968837e341523e55
 Synced by:     scripts/vendor/sync-vendored-action.sh
-Synced at:     2026-09-06T19:17:59Z
+Synced at:     2026-09-06T19:35:19Z
 
 Edit the source, then re-run the sync script. To detect drift in CI:
     sync-vendored-action.sh <this-repo-root> --check
