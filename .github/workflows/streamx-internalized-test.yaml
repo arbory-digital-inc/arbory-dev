@@ -54,7 +54,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Publish via the internalized action in arbory-streamx
-        uses: arbory-digital-inc/arbory-streamx/.github/actions/connector-github@internalize-connector-action
+        uses: arbory-digital-inc/arbory-streamx/.github/actions/connector-github@v1
         env:
           STREAMX_CONNECTION_SOCKET_TIMEOUT: 30000
           STREAMX_CONNECTION_TIMEOUT: 3000

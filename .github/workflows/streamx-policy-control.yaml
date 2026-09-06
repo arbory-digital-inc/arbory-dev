@@ -23,9 +23,6 @@
 name: StreamX connector policy control (expected to fail)
 
 on:
-  push:
-    branches:
-      - test-internalized-connector
   workflow_dispatch:
 
 permissions:
